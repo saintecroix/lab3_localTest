@@ -1,0 +1,132 @@
+{{template "base" .}}
+
+{{define "title"}}Поиск по одному атрибуту{{end}}
+
+{{define "main"}}
+    <label>Поиск по одному атрибуту: </label>
+    <form action="/soloSearch" method="post">
+    <select id="Goods" name="Goods">
+        <option value="">Выберите атрибут</option>
+        <!--<option value="eNumber">Номер заявки</option>
+        <option value="eReg_date">Дата регистрации</option>-->
+        <option value="Status">Статус заявки</option>
+        <!--<option value="eProvide_date">Дата подачи вагона</option>
+        <option value="eDeparture_type">Вид отправления</option>-->
+        <option value="Goods">Наименование груза</option>
+        <option value="Origin_state">Государство отправления</option>
+        <option value="Enter_station">Станция входа на Россию</option>
+        <option value="Region_depart">Область отправления</option>
+        <option value="Road_depart">Дорога отправления</option>
+        <option value="Station_depart">Станция отправления</option>
+        <option value="Consigner">Грузоотправитель</option>
+        <option value="State_destination">Государство назначения</option>
+        <option value="Exit_station">Станция выхода из России</option>
+        <option value="Region_destination">Область назначения</option>
+        <option value="Road_destination">Дорога назначения</option>
+        <option value="Station_destination">Станция назначения</option>
+        <option value="Consignee">Грузополучатель</option>
+        <option value="Wagon_type">Тип вагона</option>
+        <!--<option value="eProperty">Призн собств вагона</option>
+        <option value="eWagon_owner">Собственник вагона</option>
+        <option value="ePayer">Плательщик</option>
+        <option value="eRoad_owner">Владелец пути необщего пользования</option>
+        <option value="eTransport_manager">Организация перевозки в порту</option>
+        <option value="eTons_declared">Тонн заявлено</option>
+        <option value="eTons_accepted">Тонн принято</option>
+        <option value="eWagon_declared">Вагонов(контейнеров) заявлено</option>
+        <option value="eWagon_accepted">Вагонов(контейнеров) принято</option>
+        <option value="eFiling_date">Дата подачи заявления</option>
+        <option value="eAgreement_date">Дата начала согласования</option>
+        <option value="eApproval_date">Дата утверждения</option>
+        <option value="eStop_date">Дата окончания действия</option>-->
+    </select>
+    <p>
+        <label id="ltext"  style="display: none;" for="text">Введите наименование: </label><input type="text" id="text" name="searchText" style="display: none;">
+    </p>
+    <p>
+        <input type="submit" value="Поиск"/>
+    </p>
+    </form>
+    {{if .Rez}}
+<div id="table-wrapper" >
+    <table>
+        <thead>
+        <tr>
+            <th scope="col">Номер заявки</th>
+            <th scope="col">Дата регистрации</th>
+            <th scope="col">Статус</th>
+            <th scope="col">Дата подачи вагона</th>
+            <th scope="col">Вид отправления</th>
+            <th scope="col">Наименование груза</th>
+            <th scope="col">Государство отправления</th>
+            <th scope="col">Станция входа на Россию</th>
+            <th scope="col">Область отправления</th>
+            <th scope="col">Дорога отправления</th>
+            <th scope="col">Станция отправления</th>
+            <th scope="col">Грузоотправитель</th>
+            <th scope="col">Государство назначения</th>
+            <th scope="col">Станция выхода из России</th>
+            <th scope="col">Область назначения</th>
+            <th scope="col">Дорога назначения</th>
+            <th scope="col">Станция назначения</th>
+            <th scope="col">Грузополучатель</th>
+            <th scope="col">Тип вагона</th>
+            <th scope="col">Призн собств вагона</th>
+            <th scope="col">Собственник вагона</th>
+            <th scope="col">Плательщик</th>
+            <th scope="col">Владелец пути необщего пользования</th>
+            <th scope="col">Организация перевозки в порту</th>
+            <th scope="col">Тонн заявлено</th>
+            <th scope="col">Тонн принято</th>
+            <th scope="col">Вагонов(контейнеров) заявлено</th>
+            <th scope="col">Вагонов(контейнеров) принято</th>
+            <th scope="col">Дата подачи заявления</th>
+            <th scope="col">Дата начала согласования</th>
+            <th scope="col">Дата утверждения</th>
+            <th scope="col">Дата начала действия</th>
+            <th scope="col">Дата окончания действия</th>
+        </tr>
+        </thead>
+        <tbody>
+        {{ range .Rez }}
+        <tr>
+            <td data-label="Номер заявки">{{ .Number }}</td>
+            <td data-label="Дата регистрации">{{ .Reg_date }}</td>
+            <td data-label="Статус">{{ .Status }}</td>
+            <td data-label="Дата подачи вагона">{{ .Provide_date }}</td>
+            <td data-label="Вид отправления">{{ .Departure_type }}</td>
+            <td data-label="Наименование груза">{{ .Goods }}</td>
+            <td data-label="Государство отправления">{{ .Origin_state }}</td>
+            <td data-label="Станция входа на Россию">{{ .Enter_station }}</td>
+            <td data-label="Область отправления">{{ .Region_depart }}</td>
+            <td data-label="Дорога отправления">{{ .Road_depart }}</td>
+            <td data-label="Станция отправления">{{ .Station_depart }}</td>
+            <td data-label="Грузоотправитель">{{ .Consigner }}</td>
+            <td data-label="Государство назначения">{{ .State_destination }}</td>
+            <td data-label="Станция выхода из России">{{ .Exit_station }}</td>
+            <td data-label="Область назначения">{{ .Region_destination }}</td>
+            <td data-label="Дорога назначения">{{ .Road_destination }}</td>
+            <td data-label="Станция назначения">{{ .Station_destination }}</td>
+            <td data-label="Грузополучатель">{{ .Consignee }}</td>
+            <td data-label="Тип вагона">{{ .Wagon_type }}</td>
+            <td data-label="Призн собств вагона">{{ .Property }}</td>
+            <td data-label="Собственник вагона">{{ .Wagon_owner }}</td>
+            <td data-label="Плательщик">{{ .Payer }}</td>
+            <td data-label="Владелец пути необщего пользования">{{ .Road_owner }}</td>
+            <td data-label="Организация перевозки в порту">{{ .Transport_manager }}</td>
+            <td data-label="Тонн заявлено">{{ .Tons_declared }}</td>
+            <td data-label="Тонн принято">{{ .Tons_accepted }}</td>
+            <td data-label="Вагонов(контейнеров) заявлено">{{ .Wagon_declared }}</td>
+            <td data-label="Вагонов(контейнеров) принято">{{ .Wagon_accepted }}</td>
+            <td data-label="Дата подачи заявления">{{ .Filing_date }}</td>
+            <td data-label="Дата начала согласования">{{ .Agreement_date }}</td>
+            <td data-label="Дата утверждения">{{ .Approval_date }}</td>
+            <td data-label="Дата начала действия">{{ .Start_date }}</td>
+            <td data-label="Дата окончания действия">{{ .Stop_date }}</td>
+        </tr>
+        {{end}}
+        </tbody>
+    </table>
+</div>
+{{end}}
+{{end}}

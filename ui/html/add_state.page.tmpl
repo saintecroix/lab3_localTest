@@ -1,0 +1,34 @@
+{{template "base" .}}
+
+{{define "title"}}Добавление страны{{end}}
+
+{{define "main"}}
+<h2>Добавление страны</h2>
+<form action="/save_state" method="post">
+    <p>
+        <label>Наименование страны: </label>
+        <input type="text" id="Name" name="Name" required minlength="1" size="10" />
+        <t>Например: РОССИЯ</t>
+    </p>
+    <input type="submit" value="Добавить страну" class="glo"/>
+</form>
+
+<div id="table-wrapper">
+    <table>
+        <caption>Таблица стран</caption>
+        <thead>
+        <tr>
+            <th scope="col">Наименование</th>
+        </tr>
+        </thead>
+        <tbody>
+        {{ range .State }}
+        <tr>
+            <td data-label="Наименование">{{ .Name }}</td>
+        </tr>
+        {{ end }}
+        </tbody>
+    </table>
+</div>
+
+{{end}}

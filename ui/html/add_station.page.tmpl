@@ -1,0 +1,48 @@
+{{template "base" .}}
+
+{{define "title"}}Добавление станции{{end}}
+
+{{define "main"}}
+<h2>Добавление станции</h2>
+<form action="/save_state" method="post">
+    <p>
+        <label>Наименование станции: </label>
+        <input type="text" id="Name" name="Name" required minlength="1" size="10" />
+        <t>Например: ПЕТРОЗАВОДСК</t>
+    </p>
+    <p>
+        <label>Код ESR: </label>
+        <input type="text" id="ESR" name="ESR" required size="10" />
+        <t>Например: 010002. Должен состоять исключительно из шести цифр</t>
+    </p>
+    <p>
+        <label>Дорога: </label>
+        <input type="text" id="Road" name="Road" required size="10" />
+        <t>Например: ОКТ. Должна состоять исключительно из трех букв</t>
+    </p>
+    <input type="submit" value="Добавить станцию" class="glo"/>
+</form>
+
+<div id="table-wrapper">
+    <table>
+        <caption>Таблица станций</caption>
+        <thead>
+        <tr>
+            <th scope="col">Наименование</th>
+            <th scope="col">Код ESR</th>
+            <th scope="col">Дорога</th>
+        </tr>
+        </thead>
+        <tbody>
+        {{ range .Station }}
+        <tr>
+            <td data-label="Наименование">{{ .Name }}</td>
+            <td data-label="Код ESR">{{ .ESR }}</td>
+            <td data-label="Дорога">{{ .Road }}</td>
+        </tr>
+        {{ end }}
+        </tbody>
+    </table>
+</div>
+
+{{end}}

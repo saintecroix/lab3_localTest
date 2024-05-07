@@ -1,0 +1,50 @@
+{{template "base" .}}
+
+{{define "title"}}Добавление груза{{end}}
+
+{{define "main"}}
+<h2>Добавление груза</h2>
+<form action="/save_gruz" method="post">
+    <p>
+        <label>Наименование груза: </label>
+        <input type="text" id="Name" name="Name" required minlength="1" size="10" />
+        <t>Например: УГОЛЬ Д</t>
+    </p>
+    <p>
+        <label>Код ЕТСНГ: </label>
+        <input type="number" id="ETSNG" name="ETSNG" required minlength="6" maxlength="6" size="10" />
+        <t>Например: 016112. Должен состоять исключительно из шести цифр</t>
+    </p>
+    <p>
+        <label>Код ГНГ: </label>
+        <input type="number" id="GNG" name="GNG" required minlength="8" maxlength="8" size="10" />
+        <t>Например: 27011290. Должен состоять исключительно из восьми цифр</t>
+    </p>
+    <input type="submit" value="Добавить груз" class="glo"/>
+
+
+</form>
+
+<div id="table-wrapper">
+    <table>
+        <caption>Таблица грузов</caption>
+        <thead>
+        <tr>
+            <th scope="col">Наименование</th>
+            <th scope="col">Код ETSNG</th>
+            <th scope="col">Код GNG</th>
+        </tr>
+        </thead>
+        <tbody>
+        {{ range .Gruz }}
+        <tr>
+            <td data-label="Наименование">{{ .Name }}</td>
+            <td data-label="Код ETSNG">{{ .ETSNG }}</td>
+            <td data-label="Код GNG">{{ .GNG }}</td>
+        </tr>
+        {{ end }}
+        </tbody>
+    </table>
+</div>
+
+{{end}}

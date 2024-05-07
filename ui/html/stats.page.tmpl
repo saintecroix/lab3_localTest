@@ -1,0 +1,71 @@
+{{template "base" .}}
+
+{{define "title"}}Статистика{{end}}
+
+{{define "main"}}
+<h2>Статистика</h2>
+<div id="table-wrapper">
+    <p>
+        <label>Средний уровень грузоперевозок по месяцам: </label>
+    </p>
+        <table>
+            <thead>
+            <tr>
+                <th scope="col">Месяц</th>
+                <th scope="col">Средний уровень транпортировок</th>
+            </tr>
+            </thead>
+            <tbody>
+            {{ range .AvgRez }}
+            <tr>
+                <td data-label="Месяц">{{ .Month_reg_date }}</td>
+                <td data-label="Средний уровень транпортировок">{{ .Avg_transport_level }}</td>
+            </tr>
+            {{ end }}
+            </tbody>
+        </table><p><label> </label></p><p><label> </label></p>
+    <p>
+        <label>Популярные направления для транспортировок: </label>
+    </p>
+        <table>
+            <thead>
+            <tr>
+                <th scope="col">Дорога отправления</th>
+                <th scope="col">Дорога прибытия</th>
+                <th scope="col">Кол-во транспортировок</th>
+            </tr>
+            </thead>
+            <tbody>
+            {{ range .RezRoad }}
+            <tr>
+                <td data-label="Дорога отправления">{{ .FrstRoad }}</td>
+                <td data-label="Дорога прибытия">{{ .SecRoad }}</td>
+                <td data-label="Кол-во транспортировок">{{ .Usage }}</td>
+            </tr>
+            {{ end }}
+            </tbody>
+        </table><p><label> </label></p><p><label> </label></p>
+    <p>
+        <label>Направления, по которым возят ключевые грузоотправители: </label>
+    </p>
+    <table>
+        <thead>
+        <tr>
+            <th scope="col">Область отправления</th>
+            <th scope="col">Область прибытия</th>
+            <th scope="col">Кол-во транспортировок</th>
+        </tr>
+        </thead>
+        <tbody>
+        {{ range .RezReg }}
+        <tr>
+            <td data-label="Область отправления">{{ .FrstReg }}</td>
+            <td data-label="Область прибытия">{{ .SecReg }}</td>
+            <td data-label="Кол-во транспортировок">{{ .Usages }}</td>
+        </tr>
+        {{ end }}
+        </tbody>
+    </table>
+</div>
+
+{{end}}

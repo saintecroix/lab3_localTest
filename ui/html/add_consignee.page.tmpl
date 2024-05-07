@@ -1,0 +1,47 @@
+{{template "base" .}}
+
+{{define "title"}}Добавление грузоотправителя/грузополучателя{{end}}
+
+{{define "main"}}
+<h2>Добавление грузоотправителя/грузополучателя</h2>
+<form action="/save_consignee" method="post">
+    <p>
+        <label>Наименование грузоотправителя/грузополучателя: </label>
+        <input type="text" id="Name" name="Name" required minlength="1" size="16" />
+        <t>Например: АО 4К</t>
+    </p>
+    <p>
+        <label>Код ОКПО: </label>
+        <input type="text" id="OKPO" name="OKPO" required minlength="8" maxlength="8" size="16" />
+        <t>Например: 05888740</t>
+    </p>
+    <p>
+        <label>Являлся ли грузоотправителем: </label>
+        <input type="checkbox" id="Was_sender" name="Was_sender" value="true"/>
+    </p>
+    <input type="submit" value="Добавить грузоотправителя/грузополучателя" class="glo"/>
+</form>
+
+<div id="table-wrapper">
+    <table>
+        <caption>Таблица грузоотправителя/грузополучателя</caption>
+        <thead>
+        <tr>
+            <th scope="col">Наименование</th>
+            <th scope="col">Код ОКПО</th>
+            <th scope="col">Являлся ли грузоотправителем</th>
+        </tr>
+        </thead>
+        <tbody>
+        {{ range .Consignee }}
+        <tr>
+            <td data-label="Наименование">{{ .Name }}</td>
+            <td data-label="Код ОКПО">{{ .OKPO }}</td>
+            <td data-label="Являлся ли грузоотправителем"><input type="checkbox" onclick="return false;" {{ if eq .Was_sender 1 }} checked {{ end }} /></td>
+        </tr>
+        {{ end }}
+        </tbody>
+    </table>
+</div>
+
+{{end}}

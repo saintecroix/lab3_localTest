@@ -1,0 +1,69 @@
+{{template "base" .}}
+
+{{define "title"}}Поиск по двум атрибутам{{end}}
+
+{{define "main"}}
+<label>Поиск по двум атрибутам: </label>
+<form id="my-form">
+    <label>Первый атрибут: </label>
+    <select id="Duos" name="Duos">
+        <option value="">Выберите тип вагонов</option>
+        {{ range .Wagon }}
+        <option value="{{ .Id }}">{{ .Name }}</option>
+        {{ end }}
+    </select>
+    <p></p>
+    <p>
+        <label>Второй атрибут: </label>
+        <select id="Gruz-list" name="gruz-list">
+            <option value="">Выберите тип груза</option>
+        </select>
+    </p>
+    <p>
+        <input id="search-button" type="submit" value="Поиск"/>
+    </p>
+</form>
+<div id="table-wrapper" >
+    <table>
+        <thead>
+        <tr>
+            <th scope="col">Номер заявки</th>
+            <th scope="col">Дата регистрации</th>
+            <th scope="col">Статус</th>
+            <th scope="col">Дата подачи вагона</th>
+            <th scope="col">Вид отправления</th>
+            <th scope="col">Наименование груза</th>
+            <th scope="col">Государство отправления</th>
+            <th scope="col">Станция входа на Россию</th>
+            <th scope="col">Область отправления</th>
+            <th scope="col">Дорога отправления</th>
+            <th scope="col">Станция отправления</th>
+            <th scope="col">Грузоотправитель</th>
+            <th scope="col">Государство назначения</th>
+            <th scope="col">Станция выхода из России</th>
+            <th scope="col">Область назначения</th>
+            <th scope="col">Дорога назначения</th>
+            <th scope="col">Станция назначения</th>
+            <th scope="col">Грузополучатель</th>
+            <th scope="col">Тип вагона</th>
+            <th scope="col">Призн собств вагона</th>
+            <th scope="col">Собственник вагона</th>
+            <th scope="col">Плательщик</th>
+            <th scope="col">Владелец пути необщего пользования</th>
+            <th scope="col">Организация перевозки в порту</th>
+            <th scope="col">Тонн заявлено</th>
+            <th scope="col">Тонн принято</th>
+            <th scope="col">Вагонов(контейнеров) заявлено</th>
+            <th scope="col">Вагонов(контейнеров) принято</th>
+            <th scope="col">Дата подачи заявления</th>
+            <th scope="col">Дата начала согласования</th>
+            <th scope="col">Дата утверждения</th>
+            <th scope="col">Дата начала действия</th>
+            <th scope="col">Дата окончания действия</th>
+        </tr>
+        </thead>
+        <tbody id="app-table-body">
+        </tbody>
+    </table>
+</div>
+{{end}}

@@ -1,0 +1,41 @@
+{{template "base" .}}
+
+{{define "title"}}Добавление дороги{{end}}
+
+{{define "main"}}
+<h2>Добавление дороги</h2>
+<form action="/save_road" method="post">
+    <p>
+        <label>Наименование дороги: </label>
+        <input type="text" id="Name" name="Name" required minlength="3" maxlength="3" size="16" />
+        <t>Например: ЮУР</t>
+    </p>
+    <p>
+        <label>Длина дороги: </label>
+        <input type="number" id="Length" name="Length" required size="16" />
+        <t>Например: 4545</t>
+    </p>
+    <input type="submit" value="Добавить дорогу" class="glo"/>
+</form>
+
+<div id="table-wrapper">
+    <table>
+        <caption>Таблица дорог</caption>
+        <thead>
+        <tr>
+            <th scope="col">Наименование</th>
+            <th scope="col">Длина</th>
+        </tr>
+        </thead>
+        <tbody>
+        {{ range .Road }}
+        <tr>
+            <td data-label="Наименование">{{ .Name }}</td>
+            <td data-label="Длина">{{ .Length }}</td>
+        </tr>
+        {{ end }}
+        </tbody>
+    </table>
+</div>
+
+{{end}}
