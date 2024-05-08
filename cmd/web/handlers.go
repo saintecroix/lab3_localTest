@@ -250,6 +250,7 @@ func (app *application) home(w http.ResponseWriter, r *http.Request) {
 	err = ts.Execute(w, nil)
 	if err != nil {
 		app.serverError(w, err) // Использование помощника serverError()
+		return
 	}
 }
 
@@ -262,11 +263,7 @@ func (app *application) input(w http.ResponseWriter, r *http.Request) {
 		"./ui/html/footer.partial.tmpl",
 	}
 
-	db, errsql := sql.Open("mysql", "root:@tcp(127.0.0.1:3306)/lab3")
-	if errsql != nil {
-		panic(errsql)
-	}
-
+	db := dbConnection()
 	defer db.Close()
 
 	ts, err := template.ParseFiles(files...)
@@ -316,11 +313,7 @@ func (app *application) save_application(w http.ResponseWriter, r *http.Request)
 	start_date := r.FormValue("Start_date")
 	stop_date := r.FormValue("Stop_date")
 
-	db, errsql := sql.Open("mysql", "root:@tcp(127.0.0.1:3306)/lab3")
-	if errsql != nil {
-		panic(errsql)
-	}
-
+	db := dbConnection()
 	defer db.Close()
 
 	goods, _ := strconv.Atoi(r.FormValue("Goods"))
@@ -382,11 +375,7 @@ func (app *application) addGruz(w http.ResponseWriter, r *http.Request) {
 		"./ui/html/footer.partial.tmpl",
 	}
 
-	db, errsql := sql.Open("mysql", "root:@tcp(127.0.0.1:3306)/lab3")
-	if errsql != nil {
-		panic(errsql)
-	}
-
+	db := dbConnection()
 	defer db.Close()
 
 	ts, err := template.ParseFiles(files...)
@@ -413,11 +402,7 @@ func (app *application) save_gruz(w http.ResponseWriter, r *http.Request) {
 	etsng := r.FormValue("ETSNG")
 	gng := r.FormValue("GNG")
 
-	db, errsql := sql.Open("mysql", "root:@tcp(127.0.0.1:3306)/lab3")
-	if errsql != nil {
-		panic(errsql)
-	}
-
+	db := dbConnection()
 	defer db.Close()
 
 	insert, err := db.Query(fmt.Sprintf("INSERT INTO `gruz` "+
@@ -441,11 +426,7 @@ func (app *application) add_state(w http.ResponseWriter, r *http.Request) {
 		"./ui/html/footer.partial.tmpl",
 	}
 
-	db, errsql := sql.Open("mysql", "root:@tcp(127.0.0.1:3306)/lab3")
-	if errsql != nil {
-		panic(errsql)
-	}
-
+	db := dbConnection()
 	defer db.Close()
 
 	ts, err := template.ParseFiles(files...)
@@ -470,11 +451,7 @@ func (app *application) add_state(w http.ResponseWriter, r *http.Request) {
 func (app *application) save_state(w http.ResponseWriter, r *http.Request) {
 	name := r.FormValue("Name")
 
-	db, errsql := sql.Open("mysql", "root:@tcp(127.0.0.1:3306)/lab3")
-	if errsql != nil {
-		panic(errsql)
-	}
-
+	db := dbConnection()
 	defer db.Close()
 
 	insert, err := db.Query(fmt.Sprintf("INSERT INTO `state` "+
@@ -498,11 +475,7 @@ func (app *application) add_station(w http.ResponseWriter, r *http.Request) {
 		"./ui/html/footer.partial.tmpl",
 	}
 
-	db, errsql := sql.Open("mysql", "root:@tcp(127.0.0.1:3306)/lab3")
-	if errsql != nil {
-		panic(errsql)
-	}
-
+	db := dbConnection()
 	defer db.Close()
 
 	ts, err := template.ParseFiles(files...)
@@ -529,11 +502,7 @@ func (app *application) save_station(w http.ResponseWriter, r *http.Request) {
 	esr := r.FormValue("ESR")
 	road := r.FormValue("Road")
 
-	db, errsql := sql.Open("mysql", "root:@tcp(127.0.0.1:3306)/lab3")
-	if errsql != nil {
-		panic(errsql)
-	}
-
+	db := dbConnection()
 	defer db.Close()
 
 	insert, err := db.Query(fmt.Sprintf("INSERT INTO `station` "+
@@ -557,11 +526,7 @@ func (app *application) add_region(w http.ResponseWriter, r *http.Request) {
 		"./ui/html/footer.partial.tmpl",
 	}
 
-	db, errsql := sql.Open("mysql", "root:@tcp(127.0.0.1:3306)/lab3")
-	if errsql != nil {
-		panic(errsql)
-	}
-
+	db := dbConnection()
 	defer db.Close()
 
 	ts, err := template.ParseFiles(files...)
@@ -586,11 +551,7 @@ func (app *application) add_region(w http.ResponseWriter, r *http.Request) {
 func (app *application) save_region(w http.ResponseWriter, r *http.Request) {
 	name := r.FormValue("Name")
 
-	db, errsql := sql.Open("mysql", "root:@tcp(127.0.0.1:3306)/lab3")
-	if errsql != nil {
-		panic(errsql)
-	}
-
+	db := dbConnection()
 	defer db.Close()
 
 	insert, err := db.Query(fmt.Sprintf("INSERT INTO `region` "+
@@ -614,11 +575,7 @@ func (app *application) add_road(w http.ResponseWriter, r *http.Request) {
 		"./ui/html/footer.partial.tmpl",
 	}
 
-	db, errsql := sql.Open("mysql", "root:@tcp(127.0.0.1:3306)/lab3")
-	if errsql != nil {
-		panic(errsql)
-	}
-
+	db := dbConnection()
 	defer db.Close()
 
 	ts, err := template.ParseFiles(files...)
@@ -644,11 +601,7 @@ func (app *application) save_road(w http.ResponseWriter, r *http.Request) {
 	name := r.FormValue("Name")
 	length, _ := strconv.Atoi(r.FormValue("Length"))
 
-	db, errsql := sql.Open("mysql", "root:@tcp(127.0.0.1:3306)/lab3")
-	if errsql != nil {
-		panic(errsql)
-	}
-
+	db := dbConnection()
 	defer db.Close()
 
 	insert, err := db.Query(fmt.Sprintf("INSERT INTO `road` "+
@@ -672,11 +625,7 @@ func (app *application) add_consignee(w http.ResponseWriter, r *http.Request) {
 		"./ui/html/footer.partial.tmpl",
 	}
 
-	db, errsql := sql.Open("mysql", "root:@tcp(127.0.0.1:3306)/lab3")
-	if errsql != nil {
-		panic(errsql)
-	}
-
+	db := dbConnection()
 	defer db.Close()
 
 	ts, err := template.ParseFiles(files...)
@@ -708,11 +657,7 @@ func (app *application) save_consignee(w http.ResponseWriter, r *http.Request) {
 		a = 0
 	}
 
-	db, errsql := sql.Open("mysql", "root:@tcp(127.0.0.1:3306)/lab3")
-	if errsql != nil {
-		panic(errsql)
-	}
-
+	db := dbConnection()
 	defer db.Close()
 
 	insert, err := db.Query(fmt.Sprintf("INSERT INTO `consignee` "+
@@ -736,11 +681,7 @@ func (app *application) add_wagon(w http.ResponseWriter, r *http.Request) {
 		"./ui/html/footer.partial.tmpl",
 	}
 
-	db, errsql := sql.Open("mysql", "root:@tcp(127.0.0.1:3306)/lab3")
-	if errsql != nil {
-		panic(errsql)
-	}
-
+	db := dbConnection()
 	defer db.Close()
 
 	ts, err := template.ParseFiles(files...)
@@ -765,11 +706,7 @@ func (app *application) add_wagon(w http.ResponseWriter, r *http.Request) {
 func (app *application) save_wagon(w http.ResponseWriter, r *http.Request) {
 	name := r.FormValue("Name")
 
-	db, errsql := sql.Open("mysql", "root:@tcp(127.0.0.1:3306)/lab3")
-	if errsql != nil {
-		panic(errsql)
-	}
-
+	db := dbConnection()
 	defer db.Close()
 
 	insert, err := db.Query(fmt.Sprintf("INSERT INTO `wagon` "+
@@ -810,11 +747,7 @@ func (app *application) stats(w http.ResponseWriter, r *http.Request) {
 		"./ui/html/footer.partial.tmpl",
 	}
 
-	db, errsql := sql.Open("mysql", "root:@tcp(127.0.0.1:3306)/lab3")
-	if errsql != nil {
-		panic(errsql)
-	}
-
+	db := dbConnection()
 	defer db.Close()
 
 	ts, err := template.ParseFiles(files...)
@@ -828,6 +761,7 @@ func (app *application) stats(w http.ResponseWriter, r *http.Request) {
 		"AS q GROUP BY month(reg_date);")
 	if err != nil {
 		app.serverError(w, err)
+		return
 	}
 
 	avgRez := make([]Average, 0)
@@ -845,6 +779,7 @@ func (app *application) stats(w http.ResponseWriter, r *http.Request) {
 		" ON h.Region_depart=o.id) INNER JOIN region AS oo ON h.Region_destination=oo.ID GROUP BY o.Name, oo.Name ORDER BY count(*) DESC;")
 	if err != nil {
 		app.serverError(w, err)
+		return
 	}
 
 	rezReg := make([]RegPop, 0)
@@ -863,6 +798,7 @@ func (app *application) stats(w http.ResponseWriter, r *http.Request) {
 		"d.id = q.Road_depart INNER JOIN road AS do ON do.id=q.Road_destination ORDER BY q.n_transportations DESC LIMIT 10;")
 	if err != nil {
 		app.serverError(w, err)
+		return
 	}
 
 	rezRoad := make([]PopRoad, 0)
@@ -871,7 +807,8 @@ func (app *application) stats(w http.ResponseWriter, r *http.Request) {
 		var a PopRoad
 		err := popRoad.Scan(&a.FrstRoad, &a.SecRoad, &a.Usage)
 		if err != nil {
-			panic(err)
+			app.serverError(w, err)
+			return
 		}
 		rezRoad = append(rezRoad, a)
 	}
@@ -906,11 +843,7 @@ func (app *application) soloSearch(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	db, errsql := sql.Open("mysql", "root:@tcp(127.0.0.1:3306)/lab3")
-	if errsql != nil {
-		panic(errsql)
-	}
-
+	db := dbConnection()
 	defer db.Close()
 
 	Rez := make([]Application, 0)
@@ -954,6 +887,7 @@ func (app *application) soloSearch(w http.ResponseWriter, r *http.Request) {
 	err = ts.Execute(w, Jopa{Rez: Rez})
 	if err != nil {
 		app.serverError(w, err) // Использование помощника serverError()
+		return
 	}
 }
 
@@ -991,6 +925,7 @@ func (app *application) duoSearch(w http.ResponseWriter, r *http.Request) {
 	err = ts.Execute(w, AllInfo{Wagon: rez})
 	if err != nil {
 		app.serverError(w, err) // Использование помощника serverError()
+		return
 	}
 }
 
@@ -1015,6 +950,7 @@ func getApplication(app *application, db *sql.DB, w http.ResponseWriter, whereSt
 	get, err := db.Query(fmt.Sprintf(sel+whereString, what))
 	if err != nil {
 		app.serverError(w, err)
+		return rez
 	}
 	defer get.Close()
 	for get.Next() {
@@ -1027,6 +963,7 @@ func getApplication(app *application, db *sql.DB, w http.ResponseWriter, whereSt
 			&v.Approval_date, &v.Start_date, &v.Stop_date)
 		if err != nil {
 			app.serverError(w, err)
+			return rez
 		}
 		rez = append(rez, v)
 	}
@@ -1036,7 +973,7 @@ func getApplication(app *application, db *sql.DB, w http.ResponseWriter, whereSt
 /*----------------------------------------------------------------------------------------*/
 
 func dbConnection() *sql.DB {
-	db, errsql := sql.Open("mysql", "root:@tcp(127.0.0.1:3306)/lab3")
+	db, errsql := sql.Open("mysql", "root:@(db:3306)/lab3")
 	if errsql != nil {
 		panic(errsql)
 	}
@@ -1128,6 +1065,7 @@ func (app *application) letDuoSearch(w http.ResponseWriter, r *http.Request) {
 	get, err := db.Query(fmt.Sprintf(sel+whereString, data.Duos, data.Gruz))
 	if err != nil {
 		app.serverError(w, err)
+		return
 	}
 	defer get.Close()
 	for get.Next() {
@@ -1140,6 +1078,7 @@ func (app *application) letDuoSearch(w http.ResponseWriter, r *http.Request) {
 			&v.Approval_date, &v.Start_date, &v.Stop_date)
 		if err != nil {
 			app.serverError(w, err)
+			return
 		}
 		rez = append(rez, v)
 	}

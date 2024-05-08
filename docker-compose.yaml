@@ -1,0 +1,52 @@
+version: "3.9"
+
+volumes:
+  mysql:
+  phpmyadmin:
+
+networks:
+  app:
+    driver: bridge
+    attachable: true
+
+services:
+  mysql:
+    image: mysql
+    container_name: mysql
+    restart: always
+    environment:
+     - MYSQL_ALLOW_EMPTY_PASSWORD=yes
+    volumes:
+      -  mysql:/var/lib/mysql
+      - ./lab3.sql:/docker-entrypoint-initdb.d/lab3.sql
+    ports:
+      - "13306:3306"
+    networks:
+      app:
+        aliases:
+          - db
+          - mysql
+
+  app:
+    build:
+      dockerfile: Dockerfile
+    container_name: app
+    ports:
+      - "4000:4000"
+    networks:
+      app:
+
+  phpmyadmin:
+    image: phpmyadmin
+    container_name: phpmyadmin
+    restart: always
+    environment:
+      - PMA_ARBITRARY=1
+    ports:
+      - "3306:80"
+    volumes:
+      - mysql:/var/lib/mysql
+    depends_on:
+      - mysql
+    networks:
+      app:
