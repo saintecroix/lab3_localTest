@@ -17,7 +17,7 @@ type Gruz struct {
 }
 
 func getGruz(db *sql.DB) []Gruz {
-	gruz, err := db.Query("Select * from gruz")
+	gruz, err := db.Query("Select * from gruz order by Name")
 	if err != nil {
 		panic(err)
 	}
@@ -43,7 +43,7 @@ type Consignee struct {
 }
 
 func getConsignee(db *sql.DB) []Consignee {
-	gruz, err := db.Query("Select * from consignee")
+	gruz, err := db.Query("Select * from consignee order by Name")
 	if err != nil {
 		panic(err)
 	}
@@ -67,7 +67,7 @@ type Region struct {
 }
 
 func getRegion(db *sql.DB) []Region {
-	gruz, err := db.Query("Select * from region")
+	gruz, err := db.Query("Select * from region order by Name")
 	if err != nil {
 		panic(err)
 	}
@@ -92,7 +92,7 @@ type Road struct {
 }
 
 func getRoad(db *sql.DB) []Road {
-	gruz, err := db.Query("Select * from road")
+	gruz, err := db.Query("Select * from road order by Name")
 	if err != nil {
 		panic(err)
 	}
@@ -116,7 +116,7 @@ type State struct {
 }
 
 func getState(db *sql.DB) []State {
-	gruz, err := db.Query("Select * from state")
+	gruz, err := db.Query("Select * from state order by Name")
 	if err != nil {
 		panic(err)
 	}
@@ -142,7 +142,7 @@ type Station struct {
 }
 
 func getStation(db *sql.DB) []Station {
-	gruz, err := db.Query("Select * from station")
+	gruz, err := db.Query("Select * from station order by Name")
 	if err != nil {
 		panic(err)
 	}
@@ -211,7 +211,7 @@ type Application struct {
 }
 
 func getWagon(db *sql.DB) []Wagon {
-	gruz, err := db.Query("Select * from wagon")
+	gruz, err := db.Query("Select * from wagon order by Name")
 	if err != nil {
 		panic(err)
 	}
@@ -263,8 +263,7 @@ func (app *application) input(w http.ResponseWriter, r *http.Request) {
 		"./ui/html/footer.partial.tmpl",
 	}
 
-	db := dbConnection()
-	defer db.Close()
+	db := app.db
 
 	ts, err := template.ParseFiles(files...)
 	if err != nil {
@@ -313,8 +312,7 @@ func (app *application) save_application(w http.ResponseWriter, r *http.Request)
 	start_date := r.FormValue("Start_date")
 	stop_date := r.FormValue("Stop_date")
 
-	db := dbConnection()
-	defer db.Close()
+	db := app.db
 
 	goods, _ := strconv.Atoi(r.FormValue("Goods"))
 
@@ -375,8 +373,7 @@ func (app *application) addGruz(w http.ResponseWriter, r *http.Request) {
 		"./ui/html/footer.partial.tmpl",
 	}
 
-	db := dbConnection()
-	defer db.Close()
+	db := app.db
 
 	ts, err := template.ParseFiles(files...)
 	if err != nil {
@@ -402,8 +399,7 @@ func (app *application) save_gruz(w http.ResponseWriter, r *http.Request) {
 	etsng := r.FormValue("ETSNG")
 	gng := r.FormValue("GNG")
 
-	db := dbConnection()
-	defer db.Close()
+	db := app.db
 
 	insert, err := db.Query(fmt.Sprintf("INSERT INTO `gruz` "+
 		"(`Name`, `ETSNG`, `GNG`) VALUES('%s', '%s', '%s')", name, etsng, gng))
@@ -426,8 +422,7 @@ func (app *application) add_state(w http.ResponseWriter, r *http.Request) {
 		"./ui/html/footer.partial.tmpl",
 	}
 
-	db := dbConnection()
-	defer db.Close()
+	db := app.db
 
 	ts, err := template.ParseFiles(files...)
 	if err != nil {
@@ -451,8 +446,7 @@ func (app *application) add_state(w http.ResponseWriter, r *http.Request) {
 func (app *application) save_state(w http.ResponseWriter, r *http.Request) {
 	name := r.FormValue("Name")
 
-	db := dbConnection()
-	defer db.Close()
+	db := app.db
 
 	insert, err := db.Query(fmt.Sprintf("INSERT INTO `state` "+
 		"(`Name`) VALUES('%s')", name))
@@ -475,8 +469,7 @@ func (app *application) add_station(w http.ResponseWriter, r *http.Request) {
 		"./ui/html/footer.partial.tmpl",
 	}
 
-	db := dbConnection()
-	defer db.Close()
+	db := app.db
 
 	ts, err := template.ParseFiles(files...)
 	if err != nil {
@@ -502,8 +495,7 @@ func (app *application) save_station(w http.ResponseWriter, r *http.Request) {
 	esr := r.FormValue("ESR")
 	road := r.FormValue("Road")
 
-	db := dbConnection()
-	defer db.Close()
+	db := app.db
 
 	insert, err := db.Query(fmt.Sprintf("INSERT INTO `station` "+
 		"(`Name`,`ESR`, `Road`) VALUES('%s', `%s`, `%s`)", name, esr, road))
@@ -526,8 +518,7 @@ func (app *application) add_region(w http.ResponseWriter, r *http.Request) {
 		"./ui/html/footer.partial.tmpl",
 	}
 
-	db := dbConnection()
-	defer db.Close()
+	db := app.db
 
 	ts, err := template.ParseFiles(files...)
 	if err != nil {
@@ -551,8 +542,7 @@ func (app *application) add_region(w http.ResponseWriter, r *http.Request) {
 func (app *application) save_region(w http.ResponseWriter, r *http.Request) {
 	name := r.FormValue("Name")
 
-	db := dbConnection()
-	defer db.Close()
+	db := app.db
 
 	insert, err := db.Query(fmt.Sprintf("INSERT INTO `region` "+
 		"(`Name`) VALUES('%s')", name))
@@ -575,8 +565,7 @@ func (app *application) add_road(w http.ResponseWriter, r *http.Request) {
 		"./ui/html/footer.partial.tmpl",
 	}
 
-	db := dbConnection()
-	defer db.Close()
+	db := app.db
 
 	ts, err := template.ParseFiles(files...)
 	if err != nil {
@@ -601,8 +590,7 @@ func (app *application) save_road(w http.ResponseWriter, r *http.Request) {
 	name := r.FormValue("Name")
 	length, _ := strconv.Atoi(r.FormValue("Length"))
 
-	db := dbConnection()
-	defer db.Close()
+	db := app.db
 
 	insert, err := db.Query(fmt.Sprintf("INSERT INTO `road` "+
 		"(`Name`, `Length`) VALUES('%s', '%d')", name, length))
@@ -625,8 +613,7 @@ func (app *application) add_consignee(w http.ResponseWriter, r *http.Request) {
 		"./ui/html/footer.partial.tmpl",
 	}
 
-	db := dbConnection()
-	defer db.Close()
+	db := app.db
 
 	ts, err := template.ParseFiles(files...)
 	if err != nil {
@@ -657,8 +644,7 @@ func (app *application) save_consignee(w http.ResponseWriter, r *http.Request) {
 		a = 0
 	}
 
-	db := dbConnection()
-	defer db.Close()
+	db := app.db
 
 	insert, err := db.Query(fmt.Sprintf("INSERT INTO `consignee` "+
 		"(`Name`, `OKPO`, `Was_sender`) VALUES('%s', '%s', '%d')", name, okpo, a))
@@ -681,8 +667,7 @@ func (app *application) add_wagon(w http.ResponseWriter, r *http.Request) {
 		"./ui/html/footer.partial.tmpl",
 	}
 
-	db := dbConnection()
-	defer db.Close()
+	db := app.db
 
 	ts, err := template.ParseFiles(files...)
 	if err != nil {
@@ -706,8 +691,7 @@ func (app *application) add_wagon(w http.ResponseWriter, r *http.Request) {
 func (app *application) save_wagon(w http.ResponseWriter, r *http.Request) {
 	name := r.FormValue("Name")
 
-	db := dbConnection()
-	defer db.Close()
+	db := app.db
 
 	insert, err := db.Query(fmt.Sprintf("INSERT INTO `wagon` "+
 		"(`Name`) VALUES('%s')", name))
@@ -747,8 +731,7 @@ func (app *application) stats(w http.ResponseWriter, r *http.Request) {
 		"./ui/html/footer.partial.tmpl",
 	}
 
-	db := dbConnection()
-	defer db.Close()
+	db := app.db
 
 	ts, err := template.ParseFiles(files...)
 	if err != nil {
@@ -843,8 +826,7 @@ func (app *application) soloSearch(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	db := dbConnection()
-	defer db.Close()
+	db := app.db
 
 	Rez := make([]Application, 0)
 
@@ -903,8 +885,7 @@ func (app *application) duoSearch(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	db := dbConnection()
-	defer db.Close()
+	db := app.db
 
 	gruz, err := db.Query("Select * from wagon where id in (select distinct Wagon_type from application);")
 	if err != nil {
@@ -972,16 +953,6 @@ func getApplication(app *application, db *sql.DB, w http.ResponseWriter, whereSt
 
 /*----------------------------------------------------------------------------------------*/
 
-func dbConnection() *sql.DB {
-	db, errsql := sql.Open("mysql", "root:@(db:3306)/lab3")
-	if errsql != nil {
-		panic(errsql)
-	}
-	return db
-}
-
-/*----------------------------------------------------------------------------------------*/
-
 func (app *application) getSecondPerSearch(w http.ResponseWriter, r *http.Request) {
 	if r.Method != "POST" {
 		http.Error(w, "Неверный метод запроса", http.StatusMethodNotAllowed)
@@ -998,8 +969,7 @@ func (app *application) getSecondPerSearch(w http.ResponseWriter, r *http.Reques
 		return
 	}
 
-	db := dbConnection()
-	defer db.Close()
+	db := app.db
 
 	getRaw, err := db.Query(fmt.Sprintf("SELECT * FROM `gruz` WHERE id in (SELECT Goods FROM `application` WHERE Wagon_type = %s);", data.CheckData))
 	if err != nil {
@@ -1042,8 +1012,7 @@ func (app *application) letDuoSearch(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 	fmt.Println(data.Duos, data.Gruz)
-	db := dbConnection()
-	defer db.Close()
+	db := app.db
 	sel := "select a.id, a.Number, a.Reg_date, a.Status, a.Provide_date, a.Departure_type, g.Name as Goods, state.Name " +
 		"as Origin_state, st.Name as Enter_station, reg.Name as Region_depart, r.Name as Road_depart, st1.Name as " +
 		"Station_depart, con.Name as Consigner, state1.Name as State_destination, st2.Name as Exit_station, reg1.Name " +

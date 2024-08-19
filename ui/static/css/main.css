@@ -241,6 +241,23 @@ form div:last-child {
 .menu__item:hover {
     background-color: #CFD8DC;
 }
+.menu__item ul {
+    position: absolute;
+    left: 100%;
+    top: 0;
+    width: 100%;
+    background-color: #F7F7F7;
+    border-top: 1px solid #E5E5E5;
+}
+
+.menu__item:hover ul {
+}
+
+.menu__item ul li {
+    display: none;
+    padding-bottom: 10px;
+    padding-left: 20px;
+}
 
 
 label {

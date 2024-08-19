@@ -146,3 +146,15 @@ form.addEventListener('submit', (event) => {
 			console.error("Ошибка при выполнении запроса на сервер: ", error);
 		});
 });
+
+/*----------------------------------------------------------------------------------------*/
+
+const menuItems = document.querySelectorAll('.menu__item');
+
+menuItems.forEach((menuItem) => {
+	menuItem.addEventListener('click', () => {
+		const submenu = menuItem.querySelector('li');
+		submenu.classList.toggle('show');
+		submenu.style = "display: content;";
+	});
+});
