@@ -1,6 +1,6 @@
 let select = document.getElementById("Goods");
 
-if(select ){
+if (select) {
 	select.addEventListener("change", myFunction);
 }
 
@@ -14,7 +14,6 @@ function myFunction() {
 		textLabel.style = "display: content";
 	}
 }
-console.log("test")
 
 /*----------------------------------------------------------------------------------------*/
 
@@ -22,7 +21,7 @@ console.log("test")
 const duosSelect = document.getElementById('Duos');
 
 // Добавление обработчика события изменения состояния
-duosSelect.addEventListener('change', (event) => {
+duosSelect?.addEventListener('change', (event) => {
 	// Проверка значения value
 	if (event.target.value !== '') {
 		// Значение value не пустое, отправляем GET запрос на сервер
@@ -71,7 +70,7 @@ duosSelect.addEventListener('change', (event) => {
 const form = document.getElementById('my-form');
 const gruzSelect = document.getElementById('Gruz-list');
 
-form.addEventListener('submit', (event) => {
+form?.addEventListener('submit', (event) => {
 	event.preventDefault();
 	fetch('/letDuoSearch', {
 		method: 'POST',
