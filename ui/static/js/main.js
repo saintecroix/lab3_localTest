@@ -149,12 +149,16 @@ form.addEventListener('submit', (event) => {
 
 /*----------------------------------------------------------------------------------------*/
 
-const menuItems = document.querySelectorAll('.menu__item');
+const switchers = document.querySelectorAll('.menu__switcher');
 
-menuItems.forEach((menuItem) => {
-	menuItem.addEventListener('click', () => {
-		const submenu = menuItem.querySelector('li');
-		submenu.classList.toggle('show');
-		submenu.style = "display: content;";
+switchers.forEach(switcher => {
+	switcher.addEventListener('click', () => {
+		const parentElem = switcher.parentElement;
+
+		const items = parentElem.querySelectorAll('li');
+
+		items.forEach(item => {
+			item.style.display = (item.style.display === 'none' || item.style.display === '') ? 'block' : 'none';
+		});
 	});
 });

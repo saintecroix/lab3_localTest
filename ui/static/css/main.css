@@ -259,6 +259,44 @@ form div:last-child {
     padding-left: 20px;
 }
 
+.menu__switcher {
+    padding-left: 24px;
+}
+
+.menu__wrap {
+    padding-left: 0px;
+}
+
+.menu__wrap li {
+    padding-left: 24px;
+}
+
+.sub__menu {
+    padding-left: 24px;
+}
+
+
+.sub__menu {
+    position: relative;
+}
+
+.sub__menu::before {
+    content: '';
+    position: absolute;
+    left: 5px;
+    top: 50%;
+    transform: translateY(-50%);
+    width: 10px;
+    height: 10px;
+    border: 1px solid black;
+    background: black;
+    border-radius: 100%;
+}
+.menu__wrap li {
+    display: none;
+}
+
+
 
 label {
     display: flex;

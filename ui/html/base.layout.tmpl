@@ -30,23 +30,24 @@
 
 
     <!-- Всплывающее меню -->
-        <div class="hamburger-menu">
-            <input id="menu__toggle" type="checkbox" />
-            <label class="menu__btn" for="menu__toggle">
-              <span></span>
-            </label>
-            <ul class="menu__box">
-              <li><a class="menu__item" href="/">Главная</a><li>
-              <li><a class="menu__item" href="/input">Ввод данных</a></li>
-              <ul><a class="menu__item">Поиск</a>
-                <li><a class="menu__item" href="/soloSearch">Поиск по одному атрибуту</a></li>
-                <li><a class="menu__item" href="/duoSearch">Поиск по двум атрибутам</a></li>
-              </ul>
-              <li><a class="menu__item" href="/stats">Статистика</a></li>
-              <li><a class="menu__item" href="#">Помощь</a></li>
-              <li><a class="menu__item" href="#">Выгрузка файла БД</a></li>
+    <div class="hamburger-menu">
+        <input id="menu__toggle" type="checkbox" />
+        <label class="menu__btn" for="menu__toggle">
+            <span></span>
+        </label>
+        <ul class="menu__box">
+            <li><a class="menu__item" href="/">Главная</a><li>
+            <li><a class="menu__item" href="/input">Ввод данных</a></li>
+            <ul class="menu__wrap">
+                <a class="menu__item menu__switcher">Поиск</a>
+                <li><a class="menu__item sub__menu" href="/soloSearch">Поиск по одному атрибуту</a></li>
+                <li><a class="menu__item sub__menu" href="/duoSearch">Поиск по двум атрибутам</a></li>
             </ul>
-          </div>
+            <li><a class="menu__item" href="/stats">Статистика</a></li>
+            <li><a class="menu__item" href="#">Помощь</a></li>
+            <li><a class="menu__item" href="#">Выгрузка файла БД</a></li>
+        </ul>
+    </div>
     <script src="/static/js/main.js"></script>
 </body>
 {{template "footer" .}}
