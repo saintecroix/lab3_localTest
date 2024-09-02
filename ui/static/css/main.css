@@ -254,7 +254,6 @@ form div:last-child {
 }
 
 .menu__item ul li {
-    display: none;
     padding-bottom: 10px;
     padding-left: 20px;
 }
@@ -268,6 +267,7 @@ form div:last-child {
 }
 
 .menu__wrap li {
+    display: none;
     padding-left: 24px;
 }
 
@@ -295,8 +295,6 @@ form div:last-child {
 .menu__wrap li {
     display: none;
 }
-
-
 
 label {
     display: flex;
