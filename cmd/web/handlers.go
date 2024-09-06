@@ -1059,3 +1059,23 @@ func (app *application) letDuoSearch(w http.ResponseWriter, r *http.Request) {
 	w.Header().Set("Content-Type", "application/json")
 	w.Write(jsonApps)
 }
+
+func (app *application) aboutDB(w http.ResponseWriter, r *http.Request) {
+	files := []string{
+		"./ui/html/about_db.page.tmpl",
+		"./ui/html/base.layout.tmpl",
+		"./ui/html/footer.partial.tmpl",
+	}
+
+	ts, err := template.ParseFiles(files...)
+	if err != nil {
+		app.serverError(w, err)
+		return
+	}
+
+	err = ts.Execute(w, nil)
+	if err != nil {
+		app.serverError(w, err)
+		return
+	}
+}

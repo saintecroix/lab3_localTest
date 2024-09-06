@@ -10,6 +10,7 @@
     <link rel='shortcut icon' href='../static/img/logo1.ico' type='image/x-icon'>
     <!-- Подключаем новый шрифт для сайта от Google Fonts -->
     <link id="u-theme-google-font" rel="stylesheet" href="https://fonts.googleapis.com/css?family=Roboto:100,100i,300,300i,400,400i,500,500i,700,700i,900,900i|Open+Sans:300,300i,400,400i,500,500i,600,600i,700,700i,800,800i">
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@24,400,0,0" />
     <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.4/css/bootstrap.min.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-select/1.7.5/css/bootstrap-select.min.css">
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.11.3/jquery.min.js"></script>
@@ -21,11 +22,9 @@
         <h1><a href='/'>Железнодорожные перевозки</a></h1>
     </header>
     <div>
-        <div>
         <main>
             {{template "main" .}}
         </main>
-        </div>
     </div>
 
 
@@ -42,6 +41,9 @@
             <li class="menu__item menu__switcher">
                 <a href="#" class="menu__link">База данных</a>
                 <ul class="sub__menu">
+                    <li class="menu__item">
+                        <a href="/about_db" class="menu__link">О базе данных</a>
+                    </li>
                     <li class="menu__item">
                         <a href="/input" class="menu__link">Ввод данных</a>
                     </li>
