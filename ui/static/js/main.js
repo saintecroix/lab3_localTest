@@ -148,16 +148,10 @@ form?.addEventListener('submit', (event) => {
 
 /*----------------------------------------------------------------------------------------*/
 
-const switchers = document.querySelectorAll('.menu__switcher');
-
-switchers.forEach(switcher => {
-	switcher.addEventListener('click', () => {
-		const parentElem = switcher.parentElement;
-
-		const items = parentElem.querySelectorAll('li');
-
-		items.forEach(item => {
-			item.style.display = (item.style.display === 'none' || item.style.display === '') ? 'block' : 'none';
-		});
+document.querySelectorAll('.menu__switcher > .menu__link').forEach(link => {
+	link.addEventListener('click', (event) => {
+		event.preventDefault();
+		const parent = link.parentElement;
+		parent.classList.toggle('active');
 	});
 });
