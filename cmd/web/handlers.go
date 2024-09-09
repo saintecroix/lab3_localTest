@@ -1079,3 +1079,23 @@ func (app *application) aboutDB(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 }
+
+func (app *application) xmlPage(w http.ResponseWriter, r *http.Request) {
+	files := []string{
+		"./ui/html/xml.page.tmpl",
+		"./ui/html/base.layout.tmpl",
+		"./ui/html/footer.partial.tmpl",
+	}
+
+	ts, err := template.ParseFiles(files...)
+	if err != nil {
+		app.serverError(w, err)
+		return
+	}
+
+	err = ts.Execute(w, nil)
+	if err != nil {
+		app.serverError(w, err)
+		return
+	}
+}

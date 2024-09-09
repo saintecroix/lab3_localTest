@@ -21,13 +21,6 @@
     <header>
         <h1><a href='/'>Железнодорожные перевозки</a></h1>
     </header>
-    <div>
-        <main>
-            {{template "main" .}}
-        </main>
-    </div>
-
-
     <!-- Всплывающее меню -->
     <input id="menu__toggle" type="checkbox" />
     <label class="menu__btn" for="menu__toggle">
@@ -57,7 +50,7 @@
                     <li class="menu__item"><a href="/stats" class="menu__link">Статистика</a></li>
                 </ul>
             </li>
-            <li class="menu__item"><a href="#" class="menu__link">XML</a></li>
+            <li class="menu__item"><a href="/xml" class="menu__link">XML</a></li>
             <li class="menu__item"><a href="#" class="menu__link">RSS</a></li>
             <li class="menu__item"><a href="#" class="menu__link">Виджеты</a></li>
             <li class="menu__item"><a href="#" class="menu__link">Галерея</a></li>
@@ -65,6 +58,13 @@
             <li class="menu__item"><a href="#" class="menu__link">О нас</a></li>
         </ul>
     </nav>
+
+
+    <div>
+        <main>
+            {{template "main" .}}
+        </main>
+    </div>
     <script src="../static/js/main.js"></script>
 </body>
 {{template "footer" .}}
