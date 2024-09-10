@@ -1093,7 +1093,36 @@ func (app *application) xmlPage(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	err = ts.Execute(w, nil)
+	db := app.db
+
+	topTen, err1 := db.Query("SELECT * FROM `application` order by id DESC limit 10;")
+	if err1 != nil {
+		app.serverError(w, err1)
+		return
+	}
+
+	resoult := make([]Application, 0)
+
+	for topTen.Next() {
+		var a Application
+		err = topTen.Scan(&a.Id, &a.Number, &a.Reg_date, &a.Status, &a.Provide_date, &a.Departure_type, &a.Goods, &a.Origin_state,
+			&a.Enter_station, &a.Region_depart, &a.Road_depart, &a.Station_depart, &a.Consigner, &a.State_destination,
+			&a.Exit_station, &a.Region_destination, &a.Road_destination, &a.Station_destination, &a.Consignee, &a.Wagon_type,
+			&a.Property, &a.Wagon_owner, &a.Payer, &a.Road_owner, &a.Transport_manager, &a.Tons_declared, &a.Tons_accepted,
+			&a.Wagon_declared, &a.Wagon_accepted, &a.Filing_date, &a.Agreement_date, &a.Approval_date, &a.Start_date,
+			&a.Stop_date)
+		if err != nil {
+			app.serverError(w, err)
+			return
+		}
+		resoult = append(resoult, a)
+	}
+
+	type Jopa struct {
+		Application []Application
+	}
+
+	err = ts.Execute(w, Jopa{Application: resoult})
 	if err != nil {
 		app.serverError(w, err)
 		return

@@ -4,5 +4,83 @@
 
 {{define "main"}}
 <h2>Страница с XML данными</h2>
-<p>Данная база данных была создана для быстрого получения и изменения данных о железнодорожных перевозках для поиска новых клиентов и анализа рынка логистических услуг в сфере ж\д грузоперевозок. Работу выполнил студент группы ИВТ-Б20 - Марков К.А.</p>
+<label>Таблица с 10-ю последними заявками: </label>
+<table>
+    <thead>
+    <tr>
+        <th scope="col">Номер заявки</th>
+        <th scope="col">Дата регистрации</th>
+        <th scope="col">Статус</th>
+        <th scope="col">Дата подачи вагона</th>
+        <th scope="col">Вид отправления</th>
+        <th scope="col">Наименование груза</th>
+        <th scope="col">Государство отправления</th>
+        <th scope="col">Станция входа на Россию</th>
+        <th scope="col">Область отправления</th>
+        <th scope="col">Дорога отправления</th>
+        <th scope="col">Станция отправления</th>
+        <th scope="col">Грузоотправитель</th>
+        <th scope="col">Государство назначения</th>
+        <th scope="col">Станция выхода из России</th>
+        <th scope="col">Область назначения</th>
+        <th scope="col">Дорога назначения</th>
+        <th scope="col">Станция назначения</th>
+        <th scope="col">Грузополучатель</th>
+        <th scope="col">Тип вагона</th>
+        <th scope="col">Призн собств вагона</th>
+        <th scope="col">Собственник вагона</th>
+        <th scope="col">Плательщик</th>
+        <th scope="col">Владелец пути необщего пользования</th>
+        <th scope="col">Организация перевозки в порту</th>
+        <th scope="col">Тонн заявлено</th>
+        <th scope="col">Тонн принято</th>
+        <th scope="col">Вагонов(контейнеров) заявлено</th>
+        <th scope="col">Вагонов(контейнеров) принято</th>
+        <th scope="col">Дата подачи заявления</th>
+        <th scope="col">Дата начала согласования</th>
+        <th scope="col">Дата утверждения</th>
+        <th scope="col">Дата начала действия</th>
+        <th scope="col">Дата окончания действия</th>
+    </tr>
+    </thead>
+    <tbody>
+    {{ range .Application }}
+    <tr>
+        <td data-label="Номер заявки">{{ .Number }}</td>
+        <td data-label="Дата регистрации">{{ .Reg_date }}</td>
+        <td data-label="Статус">{{ .Status }}</td>
+        <td data-label="Дата подачи вагона">{{ .Provide_date }}</td>
+        <td data-label="Вид отправления">{{ .Departure_type }}</td>
+        <td data-label="Наименование груза">{{ .Goods }}</td>
+        <td data-label="Государство отправления">{{ .Reg_date }}</td>
+        <td data-label="Станция входа на Россию">{{ .Reg_date }}</td>
+        <td data-label="Область отправления">{{ .Reg_date }}</td>
+        <td data-label="Дорога отправления">{{ .Reg_date }}</td>
+        <td data-label="Станция отправления">{{ .Reg_date }}</td>
+        <td data-label="Грузоотправитель">{{ .Reg_date }}</td>
+        <td data-label="Государство назначения">{{ .Reg_date }}</td>
+        <td data-label="Станция выхода из России">{{ .Reg_date }}</td>
+        <td data-label="Область назначения">{{ .Reg_date }}</td>
+        <td data-label="Дорога назначения">{{ .Reg_date }}</td>
+        <td data-label="Станция назначения">{{ .Reg_date }}</td>
+        <td data-label="Грузополучатель">{{ .Reg_date }}</td>
+        <td data-label="Тип вагона">{{ .Reg_date }}</td>
+        <td data-label="Призн собств вагона">{{ .Reg_date }}</td>
+        <td data-label="Собственник вагона">{{ .Reg_date }}</td>
+        <td data-label="Плательщик">{{ .Reg_date }}</td>
+        <td data-label="Владелец пути необщего пользования">{{ .Reg_date }}</td>
+        <td data-label="Организация перевозки в порту">{{ .Reg_date }}</td>
+        <td data-label="Тонн заявлено">{{ .Reg_date }}</td>
+        <td data-label="Тонн принято">{{ .Reg_date }}</td>
+        <td data-label="Вагонов(контейнеров) заявлено">{{ .Reg_date }}</td>
+        <td data-label="Вагонов(контейнеров) принято">{{ .Reg_date }}</td>
+        <td data-label="Дата подачи заявления">{{ .Reg_date }}</td>
+        <td data-label="Дата начала согласования">{{ .Reg_date }}</td>
+        <td data-label="Дата утверждения">{{ .Reg_date }}</td>
+        <td data-label="Дата начала действия">{{ .Reg_date }}</td>
+        <td data-label="Дата окончания действия">{{ .Reg_date }}</td>
+    </tr>
+    {{ end }}
+    </tbody>
+</table>
 {{end}}
