@@ -3,6 +3,7 @@ package main
 import (
 	"database/sql"
 	"encoding/json"
+	"encoding/xml"
 	"fmt"
 	"html/template"
 	"net/http"
@@ -1095,16 +1096,69 @@ func (app *application) xmlPage(w http.ResponseWriter, r *http.Request) {
 
 	db := app.db
 
-	topTen, err1 := db.Query("SELECT * FROM `application` order by id DESC limit 10;")
+	topTen, err1 := db.Query("select a.id, a.Number, a.Reg_date, a.Status, a.Provide_date, a.Departure_type, g.Name as Goods, state.Name " +
+		"as Origin_state, st.Name as Enter_station, reg.Name as Region_depart, r.Name as Road_depart, st1.Name as " +
+		"Station_depart, con.Name as Consigner, state1.Name as State_destination, st2.Name as Exit_station, reg1.Name " +
+		"as Region_destination, r1.Name as Road_destination, st3.Name as Station_destination, con1.Name as Consignee, " +
+		"w.Name as Wagon_type, a.Property, a.Wagon_owner, a.Payer, a.Road_owner, a.Transport_manager, a.Tons_declared, " +
+		"a.Tons_accepted, a.Wagon_declared, a.Wagon_accepted, a.Filing_date, a.Agreement_date, a.Approval_date, " +
+		"a.Start_date, a.Stop_date from application as a inner join gruz as g on a.Goods=g.id inner join state on " +
+		"a.Origin_state=state.id inner join station as st on a.Enter_station=st.id inner join region as reg on " +
+		"a.Region_depart=reg.id inner join road as r on a.Road_depart=r.id inner join (select * from station) " +
+		"as st1 on a.Station_depart=st1.id inner join consignee as con on a.Consigner=con.id inner join (select * from " +
+		"state) as state1 on a.State_destination=state1.id inner join (select * from station) as st2 on " +
+		"a.Exit_station=st2.id inner join (select * from region) as reg1 on a.Region_destination=reg1.id inner join " +
+		"(select * from road) as r1 on a.Road_destination=r1.id inner join (select * from station) as st3 on " +
+		"a.Station_destination=st3.id inner join (select * from consignee) as con1 on a.Consignee=con1.id inner join " +
+		"wagon as w on a.Wagon_type=w.id order by a.id DESC limit 10;")
+
+	type XMLApplication struct {
+		XMLName             xml.Name `xml:"application"`
+		Id                  int      `xml:"id"`
+		Number              int      `xml:"number"`
+		Reg_date            string   `xml:"regDate"`
+		Status              string   `xml:"status"`
+		Provide_date        string   `xml:"provideDate"`
+		Departure_type      string   `xml:"departureType"`
+		Goods               string   `xml:"goods"`
+		Origin_state        string   `xml:"originState"`
+		Enter_station       string   `xml:"enterStation"`
+		Region_depart       string   `xml:"regionDepart"`
+		Road_depart         string   `xml:"roadDepart"`
+		Station_depart      string   `xml:"stationDepart"`
+		Consigner           string   `xml:"consigner"`
+		State_destination   string   `xml:"stateDestination"`
+		Exit_station        string   `xml:"exitStation"`
+		Region_destination  string   `xml:"regionDestination"`
+		Road_destination    string   `xml:"roadDestination"`
+		Station_destination string   `xml:"stationDestination"`
+		Consignee           string   `xml:"consignee"`
+		Wagon_type          string   `xml:"wagonType"`
+		Property            string   `xml:"property"`
+		Wagon_owner         string   `xml:"wagonOwner"`
+		Payer               string   `xml:"payer"`
+		Road_owner          string   `xml:"roadOwner"`
+		Transport_manager   string   `xml:"transportManager"`
+		Tons_declared       int      `xml:"tonsDeclared"`
+		Tons_accepted       int      `xml:"tonsAccepted"`
+		Wagon_declared      int      `xml:"wagonDeclared"`
+		Wagon_accepted      int      `xml:"wagonAccepted"`
+		Filing_date         string   `xml:"filingDate"`
+		Agreement_date      string   `xml:"agreementDate"`
+		Approval_date       string   `xml:"approvalDate"`
+		Start_date          string   `xml:"startDate"`
+		Stop_date           string   `xml:"stopDate"`
+	}
+
 	if err1 != nil {
 		app.serverError(w, err1)
 		return
 	}
 
-	resoult := make([]Application, 0)
+	resoult := make([]XMLApplication, 0)
 
 	for topTen.Next() {
-		var a Application
+		var a XMLApplication
 		err = topTen.Scan(&a.Id, &a.Number, &a.Reg_date, &a.Status, &a.Provide_date, &a.Departure_type, &a.Goods, &a.Origin_state,
 			&a.Enter_station, &a.Region_depart, &a.Road_depart, &a.Station_depart, &a.Consigner, &a.State_destination,
 			&a.Exit_station, &a.Region_destination, &a.Road_destination, &a.Station_destination, &a.Consignee, &a.Wagon_type,
@@ -1119,7 +1173,7 @@ func (app *application) xmlPage(w http.ResponseWriter, r *http.Request) {
 	}
 
 	type Jopa struct {
-		Application []Application
+		Application []XMLApplication
 	}
 
 	err = ts.Execute(w, Jopa{Application: resoult})

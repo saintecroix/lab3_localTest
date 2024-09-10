@@ -3,9 +3,11 @@
 {{define "title"}}XML{{end}}
 
 {{define "main"}}
+<div style="display: block">
 <h2>Страница с XML данными</h2>
+</div>
 <label>Таблица с 10-ю последними заявками: </label>
-<div id="table-wrapper">
+<div id="table-wrapper" style="height: 280px">
     <table>
         <thead>
         <tr>
@@ -35,8 +37,8 @@
             <th scope="col">Организация перевозки в порту</th>
             <th scope="col">Тонн заявлено</th>
             <th scope="col">Тонн принято</th>
-            <th scope="col">Вагонов(контейнеров) заявлено</th>
-            <th scope="col">Вагонов(контейнеров) принято</th>
+            <th scope="col">Вагонов (контейнеров) заявлено</th>
+            <th scope="col">Вагонов (контейнеров) принято</th>
             <th scope="col">Дата подачи заявления</th>
             <th scope="col">Дата начала согласования</th>
             <th scope="col">Дата утверждения</th>
@@ -73,8 +75,8 @@
             <td data-label="Организация перевозки в порту">{{ .Transport_manager }}</td>
             <td data-label="Тонн заявлено">{{ .Tons_declared }}</td>
             <td data-label="Тонн принято">{{ .Tons_accepted }}</td>
-            <td data-label="Вагонов(контейнеров) заявлено">{{ .Wagon_declared }}</td>
-            <td data-label="Вагонов(контейнеров) принято">{{ .Wagon_accepted }}</td>
+            <td data-label="Вагонов (контейнеров) заявлено">{{ .Wagon_declared }}</td>
+            <td data-label="Вагонов (контейнеров) принято">{{ .Wagon_accepted }}</td>
             <td data-label="Дата подачи заявления">{{ .Filing_date }}</td>
             <td data-label="Дата начала согласования">{{ .Agreement_date }}</td>
             <td data-label="Дата утверждения">{{ .Approval_date }}</td>
