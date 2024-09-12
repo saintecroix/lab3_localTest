@@ -1113,44 +1113,6 @@ func (app *application) xmlPage(w http.ResponseWriter, r *http.Request) {
 		"a.Station_destination=st3.id inner join (select * from consignee) as con1 on a.Consignee=con1.id inner join " +
 		"wagon as w on a.Wagon_type=w.id order by a.id DESC limit 10;")
 
-	type XMLApplication struct {
-		xml.Name            `xml:"XMLApplication"`
-		Id                  int    `xml:"id"`
-		Number              int    `xml:"number"`
-		Reg_date            string `xml:"regDate"`
-		Status              string `xml:"status"`
-		Provide_date        string `xml:"provideDate"`
-		Departure_type      string `xml:"departureType"`
-		Goods               string `xml:"goods"`
-		Origin_state        string `xml:"originState"`
-		Enter_station       string `xml:"enterStation"`
-		Region_depart       string `xml:"regionDepart"`
-		Road_depart         string `xml:"roadDepart"`
-		Station_depart      string `xml:"stationDepart"`
-		Consigner           string `xml:"consigner"`
-		State_destination   string `xml:"stateDestination"`
-		Exit_station        string `xml:"exitStation"`
-		Region_destination  string `xml:"regionDestination"`
-		Road_destination    string `xml:"roadDestination"`
-		Station_destination string `xml:"stationDestination"`
-		Consignee           string `xml:"consignee"`
-		Wagon_type          string `xml:"wagonType"`
-		Property            string `xml:"property"`
-		Wagon_owner         string `xml:"wagonOwner"`
-		Payer               string `xml:"payer"`
-		Road_owner          string `xml:"roadOwner"`
-		Transport_manager   string `xml:"transportManager"`
-		Tons_declared       int    `xml:"tonsDeclared"`
-		Tons_accepted       int    `xml:"tonsAccepted"`
-		Wagon_declared      int    `xml:"wagonDeclared"`
-		Wagon_accepted      int    `xml:"wagonAccepted"`
-		Filing_date         string `xml:"filingDate"`
-		Agreement_date      string `xml:"agreementDate"`
-		Approval_date       string `xml:"approvalDate"`
-		Start_date          string `xml:"startDate"`
-		Stop_date           string `xml:"stopDate"`
-	}
-
 	if err1 != nil {
 		app.serverError(w, err1)
 		return
