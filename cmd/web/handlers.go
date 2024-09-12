@@ -7,6 +7,7 @@ import (
 	"fmt"
 	"html/template"
 	"net/http"
+	"os"
 	"strconv"
 )
 
@@ -1113,41 +1114,41 @@ func (app *application) xmlPage(w http.ResponseWriter, r *http.Request) {
 		"wagon as w on a.Wagon_type=w.id order by a.id DESC limit 10;")
 
 	type XMLApplication struct {
-		XMLName             xml.Name `xml:"application"`
-		Id                  int      `xml:"id"`
-		Number              int      `xml:"number"`
-		Reg_date            string   `xml:"regDate"`
-		Status              string   `xml:"status"`
-		Provide_date        string   `xml:"provideDate"`
-		Departure_type      string   `xml:"departureType"`
-		Goods               string   `xml:"goods"`
-		Origin_state        string   `xml:"originState"`
-		Enter_station       string   `xml:"enterStation"`
-		Region_depart       string   `xml:"regionDepart"`
-		Road_depart         string   `xml:"roadDepart"`
-		Station_depart      string   `xml:"stationDepart"`
-		Consigner           string   `xml:"consigner"`
-		State_destination   string   `xml:"stateDestination"`
-		Exit_station        string   `xml:"exitStation"`
-		Region_destination  string   `xml:"regionDestination"`
-		Road_destination    string   `xml:"roadDestination"`
-		Station_destination string   `xml:"stationDestination"`
-		Consignee           string   `xml:"consignee"`
-		Wagon_type          string   `xml:"wagonType"`
-		Property            string   `xml:"property"`
-		Wagon_owner         string   `xml:"wagonOwner"`
-		Payer               string   `xml:"payer"`
-		Road_owner          string   `xml:"roadOwner"`
-		Transport_manager   string   `xml:"transportManager"`
-		Tons_declared       int      `xml:"tonsDeclared"`
-		Tons_accepted       int      `xml:"tonsAccepted"`
-		Wagon_declared      int      `xml:"wagonDeclared"`
-		Wagon_accepted      int      `xml:"wagonAccepted"`
-		Filing_date         string   `xml:"filingDate"`
-		Agreement_date      string   `xml:"agreementDate"`
-		Approval_date       string   `xml:"approvalDate"`
-		Start_date          string   `xml:"startDate"`
-		Stop_date           string   `xml:"stopDate"`
+		xml.Name            `xml:"XMLApplication"`
+		Id                  int    `xml:"id"`
+		Number              int    `xml:"number"`
+		Reg_date            string `xml:"regDate"`
+		Status              string `xml:"status"`
+		Provide_date        string `xml:"provideDate"`
+		Departure_type      string `xml:"departureType"`
+		Goods               string `xml:"goods"`
+		Origin_state        string `xml:"originState"`
+		Enter_station       string `xml:"enterStation"`
+		Region_depart       string `xml:"regionDepart"`
+		Road_depart         string `xml:"roadDepart"`
+		Station_depart      string `xml:"stationDepart"`
+		Consigner           string `xml:"consigner"`
+		State_destination   string `xml:"stateDestination"`
+		Exit_station        string `xml:"exitStation"`
+		Region_destination  string `xml:"regionDestination"`
+		Road_destination    string `xml:"roadDestination"`
+		Station_destination string `xml:"stationDestination"`
+		Consignee           string `xml:"consignee"`
+		Wagon_type          string `xml:"wagonType"`
+		Property            string `xml:"property"`
+		Wagon_owner         string `xml:"wagonOwner"`
+		Payer               string `xml:"payer"`
+		Road_owner          string `xml:"roadOwner"`
+		Transport_manager   string `xml:"transportManager"`
+		Tons_declared       int    `xml:"tonsDeclared"`
+		Tons_accepted       int    `xml:"tonsAccepted"`
+		Wagon_declared      int    `xml:"wagonDeclared"`
+		Wagon_accepted      int    `xml:"wagonAccepted"`
+		Filing_date         string `xml:"filingDate"`
+		Agreement_date      string `xml:"agreementDate"`
+		Approval_date       string `xml:"approvalDate"`
+		Start_date          string `xml:"startDate"`
+		Stop_date           string `xml:"stopDate"`
 	}
 
 	if err1 != nil {
@@ -1155,10 +1156,10 @@ func (app *application) xmlPage(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	resoult := make([]XMLApplication, 0)
+	resoult := make([]Application, 0)
 
 	for topTen.Next() {
-		var a XMLApplication
+		var a Application
 		err = topTen.Scan(&a.Id, &a.Number, &a.Reg_date, &a.Status, &a.Provide_date, &a.Departure_type, &a.Goods, &a.Origin_state,
 			&a.Enter_station, &a.Region_depart, &a.Road_depart, &a.Station_depart, &a.Consigner, &a.State_destination,
 			&a.Exit_station, &a.Region_destination, &a.Road_destination, &a.Station_destination, &a.Consignee, &a.Wagon_type,
@@ -1172,8 +1173,32 @@ func (app *application) xmlPage(w http.ResponseWriter, r *http.Request) {
 		resoult = append(resoult, a)
 	}
 
+	xmlfile, err := os.OpenFile("./ui/static/file.xml", os.O_RDWR, 0644)
+	if err != nil {
+		app.serverError(w, err)
+		return
+	}
+	defer xmlfile.Close()
+	_, err = xmlfile.Seek(0, 0)
+	if err != nil {
+		app.serverError(w, err)
+		return
+	}
+	err = xmlfile.Truncate(0)
+	if err != nil {
+		app.serverError(w, err)
+		return
+	}
+	encoder := xml.NewEncoder(xmlfile)
+	encoder.Indent(" ", "	")
+
 	type Jopa struct {
-		Application []XMLApplication
+		Application []Application `xml:"Application"`
+	}
+
+	if xmlErr := encoder.Encode(Jopa{Application: resoult}); xmlErr != nil {
+		app.serverError(w, xmlErr)
+		return
 	}
 
 	err = ts.Execute(w, Jopa{Application: resoult})
