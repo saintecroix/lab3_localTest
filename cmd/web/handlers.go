@@ -1192,16 +1192,16 @@ func (app *application) xmlPage(w http.ResponseWriter, r *http.Request) {
 	encoder := xml.NewEncoder(xmlfile)
 	encoder.Indent(" ", "	")
 
-	type Jopa struct {
+	type DataXML struct {
 		Application []Application `xml:"Application"`
 	}
 
-	if xmlErr := encoder.Encode(Jopa{Application: resoult}); xmlErr != nil {
+	if xmlErr := encoder.Encode(DataXML{Application: resoult}); xmlErr != nil {
 		app.serverError(w, xmlErr)
 		return
 	}
 
-	err = ts.Execute(w, Jopa{Application: resoult})
+	err = ts.Execute(w, DataXML{Application: resoult})
 	if err != nil {
 		app.serverError(w, err)
 		return
