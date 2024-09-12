@@ -155,3 +155,53 @@ document.querySelectorAll('.menu__switcher > .menu__link').forEach(link => {
 		parent.classList.toggle('active');
 	});
 });
+
+/*----------------------------------------------------------------------------------------*/
+
+// Получить ссылку на таблицу
+const table = document.querySelector('table');
+
+// Событие ввода для поля поиска
+document.querySelector('#search-input').addEventListener('input', function() {
+	// Получить значение поиска
+	const searchValue = this.value.toLowerCase();
+
+	// Скрыть все строки, которые не содержат значение поиска
+	table.querySelectorAll('tbody tr').forEach(function(row) {
+		const rowText = row.textContent.toLowerCase();
+		if (!rowText.includes(searchValue)) {
+			row.style.display = 'none';
+		} else {
+			row.style.display = '';
+		}
+	});
+});
+
+// Событие клика для заголовков столбцов для сортировки
+table.querySelectorAll('th').forEach(function(header) {
+	header.addEventListener('click', function() {
+		// Получить индекс столбца
+		const columnIndex = header.cellIndex;
+
+		// Получить все строки в таблице
+		const rows = Array.from(table.querySelectorAll('tbody tr'));
+
+		// Отсортировать строки по значению указанного столбца
+		rows.sort(function(a, b) {
+			const aValue = a.children[columnIndex].textContent;
+			const bValue = b.children[columnIndex].textContent;
+
+			return aValue.localeCompare(bValue);
+		});
+
+		// Удалить все существующие строки из таблицы
+		table.querySelectorAll('tbody tr').forEach(function(row) {
+			row.remove();
+		});
+
+		// Добавить отсортированные строки обратно в таблицу
+		rows.forEach(function(row) {
+			table.querySelector('tbody').appendChild(row);
+		});
+	});
+});

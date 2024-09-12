@@ -423,6 +423,12 @@ table th {
              'opsz' 24
  }
 
+#search-input {
+    width: 100%;
+    padding: 5px;
+    margin-bottom: 10px;
+}
+
 /*
 .search-box{
 width: fit-content;
