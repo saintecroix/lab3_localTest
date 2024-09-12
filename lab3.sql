@@ -12341,6 +12341,37 @@ ALTER TABLE `station`
 --
 ALTER TABLE `wagon`
   MODIFY `id` int NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=7;
+
+CREATE TABLE `user` (
+                        `id` int NOT NULL,
+                        `login` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NOT NULL,
+                        `password` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NOT NULL,
+                        `mail` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NOT NULL
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+
+--
+-- Индексы сохранённых таблиц
+--
+
+--
+-- Индексы таблицы `user`
+--
+ALTER TABLE `user`
+    ADD PRIMARY KEY (`id`),
+    ADD UNIQUE KEY `login` (`login`),
+    ADD UNIQUE KEY `mail` (`mail`);
+
+--
+-- AUTO_INCREMENT для сохранённых таблиц
+--
+
+--
+-- AUTO_INCREMENT для таблицы `user`
+--
+ALTER TABLE `user`
+    MODIFY `id` int NOT NULL AUTO_INCREMENT;
+COMMIT;
+
 # COMMIT;
 
 # /*!40101 SET CHARACTER_SET_CLIENT=@OLD_CHARACTER_SET_CLIENT */;
