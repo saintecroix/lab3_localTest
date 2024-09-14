@@ -205,3 +205,35 @@ table.querySelectorAll('th').forEach(function(header) {
 		});
 	});
 });
+
+/*----------------------------------------------------------------------------------------*/
+
+// Получить ссылки на элементы всплывающего окна авторизации
+const modal = document.getElementById('login-modal');
+const btn = document.getElementById('login-button');
+const close = document.getElementsByClassName('close')[0];
+
+// Событие клика для открытия всплывающего окна авторизации
+btn.addEventListener('click', function() {
+	modal.style.display = 'block';
+});
+
+// Событие клика для закрытия всплывающего окна авторизации
+close.addEventListener('click', function() {
+	modal.style.display = 'none';
+});
+
+// Событие клика для отправки формы авторизации
+modal.addEventListener('submit', function(e) {
+	e.preventDefault();
+
+	/* Получить значение имени пользователя и пароля
+	const username = document.getElementById('username').value;
+	const password = document.getElementById('password').value;
+	const email = document.getElementById('email').value;*/
+
+	// Отправить данные авторизации на сервер (здесь это не реализовано)
+
+	// Скрыть всплывающее окно авторизации после успешной авторизации
+	modal.style.display = 'none';
+});

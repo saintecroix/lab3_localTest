@@ -59,10 +59,27 @@
         </ul>
     </nav>
 
+    <div id="login-modal" class="modal">
+        <div class="modal-content">
+            <form>
+                <label for="username">Имя пользователя:</label>
+                <input type="text" id="username">
+                <br>
+                <label for="password">Пароль:</label>
+                <input type="password" id="password">
+                <br>
+                <label for="email">Email:</label>
+                <input type="email" id="email">
+                <br>
+                <input type="submit" value="Войти">
+            </form>
+        </div>
+    </div>
 
     <div>
         <main>
             {{template "main" .}}
+            <button id="login-button" style="float: right">Авторизация</button>
         </main>
     </div>
     <script src="../static/js/main.js"></script>

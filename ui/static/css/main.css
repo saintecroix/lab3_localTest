@@ -429,61 +429,19 @@ table th {
     margin-bottom: 10px;
 }
 
-/*
-.search-box{
-width: fit-content;
-height: fit-content;
-position: relative;
-background-color: rgb(146,165,235);
-border-radius: 25px;
+.modal {
+    display: none; /* Скрыть модальное окно по умолчанию */
+    position: fixed; /* Позиционировать модальное окно в фиксированном положении */
+    z-index: 1; /* Установить высокий индекс z-слоя для модального окна */
+    left: 0;
+    top: 0;
+    width: 100%; /* Ширина модального окна */
+    height: 100%; /* Высота модального окна */
+    background-color: rgba(0, 0, 0, 0.4); /* Полупрозрачный черный фон */
 }
-.input-search{
-height: 50px;
-width: 50px;
-border-style: none;
-padding: 10px;
-font-size: 18px;
-letter-spacing: 2px;
-outline: none;
-border-radius: 25px;
-transition: all .5s ease-in-out;
-background-color: transparent;
-padding-right: 40px;
-color:#fff;
+.modal-content {
+    background-color: #fff; /* Белый фон для содержимого модального окна */
+    margin: 15% auto; /* Отступ для содержимого модального окна */
+    padding: 20px;
+    border: 1px solid #888;
 }
-.input-search::placeholder{
-color:rgba(255,255,255,.5);
-font-size: 18px;
-letter-spacing: 2px;
-font-weight: 100;
-}
-.btn-search{
-width: 50px;
-height: 50px;
-border-style: none;
-font-size: 20px;
-font-weight: bold;
-outline: none;
-cursor: pointer;
-border-radius: 50%;
-position: absolute;
-right: 0px;
-color:#3b5bcb ;
-background-color:transparent;
-pointer-events: painted;
-}
-.btn-search:focus ~ .input-search{
-width: 300px;
-border-radius: 0px;
-background-color: transparent;
-border-bottom:1px solid rgba(255,255,255,.5);
-transition: all 500ms cubic-bezier(0, 0.110, 0.35, 2);
-}
-.input-search:focus{
-width: 300px;
-border-radius: 0px;
-background-color: transparent;
-border-bottom:1px solid rgba(255,255,255,.5);
-transition: all 500ms cubic-bezier(0, 0.110, 0.35, 2);
-}
-*/
