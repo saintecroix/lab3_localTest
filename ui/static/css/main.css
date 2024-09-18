@@ -445,3 +445,196 @@ table th {
     padding: 20px;
     border: 1px solid #888;
 }
+
+section#button-container{
+    position: absolute;
+    width: 100px;
+    top: 17px;
+    right: 130px;
+    float: right;
+    z-index: 1000;
+
+    .login-btn{
+        margin: 20px;
+        float: left;
+        position: relative;
+        font-family: arial;
+        text-transform: uppercase;
+        color: #fff;
+        cursor: pointer;
+
+        &.v19{
+            .login-label {
+                padding: 10px 30px;
+                font-family: arial;
+                font-size: 17px;
+                display: inline-block;
+                z-index: 10;
+                position: relative;
+                white-space: nowrap;
+                line-height: 24px;
+                transition: all 0.225s;
+                transition-delay: 0.45s;
+                letter-spacing: 2px;
+            }
+
+            &.button-start{
+                .label{
+                    padding: 12px 65px;
+                }
+            }
+
+            .login-icon2 {
+                display: block;
+                position: absolute;
+                top: 0;
+                left: 0;
+                width: 100%;
+                height: 100%;
+                transition: all 0.225s;
+                transform: skew(-40deg, 0deg) scaleX(1);
+                background: rgba(#f0202f, 0.8);
+                transition-delay: 0.45s;
+            }
+
+            .login-icon {
+                display: block;
+                position: absolute;
+                top: 0;
+                left: 0;
+                width: 100%;
+                height: 100%;
+                transition: all 0.225s;
+                transform: scale(0.9) skew(0deg, 0deg);
+                transition-delay: 0.15s;
+
+                &:before, &:after {
+                    width: 60px;
+                    opacity: 0;
+                    content: '';
+                    height: 1px;
+                    position: absolute;
+                    display: block;
+                    background: #f0202f;
+                    transition: all 0.375s;
+                    transition-delay: 0.3s;
+                }
+                &:before {
+                    top: 0;
+                    left: calc(50% - 30px);
+                }
+                &:after {
+                    bottom: 0;
+                    right: calc(50% - 30px);
+                }
+                span {
+
+                    &:before, &:after {
+                        height: 0;
+                        transition-delay: 0s;
+                        content: '';
+                        background: #f0202f;
+                        position: absolute;
+                        display: block;
+                        width: 2px;
+                        transition: all 0.225s;
+                    }
+                    &:before {
+                        left: 0;
+                        top: 0;
+                    }
+                    &:after {
+                        right: 0;
+                        bottom: 0;
+                    }
+                }
+            }
+            &:hover {
+                .login-icon {
+                    transform: skew(-40deg, 0deg);
+
+                    &:before, &:after {
+                        transition-delay: 0s;
+                        width: 30px;
+                        opacity: 1;
+                    }
+                    &:before {
+                        left: 0;
+                    }
+                    &:after {
+                        right: 0;
+                    }
+
+                    span {
+                        &:before, &:after {
+                            height: 30px;
+                            transition-delay: 0.45s;
+                        }
+                    }
+                }
+                .login-icon2 {
+                    transform: skew(-40deg, 0deg) scaleX(0.2);
+                    background: transparent;
+                    transition-delay: 0s;
+                    opacity: 0;
+                }
+            }
+
+            &.white{
+
+                &:hover {
+                    .label{
+                        color: #34495E;
+                        transition-delay: 0s;
+                    }
+                }
+                .login-icon2 {
+                    background: #34495E;
+                }
+                .login-icon {
+
+                    &:before, &:after {
+                        background: #34495E;
+                    }
+                    span {
+                        &:before, &:after {
+                            background: #34495E;
+                        }
+                    }
+                }
+            }
+
+            &.transparent{
+                float: none;
+                display: inline-block;
+                -webkit-transform: translateZ(0px);
+                transform: translateZ(0px);
+
+                .login-label{
+                    color: #34495E;
+                    transition-delay: 0s;
+                }
+                .login-icon2 {
+                    background: transparent;
+                }
+                .login-icon {
+                    transform: scale(1) skew(10deg, 0deg);
+
+                    &:before, &:after {
+                        background: #34495E;
+                    }
+                    span {
+                        &:before, &:after {
+                            background: #34495E;
+                        }
+                    }
+                }
+                &:hover {
+                    .login-icon {
+                        transform: scale(1) skew(-40deg, 0deg);
+                    }
+                }
+            }
+        }
+    }
+}
