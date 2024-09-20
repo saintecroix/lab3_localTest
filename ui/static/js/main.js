@@ -208,32 +208,19 @@ table.querySelectorAll('th').forEach(function(header) {
 
 /*----------------------------------------------------------------------------------------*/
 
-// Получить ссылки на элементы всплывающего окна авторизации
-const modal = document.getElementById('login-modal');
-const btn = document.getElementById('login-button');
-const close = document.getElementsByClassName('close')[0];
+const buttonContainer = document.getElementById("button-container");
+const loginModal = document.getElementById("login-modal");
 
-// Событие клика для открытия всплывающего окна авторизации
-btn.addEventListener('click', function() {
-	modal.style.display = 'block';
+buttonContainer.addEventListener("click", (event) => {
+	event.preventDefault(); // Предотвратить выполнение действия по умолчанию (переход по ссылке)
+	loginModal.classList.remove("hidden");
 });
 
-// Событие клика для закрытия всплывающего окна авторизации
-close.addEventListener('click', function() {
-	modal.style.display = 'none';
+window.addEventListener("click", (event) => {
+	if (event.target == loginModal) {
+		loginModal.classList.add("hidden");
+	}
 });
+console.log(document.querySelectorAll("#button-container"));
+console.log(document.querySelectorAll("#login-modal"));
 
-// Событие клика для отправки формы авторизации
-modal.addEventListener('submit', function(e) {
-	e.preventDefault();
-
-	/* Получить значение имени пользователя и пароля
-	const username = document.getElementById('username').value;
-	const password = document.getElementById('password').value;
-	const email = document.getElementById('email').value;*/
-
-	// Отправить данные авторизации на сервер (здесь это не реализовано)
-
-	// Скрыть всплывающее окно авторизации после успешной авторизации
-	modal.style.display = 'none';
-});
