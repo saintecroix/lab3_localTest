@@ -225,3 +225,20 @@ window.addEventListener("click", (event) => {
 		target.classList.add("hidden");
 	}
 });
+
+/*----------------------------------------------------------------------------------------*/
+
+const passwordInput = document.getElementById("password");
+const confirmPasswordInput = document.getElementById("confirm-password");
+
+// Добавляем обработчик события изменения для поля подтверждения пароля
+confirmPasswordInput.addEventListener("input", () => {
+	// Проверяем, совпадают ли пароли
+	if (confirmPasswordInput.value !== passwordInput.value) {
+		// Пароли не совпадают, показываем сообщение об ошибке
+		confirmPasswordInput.setCustomValidity("Пароли не совпадают");
+	} else {
+		// Пароли совпадают, удаляем сообщение об ошибке
+		confirmPasswordInput.setCustomValidity("");
+	}
+});

@@ -1169,3 +1169,27 @@ func (app *application) xmlPage(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 }
+
+func (app *application) regPage(w http.ResponseWriter, r *http.Request) {
+	if r.Method != "GET" {
+		http.Error(w, "Неверный метод запроса", http.StatusMethodNotAllowed)
+		return
+	}
+
+	files := []string{
+		"./ui/html/regPage.page.tmpl",
+		"./ui/html/base.layout.tmpl",
+		"./ui/html/footer.partial.tmpl",
+	}
+	ts, err := template.ParseFiles(files...)
+	if err != nil {
+		app.serverError(w, err)
+		return
+	}
+
+	err = ts.Execute(w, nil)
+	if err != nil {
+		app.serverError(w, err)
+		return
+	}
+}
