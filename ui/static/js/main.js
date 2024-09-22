@@ -160,51 +160,54 @@ document.querySelectorAll('.menu__switcher > .menu__link').forEach(link => {
 
 // Получить ссылку на таблицу
 const table = document.querySelector('table');
+const search_input = document.querySelector('#search-input')
 
 // Событие ввода для поля поиска
-document.querySelector('#search-input').addEventListener('input', function() {
-	// Получить значение поиска
-	const searchValue = this.value.toLowerCase();
+if (search_input) {
+	search_input.addEventListener('input', function () {
+		// Получить значение поиска
+		const searchValue = this.value.toLowerCase();
 
-	// Скрыть все строки, которые не содержат значение поиска
-	table.querySelectorAll('tbody tr').forEach(function(row) {
-		const rowText = row.textContent.toLowerCase();
-		if (!rowText.includes(searchValue)) {
-			row.style.display = 'none';
-		} else {
-			row.style.display = '';
-		}
+		// Скрыть все строки, которые не содержат значение поиска
+		table.querySelectorAll('tbody tr').forEach(function (row) {
+			const rowText = row.textContent.toLowerCase();
+			if (!rowText.includes(searchValue)) {
+				row.style.display = 'none';
+			} else {
+				row.style.display = '';
+			}
+		});
 	});
-});
 
 // Событие клика для заголовков столбцов для сортировки
-table.querySelectorAll('th').forEach(function(header) {
-	header.addEventListener('click', function() {
-		// Получить индекс столбца
-		const columnIndex = header.cellIndex;
+	table.querySelectorAll('th').forEach(function (header) {
+		header.addEventListener('click', function () {
+			// Получить индекс столбца
+			const columnIndex = header.cellIndex;
 
-		// Получить все строки в таблице
-		const rows = Array.from(table.querySelectorAll('tbody tr'));
+			// Получить все строки в таблице
+			const rows = Array.from(table.querySelectorAll('tbody tr'));
 
-		// Отсортировать строки по значению указанного столбца
-		rows.sort(function(a, b) {
-			const aValue = a.children[columnIndex].textContent;
-			const bValue = b.children[columnIndex].textContent;
+			// Отсортировать строки по значению указанного столбца
+			rows.sort(function (a, b) {
+				const aValue = a.children[columnIndex].textContent;
+				const bValue = b.children[columnIndex].textContent;
 
-			return aValue.localeCompare(bValue);
-		});
+				return aValue.localeCompare(bValue);
+			});
 
-		// Удалить все существующие строки из таблицы
-		table.querySelectorAll('tbody tr').forEach(function(row) {
-			row.remove();
-		});
+			// Удалить все существующие строки из таблицы
+			table.querySelectorAll('tbody tr').forEach(function (row) {
+				row.remove();
+			});
 
-		// Добавить отсортированные строки обратно в таблицу
-		rows.forEach(function(row) {
-			table.querySelector('tbody').appendChild(row);
+			// Добавить отсортированные строки обратно в таблицу
+			rows.forEach(function (row) {
+				table.querySelector('tbody').appendChild(row);
+			});
 		});
 	});
-});
+}
 
 /*----------------------------------------------------------------------------------------*/
 
@@ -217,10 +220,8 @@ buttonContainer.addEventListener("click", (event) => {
 });
 
 window.addEventListener("click", (event) => {
-	if (event.target == loginModal) {
-		loginModal.classList.add("hidden");
+	const target = event.target;
+	if (target.classList.contains("modal11")) {
+		target.classList.add("hidden");
 	}
 });
-console.log(document.querySelectorAll("#button-container"));
-console.log(document.querySelectorAll("#login-modal"));
-
