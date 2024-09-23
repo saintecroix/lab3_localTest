@@ -38,6 +38,11 @@ func (app *application) home(w http.ResponseWriter, r *http.Request) {
 /*----------------------------------------------------------------------------------------*/
 
 func (app *application) input(w http.ResponseWriter, r *http.Request) {
+	if r.Method != "GET" {
+		http.Error(w, "Неверный метод запроса", http.StatusMethodNotAllowed)
+		return
+	}
+
 	files := []string{
 		"./ui/html/input.page.tmpl",
 		"./ui/html/base.layout.tmpl",
@@ -148,6 +153,11 @@ func (app *application) save_application(w http.ResponseWriter, r *http.Request)
 /*----------------------------------------------------------------------------------------*/
 
 func (app *application) addGruz(w http.ResponseWriter, r *http.Request) {
+	if r.Method != "GET" {
+		http.Error(w, "Неверный метод запроса", http.StatusMethodNotAllowed)
+		return
+	}
+
 	files := []string{
 		"./ui/html/add_gruz.page.tmpl",
 		"./ui/html/base.layout.tmpl",
@@ -197,6 +207,11 @@ func (app *application) save_gruz(w http.ResponseWriter, r *http.Request) {
 /*----------------------------------------------------------------------------------------*/
 
 func (app *application) add_state(w http.ResponseWriter, r *http.Request) {
+	if r.Method != "GET" {
+		http.Error(w, "Неверный метод запроса", http.StatusMethodNotAllowed)
+		return
+	}
+
 	files := []string{
 		"./ui/html/add_state.page.tmpl",
 		"./ui/html/base.layout.tmpl",
@@ -244,6 +259,11 @@ func (app *application) save_state(w http.ResponseWriter, r *http.Request) {
 /*----------------------------------------------------------------------------------------*/
 
 func (app *application) add_station(w http.ResponseWriter, r *http.Request) {
+	if r.Method != "GET" {
+		http.Error(w, "Неверный метод запроса", http.StatusMethodNotAllowed)
+		return
+	}
+
 	files := []string{
 		"./ui/html/add_station.page.tmpl",
 		"./ui/html/base.layout.tmpl",
@@ -293,6 +313,11 @@ func (app *application) save_station(w http.ResponseWriter, r *http.Request) {
 /*----------------------------------------------------------------------------------------*/
 
 func (app *application) add_region(w http.ResponseWriter, r *http.Request) {
+	if r.Method != "GET" {
+		http.Error(w, "Неверный метод запроса", http.StatusMethodNotAllowed)
+		return
+	}
+
 	files := []string{
 		"./ui/html/add_region.page.tmpl",
 		"./ui/html/base.layout.tmpl",
@@ -340,6 +365,11 @@ func (app *application) save_region(w http.ResponseWriter, r *http.Request) {
 /*----------------------------------------------------------------------------------------*/
 
 func (app *application) add_road(w http.ResponseWriter, r *http.Request) {
+	if r.Method != "GET" {
+		http.Error(w, "Неверный метод запроса", http.StatusMethodNotAllowed)
+		return
+	}
+
 	files := []string{
 		"./ui/html/add_road.page.tmpl",
 		"./ui/html/base.layout.tmpl",
@@ -388,6 +418,11 @@ func (app *application) save_road(w http.ResponseWriter, r *http.Request) {
 /*----------------------------------------------------------------------------------------*/
 
 func (app *application) add_consignee(w http.ResponseWriter, r *http.Request) {
+	if r.Method != "GET" {
+		http.Error(w, "Неверный метод запроса", http.StatusMethodNotAllowed)
+		return
+	}
+
 	files := []string{
 		"./ui/html/add_consignee.page.tmpl",
 		"./ui/html/base.layout.tmpl",
@@ -442,6 +477,11 @@ func (app *application) save_consignee(w http.ResponseWriter, r *http.Request) {
 /*----------------------------------------------------------------------------------------*/
 
 func (app *application) add_wagon(w http.ResponseWriter, r *http.Request) {
+	if r.Method != "GET" {
+		http.Error(w, "Неверный метод запроса", http.StatusMethodNotAllowed)
+		return
+	}
+
 	files := []string{
 		"./ui/html/add_wagon.page.tmpl",
 		"./ui/html/base.layout.tmpl",
@@ -489,6 +529,11 @@ func (app *application) save_wagon(w http.ResponseWriter, r *http.Request) {
 /*----------------------------------------------------------------------------------------*/
 
 func (app *application) stats(w http.ResponseWriter, r *http.Request) {
+	if r.Method != "GET" {
+		http.Error(w, "Неверный метод запроса", http.StatusMethodNotAllowed)
+		return
+	}
+
 	files := []string{
 		"./ui/html/stats.page.tmpl",
 		"./ui/html/base.layout.tmpl",
@@ -638,6 +683,11 @@ func (app *application) soloSearch(w http.ResponseWriter, r *http.Request) {
 }
 
 func (app *application) duoSearch(w http.ResponseWriter, r *http.Request) {
+	if r.Method != "GET" {
+		http.Error(w, "Неверный метод запроса", http.StatusMethodNotAllowed)
+		return
+	}
+
 	files := []string{
 		"./ui/html/duoSearch.page.tmpl",
 		"./ui/html/base.layout.tmpl",
@@ -784,6 +834,11 @@ func (app *application) letDuoSearch(w http.ResponseWriter, r *http.Request) {
 }
 
 func (app *application) aboutDB(w http.ResponseWriter, r *http.Request) {
+	if r.Method != "GET" {
+		http.Error(w, "Неверный метод запроса", http.StatusMethodNotAllowed)
+		return
+	}
+
 	files := []string{
 		"./ui/html/about_db.page.tmpl",
 		"./ui/html/base.layout.tmpl",
@@ -804,6 +859,11 @@ func (app *application) aboutDB(w http.ResponseWriter, r *http.Request) {
 }
 
 func (app *application) xmlPage(w http.ResponseWriter, r *http.Request) {
+	if r.Method != "GET" {
+		http.Error(w, "Неверный метод запроса", http.StatusMethodNotAllowed)
+		return
+	}
+
 	files := []string{
 		"./ui/html/xml.page.tmpl",
 		"./ui/html/base.layout.tmpl",
