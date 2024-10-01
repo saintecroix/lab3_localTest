@@ -248,6 +248,14 @@ const reg_username = document.getElementById("username");
 const reg_password = document.getElementById("password");
 const reg_email = document.getElementById("email");
 
+reg_username.addEventListener("change", () => {
+	reg_username.setCustomValidity("")
+})
+
+reg_email.addEventListener("change", () => {
+	reg_email.setCustomValidity("")
+})
+
 reg_form?.addEventListener("submit", async (event) => {
 	event.preventDefault();
 
@@ -257,41 +265,70 @@ reg_form?.addEventListener("submit", async (event) => {
 		email: reg_email.value,
 	};
 
-	const response = await fetch("/registration", {
+	console.log("FormData:", formData);
+	fetch("/registration", {
 		method: "POST",
 		headers: {
 			"Content-Type": "application/json",
 		},
-		body: JSON.stringify(formData),
-	});
+		body: JSON.stringify(formData)
+	})
+		.catch(error => {
+			console.error("Ошибка при выполнении запроса на сервер: ", error)
+		})
+		.then(response => {
+			if (!response.ok) {
+				alert("Something went wrong! Please try again.");
+			} else {
+				return response.json()
+			}
+		})
+		.then(result => {
+			if (result.success === false) {
+				const existingUsername = result.existingUsername;
+				const existingEmail = result.existingEmail;
 
-	if (!response.ok) {
-		alert("Something went wrong! Please try again.");
-		return;
-	}
-
-	const result = await response.json();
-	if (result.success === false) {
-		const existingUsername = result.existingUsername;
-		const existingEmail = result.existingEmail;
-
-		if (existingUsername && reg_username.value === existingUsername) {
-			reg_username.setCustomValidity("Пользователь с таким именем уже существует");
-			delete formData.username.value
-		}
-		if (existingEmail && reg_email.value === existingEmail) {
-			reg_email.setCustomValidity("Пользователь с такой почтой уже существует");
-			delete formData.email.value
-		}
-		console.log(formData)
-	}else{
-		setTimeout(() => {
-			window.location.href = "/";
-		}, 1000);
-		alert("success!");
-		console.log(formData)
-	}
+				if (existingUsername && reg_username.value === existingUsername) {
+					reg_username.setCustomValidity("Пользователь с таким именем уже существует");
+				}
+				if (existingEmail && reg_email.value === existingEmail) {
+					reg_email.setCustomValidity("Пользователь с такой почтой уже существует");
+				}
+			} else {
+				setTimeout(() => {
+					window.location.href = "/";
+				}, 1000);
+				alert("success!");
+				console.log(formData)
+			}
+		})
+		.catch(error => {
+			// Ошибка при выполнении запроса
+			console.error("Ошибка при выполнении запроса на сервер: ", error);
+		});
 });
+
+// 	const result = await response.json();
+// 	if (result.success === false) {
+// 		const existingUsername = result.existingUsername;
+// 		const existingEmail = result.existingEmail;
+//
+// 		if (existingUsername && reg_username.value === existingUsername) {
+// 			reg_username.setCustomValidity("Пользователь с таким именем уже существует");
+// 			formData.username = undefined;
+// 		}
+// 		if (existingEmail && reg_email.value === existingEmail) {
+// 			reg_email.setCustomValidity("Пользователь с такой почтой уже существует");
+// 			formData.email = undefined;
+// 		}
+// 	}else{
+// 		setTimeout(() => {
+// 			window.location.href = "/";
+// 		}, 1000);
+// 		alert("success!");
+// 		console.log(formData)
+// 	}
+// });
 
 /*----------------------------------------------------------------------------------------*/
 

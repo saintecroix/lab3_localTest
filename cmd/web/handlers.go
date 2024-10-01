@@ -1001,7 +1001,6 @@ func (app *application) registration(w http.ResponseWriter, r *http.Request) {
 		ExistingEmail    string `json:"existingEmail"`
 	}
 	res := sendData{}
-	res.Success = false
 
 	login, err := app.dbSearch("login", "user", fmt.Sprintf("where login = '%s'", data.User))
 	if err != nil {
@@ -1009,9 +1008,9 @@ func (app *application) registration(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 	if len(login) == 0 {
-		res = sendData{ExistingUsername: ""}
+		res.ExistingUsername = ""
 	} else {
-		res = sendData{ExistingUsername: login[0]}
+		res.ExistingUsername = login[0]
 	}
 
 	email, err := app.dbSearch("mail", "user", fmt.Sprintf("where mail = '%s'", data.Email))
@@ -1020,9 +1019,9 @@ func (app *application) registration(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 	if len(email) == 0 {
-		res = sendData{ExistingEmail: ""}
+		res.ExistingEmail = ""
 	} else {
-		res = sendData{ExistingEmail: email[0]}
+		res.ExistingEmail = email[0]
 	}
 	fmt.Println(res)
 
