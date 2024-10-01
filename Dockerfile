@@ -1,4 +1,4 @@
-FROM golang:1.21 AS APP
+FROM golang:latest AS APP
 RUN mkdir /app
 COPY /. /app
 WORKDIR /app
