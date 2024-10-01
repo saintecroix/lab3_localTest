@@ -237,8 +237,66 @@ confirmPasswordInput.addEventListener("input", () => {
 	if (confirmPasswordInput.value !== passwordInput.value) {
 		// Пароли не совпадают, показываем сообщение об ошибке
 		confirmPasswordInput.setCustomValidity("Пароли не совпадают");
-	} else {
+	} else if (confirmPasswordInput.value === passwordInput.value && confirmPasswordInput.validity.customError) {
 		// Пароли совпадают, удаляем сообщение об ошибке
 		confirmPasswordInput.setCustomValidity("");
 	}
 });
+
+const reg_form = document.getElementById("reg-form");
+const reg_username = document.getElementById("username");
+const reg_password = document.getElementById("password");
+const reg_email = document.getElementById("email");
+
+reg_form?.addEventListener("submit", async (event) => {
+	event.preventDefault();
+
+	const formData = {
+		username: reg_username.value,
+		password: reg_password.value,
+		email: reg_email.value,
+	};
+
+	const response = await fetch("/registration", {
+		method: "POST",
+		headers: {
+			"Content-Type": "application/json",
+		},
+		body: JSON.stringify(formData),
+	});
+
+	if (!response.ok) {
+		alert("Something went wrong! Please try again.");
+		return;
+	}
+
+	const result = await response.json();
+	if (result.success === false) {
+		const existingUsername = result.existingUsername;
+		const existingEmail = result.existingEmail;
+
+		if (existingUsername && reg_username.value === existingUsername) {
+			reg_username.setCustomValidity("Пользователь с таким именем уже существует");
+			delete formData.username.value
+		}
+		if (existingEmail && reg_email.value === existingEmail) {
+			reg_email.setCustomValidity("Пользователь с такой почтой уже существует");
+			delete formData.email.value
+		}
+		console.log(formData)
+	}else{
+		setTimeout(() => {
+			window.location.href = "/";
+		}, 1000);
+		alert("success!");
+		console.log(formData)
+	}
+});
+
+/*----------------------------------------------------------------------------------------*/
+
+// For /test
+fetch("/test")
+	.then(response => response.json())
+	.then(data => console.log(data))
+	.catch(error => console.error(error));

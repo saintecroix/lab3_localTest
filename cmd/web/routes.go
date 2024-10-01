@@ -31,6 +31,8 @@ func (app *application) routes() *http.ServeMux {
 	m.HandleFunc("/about_db", app.aboutDB)
 	m.HandleFunc("/xml", app.xmlPage)
 	m.HandleFunc("/reg", app.regPage)
+	m.HandleFunc("/registration", app.registration)
+	m.HandleFunc("/test", app.test)
 
 	fileServer := http.FileServer(http.Dir("./ui/static/"))
 	m.Handle("/static/", http.StripPrefix("/static", fileServer))

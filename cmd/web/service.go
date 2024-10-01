@@ -2,6 +2,7 @@ package main
 
 import (
 	"database/sql"
+	"encoding/json"
 	"fmt"
 	"net/http"
 )
@@ -178,4 +179,53 @@ func getApplication(app *application, db *sql.DB, w http.ResponseWriter, whereSt
 		rez = append(rez, v)
 	}
 	return rez
+}
+
+func (app *application) dbSearch(resoultColomns, table, criterion string) ([]string, error) {
+	sel := fmt.Sprintf("select %s from %s ", resoultColomns, table)
+	if criterion != "" {
+		sel = sel + criterion
+	}
+	result := make([]string, 0)
+	req, err := app.db.Query(sel)
+	if err != nil {
+		return result, err
+	}
+	defer req.Close()
+	for req.Next() {
+		a := ""
+		err := req.Scan(&a)
+		if err != nil {
+			return result, err
+		}
+		result = append(result, a)
+	}
+	return result, nil
+}
+
+func (app *application) test(w http.ResponseWriter, r *http.Request) {
+	type sendData struct {
+		Result string `json:"result"`
+	}
+	result := sendData{}
+	mail := "z"
+	res, err := app.dbSearch("mail", "user", fmt.Sprintf("where login = '%s'", mail))
+	if err != nil {
+		app.serverError(w, err)
+		return
+	}
+	if len(res) == 0 {
+		result = sendData{Result: ""}
+	} else {
+		result = sendData{Result: res[0]}
+	}
+	fmt.Println(res, result)
+
+	json, err := json.Marshal(result)
+	if err != nil {
+		http.Error(w, "Ошибка при кодировании данных в JSON", http.StatusInternalServerError)
+		return
+	}
+	w.Header().Set("Content-Type", "application/json")
+	w.Write(json)
 }

@@ -744,7 +744,8 @@ func (app *application) getSecondPerSearch(w http.ResponseWriter, r *http.Reques
 
 	db := app.db
 
-	getRaw, err := db.Query(fmt.Sprintf("SELECT * FROM `gruz` WHERE id in (SELECT Goods FROM `application` WHERE Wagon_type = %s);", data.CheckData))
+	getRaw, err := db.Query(fmt.Sprintf("SELECT * FROM `gruz` WHERE id in (SELECT Goods FROM `application` "+
+		"WHERE Wagon_type = %s);", data.CheckData))
 	if err != nil {
 		app.serverError(w, err)
 		return
@@ -784,7 +785,6 @@ func (app *application) letDuoSearch(w http.ResponseWriter, r *http.Request) {
 		http.Error(w, "Ошибка при декодировании запроса", http.StatusBadRequest)
 		return
 	}
-	fmt.Println(data.Duos, data.Gruz)
 	db := app.db
 	sel := "select a.id, a.Number, a.Reg_date, a.Status, a.Provide_date, a.Departure_type, g.Name as Goods, state.Name " +
 		"as Origin_state, st.Name as Enter_station, reg.Name as Region_depart, r.Name as Road_depart, st1.Name as " +
@@ -974,3 +974,75 @@ func (app *application) regPage(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 }
+
+func (app *application) registration(w http.ResponseWriter, r *http.Request) {
+	if r.Method != "POST" {
+		http.Error(w, "Неверный метод запроса", http.StatusMethodNotAllowed)
+		return
+	}
+
+	type jsonData struct {
+		User  string `json:"username"`
+		Pass  string `json:"password"`
+		Email string `json:"email"`
+	}
+
+	decoder := json.NewDecoder(r.Body)
+	data := &jsonData{}
+	err := decoder.Decode(data)
+	if err != nil {
+		http.Error(w, "Ошибка при декодировании запроса", http.StatusBadRequest)
+		app.serverError(w, err)
+		return
+	}
+	type sendData struct {
+		Success          bool   `json:"success"`
+		ExistingUsername string `json:"existingUsername"`
+		ExistingEmail    string `json:"existingEmail"`
+	}
+	res := sendData{}
+	res.Success = false
+
+	login, err := app.dbSearch("login", "user", fmt.Sprintf("where login = '%s'", data.User))
+	if err != nil {
+		app.serverError(w, err)
+		return
+	}
+	if len(login) == 0 {
+		res = sendData{ExistingUsername: ""}
+	} else {
+		res = sendData{ExistingUsername: login[0]}
+	}
+
+	email, err := app.dbSearch("mail", "user", fmt.Sprintf("where mail = '%s'", data.Email))
+	if err != nil {
+		app.serverError(w, err)
+		return
+	}
+	if len(email) == 0 {
+		res = sendData{ExistingEmail: ""}
+	} else {
+		res = sendData{ExistingEmail: email[0]}
+	}
+	fmt.Println(res)
+
+	if res.ExistingEmail == "" && res.ExistingUsername == "" {
+		_, err = app.db.Query(fmt.Sprintf("INSERT INTO `user`(`login`, `password`, `mail`) VALUES ('%s','%s','%s')", data.User, data.Pass, data.Email))
+		if err != nil {
+			app.serverError(w, err)
+			return
+		}
+		res.Success = true
+	}
+
+	answ, err := json.Marshal(res)
+	if err != nil {
+		app.serverError(w, err)
+		http.Error(w, "Ошибка при кодировании данных в JSON", http.StatusInternalServerError)
+		return
+	}
+	w.Header().Set("Content-Type", "application/json")
+	w.Write(answ)
+}
+
+/* Сделать дополнительные параметры в json ответе и пихнуть туда найденные или не найденные логин/почту */

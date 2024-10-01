@@ -4,27 +4,27 @@
 
 {{define "main"}}
 <h2>Регистрация</h2>
-<form action="/registration" method="post" style="margin-top: 40px">
+<form id="reg-form" action="/registration" method="post" style="margin-top: 40px">
     <div class="form_wrap">
         <div class="form_item">
             <label for="email">Почта:</label>
-            <input type="email" id="email" autocomplete="email">
+            <input type="email" id="email" autocomplete="email" required>
         </div>
     </div>
     <div class="form_wrap">
         <div class="form_item">
             <label for="username">Имя пользователя:</label>
-            <input type="text" id="username" autocomplete="username">
+            <input type="text" id="username" autocomplete="username" required>
         </div>
     </div>
     <div class="form_wrap">
         <div class="form_item">
             <label for="password">Пароль:</label>
-            <input type="password" id="password" autocomplete="password">
+            <input type="password" id="password" autocomplete="password" required>
         </div>
         <div class="form_item">
             <label for="password">Подтвердите пароль:</label>
-            <input type="password" id="confirm-password" autocomplete="off">
+            <input type="password" id="confirm-password" autocomplete="off" required>
         </div>
     </div>
     <input type="submit" value="Зарегистрироваться" />
