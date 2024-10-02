@@ -1023,7 +1023,6 @@ func (app *application) registration(w http.ResponseWriter, r *http.Request) {
 	} else {
 		res.ExistingEmail = email[0]
 	}
-	fmt.Println(res)
 
 	if res.ExistingEmail == "" && res.ExistingUsername == "" {
 		_, err = app.db.Query(fmt.Sprintf("INSERT INTO `user`(`login`, `password`, `mail`) VALUES ('%s','%s','%s')", data.User, data.Pass, data.Email))
@@ -1044,4 +1043,51 @@ func (app *application) registration(w http.ResponseWriter, r *http.Request) {
 	w.Write(answ)
 }
 
-/* Сделать дополнительные параметры в json ответе и пихнуть туда найденные или не найденные логин/почту */
+func (app *application) authorisation(w http.ResponseWriter, r *http.Request) {
+	if r.Method != http.MethodPost {
+		http.Error(w, "Неверный метод запроса", http.StatusBadRequest)
+		return
+	}
+	type authData struct {
+		User string `json:"auth_username"`
+		Pass string `json:"auth_password"`
+	}
+	decoder := json.NewDecoder(r.Body)
+	getData := &authData{}
+	err := decoder.Decode(getData)
+	if err != nil {
+		http.Error(w, "Ошибка при декодировании запроса", http.StatusBadRequest)
+		app.serverError(w, err)
+		return
+	}
+
+	res := struct {
+		User string `json:"existingUser"`
+		Pass string `json:"existingPass"`
+	}{User: "", Pass: ""}
+	login, err := app.dbSearch("login", "user", fmt.Sprintf("where login = '%s'", getData.User))
+	if err != nil {
+		app.serverError(w, err)
+		return
+	}
+	if len(login) > 0 {
+		res.User = login[0]
+		pass, err := app.dbSearch("password", "user", fmt.Sprintf("where login = '%s'", getData.User))
+		if err != nil {
+			app.serverError(w, err)
+			return
+		}
+		if len(pass) > 0 && pass[0] == getData.Pass {
+			res.Pass = pass[0]
+		}
+	}
+
+	answ, err := json.Marshal(res)
+	if err != nil {
+		http.Error(w, "Ошибка при кодировании запроса", http.StatusInternalServerError)
+		app.serverError(w, err)
+		return
+	}
+	w.Header().Set("Content-Type", "application/json")
+	w.Write(answ)
+}

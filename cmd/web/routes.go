@@ -32,6 +32,7 @@ func (app *application) routes() *http.ServeMux {
 	m.HandleFunc("/xml", app.xmlPage)
 	m.HandleFunc("/reg", app.regPage)
 	m.HandleFunc("/registration", app.registration)
+	m.HandleFunc("/authorization", app.authorisation)
 	m.HandleFunc("/test", app.test)
 
 	fileServer := http.FileServer(http.Dir("./ui/static/"))

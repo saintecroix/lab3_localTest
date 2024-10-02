@@ -207,19 +207,16 @@ func (app *application) test(w http.ResponseWriter, r *http.Request) {
 	type sendData struct {
 		Result string `json:"result"`
 	}
-	result := sendData{}
+	result := &sendData{}
 	mail := "z"
 	res, err := app.dbSearch("mail", "user", fmt.Sprintf("where login = '%s'", mail))
 	if err != nil {
 		app.serverError(w, err)
 		return
 	}
-	if len(res) == 0 {
-		result = sendData{Result: ""}
-	} else {
-		result = sendData{Result: res[0]}
+	if len(res) != 0 {
+		result.Result = res[0]
 	}
-	fmt.Println(res, result)
 
 	json, err := json.Marshal(result)
 	if err != nil {

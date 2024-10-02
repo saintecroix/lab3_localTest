@@ -299,7 +299,6 @@ reg_form?.addEventListener("submit", async (event) => {
 					window.location.href = "/";
 				}, 1000);
 				alert("success!");
-				console.log(formData)
 			}
 		})
 		.catch(error => {
@@ -308,29 +307,67 @@ reg_form?.addEventListener("submit", async (event) => {
 		});
 });
 
-// 	const result = await response.json();
-// 	if (result.success === false) {
-// 		const existingUsername = result.existingUsername;
-// 		const existingEmail = result.existingEmail;
-//
-// 		if (existingUsername && reg_username.value === existingUsername) {
-// 			reg_username.setCustomValidity("Пользователь с таким именем уже существует");
-// 			formData.username = undefined;
-// 		}
-// 		if (existingEmail && reg_email.value === existingEmail) {
-// 			reg_email.setCustomValidity("Пользователь с такой почтой уже существует");
-// 			formData.email = undefined;
-// 		}
-// 	}else{
-// 		setTimeout(() => {
-// 			window.location.href = "/";
-// 		}, 1000);
-// 		alert("success!");
-// 		console.log(formData)
-// 	}
-// });
-
 /*----------------------------------------------------------------------------------------*/
+
+// Часть передачи запросов авторизации на сервер
+const auth_login = document.getElementById("auth-username");
+const auth_pass = document.getElementById("auth-password");
+const authForm = document.getElementById("authForm")
+
+auth_login.addEventListener("change", () => {
+	auth_login.setCustomValidity("")
+});
+
+auth_pass.addEventListener("change", () => {
+	auth_pass.setCustomValidity("")
+})
+
+authForm?.addEventListener("submit", async (event) =>{
+	event.preventDefault()
+
+	const authData = {
+		auth_username: auth_login.value,
+		auth_password: auth_pass.value,
+	};
+	console.log(authData);
+
+	fetch("/authorization", {
+		method: "POST",
+		headers: {
+			"Content-Type": "application/json",
+		},
+		body: JSON.stringify(authData)
+	})
+		.catch(error => {
+			console.error("Ошибка при выполнении запроса на сервер: ", error)
+		})
+		.then(authResponse => {
+			if (!authResponse.ok){
+				alert("Something went wrong! Please try again.")
+			} else {
+				return authResponse.json()
+			}
+		})
+		.then(authResult => {
+			const existingUser = authResult.existingUser;
+			const existingPass = authResult.existingPass;
+			if (existingUser !== "") {
+				if (existingPass !== "") {
+					setTimeout(() => {
+						window.location.href = "/";
+					}, 1000);
+					alert("success!");
+				}else {
+					auth_pass.setCustomValidity("Неверный пароль")
+				}
+			}else {
+				auth_login.setCustomValidity("Пользователя с таким именем не существует")
+			}
+		})
+		.catch(error => {
+			console.error("Ошибка при получении данных с сервера: ", error)
+		});
+});
 
 // For /test
 fetch("/test")
