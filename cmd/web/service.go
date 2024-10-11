@@ -4,7 +4,9 @@ import (
 	"database/sql"
 	"encoding/json"
 	"fmt"
+	"github.com/golang-jwt/jwt/v4"
 	"net/http"
+	"time"
 )
 
 func getGruz(db *sql.DB) []Gruz {
@@ -223,6 +225,81 @@ func (app *application) test(w http.ResponseWriter, r *http.Request) {
 		http.Error(w, "Ошибка при кодировании данных в JSON", http.StatusInternalServerError)
 		return
 	}
+	w.Header().Set("Content-Type", "application/json")
+	w.Write(json)
+}
+
+func createJWT(userID string) (string, error) {
+	token := jwt.NewWithClaims(jwt.SigningMethodHS256, jwt.MapClaims{
+		"user_id": userID,
+		"iat":     time.Now().Unix(),                     // Время выдачи токена.
+		"exp":     time.Now().Add(time.Hour * 24).Unix(), // Время истечения срока действия токена.
+	})
+
+	// Подписать токен с использованием секретного ключа.
+	tokenString, err := token.SignedString([]byte("your-secret-key"))
+	if err != nil {
+		return "", err
+	}
+
+	return tokenString, nil
+}
+
+func (app *application) verifyJWT(tokenString string) (jwt.MapClaims, error) {
+	token, err := jwt.Parse(tokenString, func(token *jwt.Token) (interface{}, error) {
+		// Убедиться, что используется правильный алгоритм подписи.
+		if _, ok := token.Method.(*jwt.SigningMethodHMAC); !ok {
+			return nil, fmt.Errorf("unexpected signing method: %v", token.Header["alg"])
+		}
+		// Получить секретный ключ для проверки подписи.
+		return []byte("your-secret-key"), nil
+	})
+	if err != nil {
+		return nil, err
+	}
+
+	// Проверить целостность токена.
+	if !token.Valid {
+		return nil, fmt.Errorf("invalid token")
+	}
+
+	// Получить данные о пользователе из токена.
+	claims, ok := token.Claims.(jwt.MapClaims)
+	if !ok {
+		return nil, fmt.Errorf("invalid token claims")
+	}
+
+	return claims, nil
+}
+
+func (app *application) protected(w http.ResponseWriter, r *http.Request) {
+	result := struct {
+		Success bool `json:"success"`
+	}{Success: false}
+	// Получить токен из заголовка запроса.
+	tokenString := r.Header.Get("Authorization")
+	if tokenString == "" {
+		http.Error(w, "Unauthorized", http.StatusUnauthorized)
+		return
+	}
+
+	// Проверить токен.
+	claims, _ := app.verifyJWT(tokenString)
+
+	// Получить идентификатор пользователя из токена.
+	userID := claims["user_id"].(string)
+	if userID != "" {
+		result.Success = true
+	}
+
+	// Преобразовать структуру в JSON и отправить клиенту.
+	json, err := json.Marshal(result)
+	if err != nil {
+		http.Error(w, "Error encoding JSON", http.StatusInternalServerError)
+		app.serverError(w, err)
+		return
+	}
+
 	w.Header().Set("Content-Type", "application/json")
 	w.Write(json)
 }

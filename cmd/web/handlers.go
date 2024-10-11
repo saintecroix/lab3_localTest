@@ -1079,6 +1079,13 @@ func (app *application) authorisation(w http.ResponseWriter, r *http.Request) {
 		}
 		if len(pass) > 0 && pass[0] == getData.Pass {
 			res.Pass = pass[0]
+
+			tokenString, err := createJWT(getData.User)
+			if err != nil {
+				app.serverError(w, err)
+				return
+			}
+			w.Header().Set("Authorization", fmt.Sprintf("%s", tokenString))
 		}
 	}
 

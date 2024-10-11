@@ -1,0 +1,17 @@
+{
+  "name": "lab3_localtest",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/saintecroix/lab3_localTest"
+  },
+  "private": true,
+  "dependencies": {
+    "jwt-simple": "^0.5.6"
+  }
+}

@@ -232,7 +232,7 @@ const passwordInput = document.getElementById("password");
 const confirmPasswordInput = document.getElementById("confirm-password");
 
 // Добавляем обработчик события изменения для поля подтверждения пароля
-confirmPasswordInput.addEventListener("input", () => {
+confirmPasswordInput?.addEventListener("input", () => {
 	// Проверяем, совпадают ли пароли
 	if (confirmPasswordInput.value !== passwordInput.value) {
 		// Пароли не совпадают, показываем сообщение об ошибке
@@ -248,11 +248,11 @@ const reg_username = document.getElementById("username");
 const reg_password = document.getElementById("password");
 const reg_email = document.getElementById("email");
 
-reg_username.addEventListener("change", () => {
+reg_username?.addEventListener("change", () => {
 	reg_username.setCustomValidity("")
 })
 
-reg_email.addEventListener("change", () => {
+reg_email?.addEventListener("change", () => {
 	reg_email.setCustomValidity("")
 })
 
@@ -313,6 +313,8 @@ reg_form?.addEventListener("submit", async (event) => {
 const auth_login = document.getElementById("auth-username");
 const auth_pass = document.getElementById("auth-password");
 const authForm = document.getElementById("authForm")
+let user = ''
+let token = ''
 
 auth_login.addEventListener("change", () => {
 	auth_login.setCustomValidity("")
@@ -345,6 +347,7 @@ authForm?.addEventListener("submit", async (event) =>{
 			if (!authResponse.ok){
 				alert("Something went wrong! Please try again.")
 			} else {
+				token = authResponse.headers.get("Authorization");
 				return authResponse.json()
 			}
 		})
@@ -356,7 +359,9 @@ authForm?.addEventListener("submit", async (event) =>{
 					setTimeout(() => {
 						window.location.href = "/";
 					}, 1000);
-					alert("success!");
+					user = auth_login.value
+					// Сохранить JWT в браузере.
+					localStorage.setItem("jwt", token);
 				}else {
 					auth_pass.setCustomValidity("Неверный пароль")
 				}
@@ -369,8 +374,18 @@ authForm?.addEventListener("submit", async (event) =>{
 		});
 });
 
-// For /test
-fetch("/test")
-	.then(response => response.json())
-	.then(data => console.log(data))
-	.catch(error => console.error(error));
+// Попытка авторизации (JWT)
+// Получить JWT из браузера.
+const jwt = localStorage.getItem("jwt");
+console.log(jwt);
+if (jwt) {
+	// Отправить запрос на защищенный маршрут с включенным JWT в заголовке авторизации.
+	fetch("/protected", {
+		headers: {
+			'Authorization': `${jwt}`
+		}
+	})
+		.then(res => res.json())
+		.then(data => console.log(data))
+		.catch(err => console.error(err));
+}
