@@ -213,10 +213,13 @@ if (search_input) {
 
 const buttonContainer = document.getElementById("button-container");
 const loginModal = document.getElementById("login-modal");
+let auth_user_name = ''
 
 buttonContainer.addEventListener("click", (event) => {
-	event.preventDefault(); // Предотвратить выполнение действия по умолчанию (переход по ссылке)
-	loginModal.classList.remove("hidden");
+	event.preventDefault();// Предотвратить выполнение действия по умолчанию (переход по ссылке)
+	if (auth_user_name === '') {
+		loginModal.classList.remove("hidden");
+	}
 });
 
 window.addEventListener("click", (event) => {
@@ -313,7 +316,6 @@ reg_form?.addEventListener("submit", async (event) => {
 const auth_login = document.getElementById("auth-username");
 const auth_pass = document.getElementById("auth-password");
 const authForm = document.getElementById("authForm")
-let user = ''
 let token = ''
 
 auth_login.addEventListener("change", () => {
@@ -359,7 +361,6 @@ authForm?.addEventListener("submit", async (event) =>{
 					setTimeout(() => {
 						window.location.href = "/";
 					}, 1000);
-					user = auth_login.value
 					// Сохранить JWT в браузере.
 					localStorage.setItem("jwt", token);
 				}else {
@@ -377,7 +378,6 @@ authForm?.addEventListener("submit", async (event) =>{
 // Попытка авторизации (JWT)
 // Получить JWT из браузера.
 const jwt = localStorage.getItem("jwt");
-console.log(jwt);
 if (jwt) {
 	// Отправить запрос на защищенный маршрут с включенным JWT в заголовке авторизации.
 	fetch("/protected", {
@@ -386,6 +386,11 @@ if (jwt) {
 		}
 	})
 		.then(res => res.json())
-		.then(data => console.log(data))
+		.then(data => {
+			document.getElementById("name-of-auth-div").classList.remove('v19')
+			document.getElementById("name-of-auth-div").classList.add('v19After')
+			auth_user_name = data.user
+			document.getElementById("user-name-text").innerHTML = `${data.user}`
+		})
 		.catch(err => console.error(err));
 }

@@ -689,3 +689,21 @@ section#button-container{
         }
     }
 }
+
+.v19After{
+    .login-label {
+        padding: 10px 30px;
+        font-family: arial;
+        font-size: 17px;
+        display: inline-block;
+        z-index: 10;
+        position: relative;
+        white-space: nowrap;
+        line-height: 24px;
+        transition: all 0.225s;
+        transition-delay: 0.45s;
+        letter-spacing: 2px;
+        color: #34495E;
+        transition-delay: 0s;
+    }
+}

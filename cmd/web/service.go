@@ -5,7 +5,9 @@ import (
 	"encoding/json"
 	"fmt"
 	"github.com/golang-jwt/jwt/v4"
+	_ "github.com/golang-jwt/jwt/v4"
 	"net/http"
+	"strings"
 	"time"
 )
 
@@ -274,21 +276,28 @@ func (app *application) verifyJWT(tokenString string) (jwt.MapClaims, error) {
 
 func (app *application) protected(w http.ResponseWriter, r *http.Request) {
 	result := struct {
-		Success bool `json:"success"`
+		User    string `json:"user"`
+		Success bool   `json:"success"`
 	}{Success: false}
 	// Получить токен из заголовка запроса.
 	tokenString := r.Header.Get("Authorization")
-	if tokenString == "" {
+	if tokenString == "" || !strings.HasPrefix(tokenString, "Bearer ") {
+		http.Error(w, "Unauthorized", http.StatusUnauthorized)
+		return
+	}
+	tokenString = strings.TrimPrefix(tokenString, "Bearer ")
+
+	// Проверить токен.
+	claims, err := app.verifyJWT(tokenString)
+	if err != nil {
 		http.Error(w, "Unauthorized", http.StatusUnauthorized)
 		return
 	}
 
-	// Проверить токен.
-	claims, _ := app.verifyJWT(tokenString)
-
 	// Получить идентификатор пользователя из токена.
-	userID := claims["user_id"].(string)
-	if userID != "" {
+	userID, ok := claims["user_id"].(string)
+	if ok && userID != "" {
+		result.User = userID
 		result.Success = true
 	}
 

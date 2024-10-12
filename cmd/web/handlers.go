@@ -1085,7 +1085,7 @@ func (app *application) authorisation(w http.ResponseWriter, r *http.Request) {
 				app.serverError(w, err)
 				return
 			}
-			w.Header().Set("Authorization", fmt.Sprintf("%s", tokenString))
+			w.Header().Set("Authorization", fmt.Sprintf("Bearer %s", tokenString))
 		}
 	}
 
