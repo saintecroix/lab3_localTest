@@ -231,11 +231,17 @@ func (app *application) test(w http.ResponseWriter, r *http.Request) {
 	w.Write(json)
 }
 
-func createJWT(userID string) (string, error) {
+func (app *application) createJWT(userID string) (string, error) {
+	userEmail, err := app.dbSearch("mail", "user", fmt.Sprintf("where login = '%s'", userID))
+	if err != nil {
+		return "", err
+	}
+
 	token := jwt.NewWithClaims(jwt.SigningMethodHS256, jwt.MapClaims{
-		"user_id": userID,
-		"iat":     time.Now().Unix(),                     // Время выдачи токена.
-		"exp":     time.Now().Add(time.Hour * 24).Unix(), // Время истечения срока действия токена.
+		"user_id":    userID,
+		"user_email": userEmail[0],
+		"iat":        time.Now().Unix(),                     // Время выдачи токена.
+		"exp":        time.Now().Add(time.Hour * 24).Unix(), // Время истечения срока действия токена.
 	})
 
 	// Подписать токен с использованием секретного ключа.
@@ -277,6 +283,7 @@ func (app *application) verifyJWT(tokenString string) (jwt.MapClaims, error) {
 func (app *application) protected(w http.ResponseWriter, r *http.Request) {
 	result := struct {
 		User    string `json:"user"`
+		Mail    string `json:"mail"`
 		Success bool   `json:"success"`
 	}{Success: false}
 	// Получить токен из заголовка запроса.
@@ -296,8 +303,10 @@ func (app *application) protected(w http.ResponseWriter, r *http.Request) {
 
 	// Получить идентификатор пользователя из токена.
 	userID, ok := claims["user_id"].(string)
+	userEmail, ok := claims["user_email"].(string)
 	if ok && userID != "" {
 		result.User = userID
+		result.Mail = userEmail
 		result.Success = true
 	}
 

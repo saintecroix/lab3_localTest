@@ -213,22 +213,23 @@ if (search_input) {
 
 const buttonContainer = document.getElementById("button-container");
 const loginModal = document.getElementById("login-modal");
-let auth_user_name = ''
 
 buttonContainer.addEventListener("click", (event) => {
 	event.preventDefault();// Предотвратить выполнение действия по умолчанию (переход по ссылке)
-	if (auth_user_name === '') {
-		loginModal.classList.remove("hidden");
-	}
+	loginModal.classList.remove("hidden");
 });
 
 window.addEventListener("click", (event) => {
 	const target = event.target;
+	const isInsideSimpleDiv = target.closest('.simple-div') !== null;
+
 	if (target.classList.contains("modal11")) {
 		target.classList.add("hidden");
 	}
+	if (!target.classList.contains("material-symbols-outlined") && !isInsideSimpleDiv && (document.getElementById("profile-list").className === "simple-div")) {
+		document.getElementById("profile-list").classList.toggle("hidden");
+	}
 });
-
 /*----------------------------------------------------------------------------------------*/
 
 const passwordInput = document.getElementById("password");
@@ -324,7 +325,7 @@ auth_login.addEventListener("change", () => {
 
 auth_pass.addEventListener("change", () => {
 	auth_pass.setCustomValidity("")
-})
+});
 
 authForm?.addEventListener("submit", async (event) =>{
 	event.preventDefault()
@@ -387,10 +388,21 @@ if (jwt) {
 	})
 		.then(res => res.json())
 		.then(data => {
-			document.getElementById("name-of-auth-div").classList.remove('v19')
-			document.getElementById("name-of-auth-div").classList.add('v19After')
-			auth_user_name = data.user
-			document.getElementById("user-name-text").innerHTML = `${data.user}`
+			document.getElementById("button-container").classList.add('hidden')
+			document.getElementById("profile").classList.remove('hidden')
+			document.getElementById("user-name-text").innerHTML = ` ${data.user}`
+			document.getElementById("user-mail-text").innerHTML = `${data.mail}`
 		})
 		.catch(err => console.error(err));
 }
+
+const profile = document.getElementById("profile")
+
+profile.addEventListener("click", () => {
+	document.getElementById("profile-list").classList.remove('hidden')
+});
+
+document.getElementById("logout").addEventListener("click", () => {
+	localStorage.removeItem('jwt');
+	window.location.href = "/";
+});
