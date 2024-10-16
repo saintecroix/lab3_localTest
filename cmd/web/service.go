@@ -329,25 +329,23 @@ func (app *application) protected(w http.ResponseWriter, r *http.Request) {
 }
 
 // Обработка новостной ленты РИА Новости.
-//
-// На данном этапе данные просто записываются в переменную, необходимо создать страницу новостей и далее эти данные туда
-// выводить.
-func (app *application) rssParse(w http.ResponseWriter) {
-	url := "https://ria.ru/export/rss2/archive/index.xml"
+func (app *application) rssParse(w http.ResponseWriter) *RssNews {
+	url1 := "https://ria.ru/export/rss2/archive/index.xml"
 
 	client := &http.Client{}
-	req, err := http.NewRequest("GET", url, nil)
+	req, err := http.NewRequest("GET", url1, nil)
 	if err != nil {
 		http.Error(w, "Error creating request", http.StatusInternalServerError)
 		app.serverError(w, err)
-		return
+		return nil
 	}
 
+	req.Header.Set("X-Forwarded-For", "128.204.79.211")
 	resp, err := client.Do(req)
 	if err != nil {
 		http.Error(w, "Ошибка при выполнении запроса к РИА новости", http.StatusInternalServerError)
 		app.serverError(w, err)
-		return
+		return nil
 	}
 	defer resp.Body.Close()
 
@@ -355,7 +353,7 @@ func (app *application) rssParse(w http.ResponseWriter) {
 	if err != nil {
 		http.Error(w, "Ошибка при чтении тела ответа", http.StatusInternalServerError)
 		app.serverError(w, err)
-		return
+		return nil
 	}
 
 	var rss RssNews
@@ -363,6 +361,7 @@ func (app *application) rssParse(w http.ResponseWriter) {
 	if err != nil {
 		http.Error(w, "Ошибка при декодировании xml", http.StatusInternalServerError)
 		app.serverError(w, err)
-		return
+		return nil
 	}
+	return &rss
 }

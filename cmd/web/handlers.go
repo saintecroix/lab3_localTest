@@ -1117,7 +1117,12 @@ func (app *application) rssPage(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	err = ts.Execute(w, nil)
+	rssData := app.rssParse(w)
+	if rssData == nil {
+		return
+	}
+
+	err = ts.Execute(w, rssData)
 	if err != nil {
 		app.serverError(w, err)
 		return
