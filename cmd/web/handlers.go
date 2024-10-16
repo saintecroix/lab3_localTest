@@ -1098,3 +1098,28 @@ func (app *application) authorisation(w http.ResponseWriter, r *http.Request) {
 	w.Header().Set("Content-Type", "application/json")
 	w.Write(answ)
 }
+
+// Обработчик страницы новостной ленты
+func (app *application) rssPage(w http.ResponseWriter, r *http.Request) {
+	if r.Method != "GET" {
+		http.Error(w, "Некорректный метод запроса", http.StatusMethodNotAllowed)
+		return
+	}
+	files := []string{
+		"./ui/html/rssPage.page.tmpl",
+		"./ui/html/base.layout.tmpl",
+		"./ui/html/footer.partial.tmpl",
+	}
+
+	ts, err := template.ParseFiles(files...)
+	if err != nil {
+		app.serverError(w, err)
+		return
+	}
+
+	err = ts.Execute(w, nil)
+	if err != nil {
+		app.serverError(w, err)
+		return
+	}
+}

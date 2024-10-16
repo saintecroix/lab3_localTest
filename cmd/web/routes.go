@@ -35,6 +35,7 @@ func (app *application) routes() *http.ServeMux {
 	m.HandleFunc("/authorization", app.authorisation)
 	m.HandleFunc("/test", app.test)
 	m.HandleFunc("/protected", app.protected)
+	m.HandleFunc("/rss", app.rssPage)
 
 	fileServer := http.FileServer(http.Dir("./ui/static/"))
 	m.Handle("/static/", http.StripPrefix("/static", fileServer))

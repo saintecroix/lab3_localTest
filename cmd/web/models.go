@@ -1,5 +1,7 @@
 package main
 
+import "encoding/xml"
+
 type Average struct {
 	Month_reg_date      int
 	Avg_transport_level float32
@@ -102,4 +104,40 @@ type Gruz struct {
 	Name  string `json:"name"`
 	ETSNG string `json:"etsng"`
 	GNG   string `json:"gng"`
+}
+
+type RssNews struct {
+	XMLName xml.Name `xml:"rss"`
+	Channel Channel  `xml:"channel"`
+}
+
+type Channel struct {
+	Title     string `xml:"title"`
+	Link      string `xml:"link"`
+	Language  string `xml:"language"`
+	Copyright string `xml:"copyright"`
+	Item      []Item `xml:"item"`
+}
+
+type Item struct {
+	Text     string `xml:",chardata"`
+	Title    string `xml:"title"`
+	Link     string `xml:"link"`
+	Guid     string `xml:"guid"`
+	Priority struct {
+		Text string `xml:",chardata"`
+		Rian string `xml:"rian,attr"`
+	} `xml:"priority"`
+	PubDate string `xml:"pubDate"`
+	Type    struct {
+		Text string `xml:",chardata"`
+		Rian string `xml:"rian,attr"`
+	} `xml:"type"`
+	Category  string `xml:"category"`
+	Enclosure struct {
+		Text       string `xml:",chardata"`
+		URL        string `xml:"url,attr"`
+		Type       string `xml:"type,attr"`
+		SourceName string `xml:"source_name,attr"`
+	} `xml:"enclosure"`
 }

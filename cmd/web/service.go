@@ -3,9 +3,10 @@ package main
 import (
 	"database/sql"
 	"encoding/json"
+	"encoding/xml"
 	"fmt"
 	"github.com/golang-jwt/jwt/v4"
-	_ "github.com/golang-jwt/jwt/v4"
+	"io"
 	"net/http"
 	"strings"
 	"time"
@@ -231,6 +232,8 @@ func (app *application) test(w http.ResponseWriter, r *http.Request) {
 	w.Write(json)
 }
 
+// Создание JWT ключа с данными пользователя(логин, почта, время создания и время истечения срока). Необходимо для
+// авторизации пользователя на сайте.
 func (app *application) createJWT(userID string) (string, error) {
 	userEmail, err := app.dbSearch("mail", "user", fmt.Sprintf("where login = '%s'", userID))
 	if err != nil {
@@ -253,6 +256,7 @@ func (app *application) createJWT(userID string) (string, error) {
 	return tokenString, nil
 }
 
+// Верификация JWT ключа.
 func (app *application) verifyJWT(tokenString string) (jwt.MapClaims, error) {
 	token, err := jwt.Parse(tokenString, func(token *jwt.Token) (interface{}, error) {
 		// Убедиться, что используется правильный алгоритм подписи.
@@ -280,6 +284,8 @@ func (app *application) verifyJWT(tokenString string) (jwt.MapClaims, error) {
 	return claims, nil
 }
 
+// При запросе на любую страницу проверяется JWT ключ из localStorage на стороне пользователя для отображения
+// пользователя на странице.
 func (app *application) protected(w http.ResponseWriter, r *http.Request) {
 	result := struct {
 		User    string `json:"user"`
@@ -320,4 +326,43 @@ func (app *application) protected(w http.ResponseWriter, r *http.Request) {
 
 	w.Header().Set("Content-Type", "application/json")
 	w.Write(json)
+}
+
+// Обработка новостной ленты РИА Новости.
+//
+// На данном этапе данные просто записываются в переменную, необходимо создать страницу новостей и далее эти данные туда
+// выводить.
+func (app *application) rssParse(w http.ResponseWriter) {
+	url := "https://ria.ru/export/rss2/archive/index.xml"
+
+	client := &http.Client{}
+	req, err := http.NewRequest("GET", url, nil)
+	if err != nil {
+		http.Error(w, "Error creating request", http.StatusInternalServerError)
+		app.serverError(w, err)
+		return
+	}
+
+	resp, err := client.Do(req)
+	if err != nil {
+		http.Error(w, "Ошибка при выполнении запроса к РИА новости", http.StatusInternalServerError)
+		app.serverError(w, err)
+		return
+	}
+	defer resp.Body.Close()
+
+	body, err := io.ReadAll(resp.Body)
+	if err != nil {
+		http.Error(w, "Ошибка при чтении тела ответа", http.StatusInternalServerError)
+		app.serverError(w, err)
+		return
+	}
+
+	var rss RssNews
+	err = xml.Unmarshal(body, &rss)
+	if err != nil {
+		http.Error(w, "Ошибка при декодировании xml", http.StatusInternalServerError)
+		app.serverError(w, err)
+		return
+	}
 }
