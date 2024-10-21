@@ -1121,6 +1121,15 @@ func (app *application) rssPage(w http.ResponseWriter, r *http.Request) {
 	if rssData == nil {
 		return
 	}
+	//for _, item := range rssData.Channel.Item {
+	//	if item.Enclosure != nil {
+	//		if strings.Contains(item.Enclosure.Type, "image") {
+	//			item.Enclosure.LocalType = "image"
+	//		} else if strings.Contains(item.Enclosure.Type, "video") {
+	//			item.Enclosure.LocalType = "video"
+	//		}
+	//	}
+	//}
 
 	err = ts.Execute(w, rssData)
 	if err != nil {

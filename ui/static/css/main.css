@@ -735,3 +735,11 @@ section#button-container{
     width: 16px;
     height: 16px;
 }
+
+.news {
+    display: block;
+    border-bottom: 1px solid #ccc;
+    text-align: center;
+    width: 650px;
+    margin: auto;
+}

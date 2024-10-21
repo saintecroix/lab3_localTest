@@ -3,5 +3,30 @@
 {{define "title"}}Лента новостей{{end}}
 
 {{define "main"}}
-<h2>Новостная лента</h2>
+<h2 style="text-align: center;">Новостная лента</h2>
+<div>
+    {{range .Channel.Item}}
+    <div class="news">
+        <a href="{{ .Link }}">{{.Title}}</a>
+        {{if .Enclosure}}
+            {{if eq .Enclosure.Type "image/jpeg"}}
+                <p></p>
+                <img style="display: block; margin-left: auto; margin-right: auto;" src="{{.Enclosure.URL}}" alt="Изображение не найдено"/>
+            {{else if eq .Enclosure.Type "video/x-flv"}}
+                <p></p>
+                <video autoplay loop width="650px" style="display: block; margin-left: auto; margin-right: auto;">
+                    <source src="{{.Enclosure.URL}}" type="{{.Enclosure.Type}}" />
+                </video>
+            {{end}}
+        {{end}}
+        <p></p>
+        <div style="display: flex;">
+            <a style="text-align: left;" class="no-hover">{{.PubDate}}</a>
+            <a style="margin-left: auto;" href="https://ria.ru">РИА новости</a>
+        </div>
+    </div>
+    <p></p>
+    {{end}}
+
+</div>
 {{end}}
