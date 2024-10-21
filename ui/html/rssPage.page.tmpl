@@ -4,6 +4,15 @@
 
 {{define "main"}}
 <h2 style="text-align: center;">Новостная лента</h2>
+<div class="outer-container">
+    <div class="news-filter">
+        <a class="clickable active">Общие</a>
+        <div class="separator"></div>
+        <a class="clickable">Внешние</a>
+        <div class="separator"></div>
+        <a class="clickable">Локальные</a>
+    </div>
+</div>
 <div>
     {{range .Channel.Item}}
     <div class="news">

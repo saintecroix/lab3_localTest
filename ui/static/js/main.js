@@ -406,3 +406,26 @@ document.getElementById("logout").addEventListener("click", () => {
 	localStorage.removeItem('jwt');
 	window.location.href = "/";
 });
+
+//Код для фильтра на новстной странице
+document.addEventListener("DOMContentLoaded", function () {
+	// Проверяем, есть ли элемент с классом 'news-filter' на странице
+	const newsFilter = document.querySelector('.news-filter');
+
+	if (newsFilter) {
+		// Находим все элементы <a> внутри .news-filter
+		const links = newsFilter.querySelectorAll('a.clickable');
+
+		// Проверяем, есть ли элементы <a> с классом 'clickable'
+		if (links.length > 0) {
+			links.forEach(link => {
+				link.addEventListener('click', function () {
+					// Удаляем класс 'active' у всех ссылок
+					links.forEach(l => l.classList.remove('active'));
+					// Добавляем класс 'active' только к текущему элементу
+					this.classList.add('active');
+				});
+			});
+		}
+	}
+});

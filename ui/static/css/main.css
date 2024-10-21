@@ -745,3 +745,36 @@ section#button-container{
     margin: auto;
     min-height: 100px;
 }
+
+.outer-container {
+    display: flex; /* Используем flexbox для центрирования */
+    justify-content: center; /* Центрируем по горизонтали */
+    align-items: center; /* Центрируем по вертикали */
+}
+
+.separator {
+    display: inline-block;
+    width: 1px;
+    /* Ширина палочки */
+    height: 20px;
+    /* Высота палочки */
+    background-color: gray;
+    /* Цвет палочки */
+    margin: 0 10px;
+    /* Отступы по бокам */
+    vertical-align: middle;
+    /* Вертикальное выравнивание */
+}
+
+.news-filter {
+    display: flex;
+    /* Используем flexbox для выравнивания элементов */
+    align-items: center;
+    /* Центрируем элементы по вертикали */
+}
+
+.active {
+    color: #3b5bcb;
+    font-weight: bold;
+    text-decoration: underline; /* Можно добавить жирное начертание для выделенного элемента */
+}
