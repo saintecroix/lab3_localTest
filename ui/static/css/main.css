@@ -737,9 +737,11 @@ section#button-container{
 }
 
 .news {
-    display: block;
+    display: flex;
+    flex-direction: column;
     border-bottom: 1px solid #ccc;
     text-align: center;
     width: 650px;
     margin: auto;
+    min-height: 100px;
 }

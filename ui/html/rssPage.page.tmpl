@@ -7,7 +7,8 @@
 <div>
     {{range .Channel.Item}}
     <div class="news">
-        <a href="{{ .Link }}">{{.Title}}</a>
+        <a href="{{ .Link }}" style="font-size: 18px">{{.Title}}</a>
+        <div style="flex: 1; display: flex; flex-direction: column; justify-content: space-between;">
         {{if .Enclosure}}
             {{if eq .Enclosure.Type "image/jpeg"}}
                 <p></p>
@@ -23,6 +24,7 @@
         <div style="display: flex;">
             <a style="text-align: left;" class="no-hover">{{.PubDate}}</a>
             <a style="margin-left: auto;" href="https://ria.ru">РИА новости</a>
+        </div>
         </div>
     </div>
     <p></p>
