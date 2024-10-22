@@ -742,13 +742,14 @@ section#button-container{
     border-bottom: 1px solid #ccc;
     text-align: center;
     width: 650px;
-    margin: auto;
     min-height: 100px;
+    margin: auto auto 20px;
 }
 
 .outer-container {
     display: flex; /* Используем flexbox для центрирования */
     justify-content: center; /* Центрируем по горизонтали */
+    flex-direction: column;
     align-items: center; /* Центрируем по вертикали */
     margin-bottom: 20px;
 }
@@ -778,4 +779,15 @@ section#button-container{
     color: #3b5bcb;
     font-weight: bold;
     text-decoration: underline; /* Можно добавить жирное начертание для выделенного элемента */
+}
+
+.styled-link {
+    position: static; /* Для позиционирования псевдоэлементов */
+    padding: 10px 20px; /* Отступы внутри ссылки */
+    color: #3b5bcb; /* Цвет текста */
+    text-decoration: none; /* Убираем подчеркивание */
+    background-color: transparent; /* Прозрачный фон */
+    border: 2px solid #3b5bcb; /* Цвет рамки */
+    border-radius: 5px; /* Скругление углов, если нужно */
+    overflow: hidden; /* Скрыть выходящие за границы элементы */
 }

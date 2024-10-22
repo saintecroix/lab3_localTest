@@ -360,7 +360,7 @@ authForm?.addEventListener("submit", async (event) =>{
 			if (existingUser !== "") {
 				if (existingPass !== "") {
 					setTimeout(() => {
-						window.location.href = "/";
+						window.location.reload()
 					}, 1000);
 					// Сохранить JWT в браузере.
 					localStorage.setItem("jwt", token);
@@ -404,7 +404,7 @@ profile.addEventListener("click", () => {
 
 document.getElementById("logout").addEventListener("click", () => {
 	localStorage.removeItem('jwt');
-	window.location.href = "/";
+	window.location.reload()
 });
 
 //Код для фильтра на новстной странице
@@ -428,4 +428,12 @@ document.addEventListener("DOMContentLoaded", function () {
 			});
 		}
 	}
+});
+
+const addNew = document.getElementById("addNewBtn");
+if (jwt) {
+	addNew.classList.remove('hidden')
+}
+addNew.addEventListener("click", () => {
+	document.getElementById("addNew-modal").classList.remove("hidden")
 });

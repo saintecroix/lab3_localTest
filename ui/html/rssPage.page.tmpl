@@ -12,6 +12,31 @@
         <div class="separator"></div>
         <a class="clickable">Локальные</a>
     </div>
+    <div style="margin-top: 15px;">
+        <a id="addNewBtn" class="styled-link clickable hidden" style="">Написать новость</a>
+    </div>
+</div>
+<div id="addNew-modal" class="modal11 hidden">
+    <div class="modal-content11">
+        <form id="addNewForm">
+            <div class="form_wrap">
+                <h2>Поделитесь новостями!</h2>
+            </div>
+            <div class="form_wrap">
+                <div class="form_item">
+                    <label for="addNewTitle">Заголовок:</label>
+                    <input type="text" id="addNewTitle" required style="width: 100%; height: auto;">
+                </div>
+            </div>
+            <div class="form_wrap">
+                <div class="form_item">
+                    <label for="addNewText">Текст:</label>
+                    <textarea id="addNewText" maxlength="255" required style="width: 100%; height: 100px; resize: vertical;"></textarea>
+                </div>
+            </div>
+            <input type="submit" value="Добавить новость">
+        </form>
+    </div>
 </div>
 <div>
     {{range .Channel.Item}}
