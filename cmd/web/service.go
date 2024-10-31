@@ -368,12 +368,6 @@ func (app *application) rssParse(w http.ResponseWriter) *RssNews {
 
 // Добавление новости в бд.
 func (app *application) addNew(w http.ResponseWriter, r *http.Request) {
-	if r.Method != "POST" {
-		http.Error(w, "method not allowed", http.StatusMethodNotAllowed)
-		app.serverError(w, fmt.Errorf("method not allowed"))
-		return
-	}
-
 	type jsonData struct {
 		Title string `json:"title"`
 		Text  string `json:"text"`

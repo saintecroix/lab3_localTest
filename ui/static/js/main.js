@@ -382,6 +382,7 @@ let user_name = ``;
 if (jwt) {
 	// Отправить запрос на защищенный маршрут с включенным JWT в заголовке авторизации.
 	fetch("/protected", {
+		method: "POST",
 		headers: {
 			'Authorization': `${jwt}`
 		}
