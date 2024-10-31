@@ -120,6 +120,8 @@ type Channel struct {
 }
 
 type Item struct {
+	Id       int    `xml:"id"`
+	User     string `xml:"user"`
 	Text     string `xml:",chardata"`
 	Title    string `xml:"title"`
 	Link     string `xml:"link"`

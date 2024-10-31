@@ -1,11 +1,31 @@
+-- phpMyAdmin SQL Dump
+-- version 5.2.1
+-- https://www.phpmyadmin.net/
+--
+-- Хост: db
+-- Время создания: Окт 23 2024 г., 11:39
+-- Версия сервера: 9.0.1
+-- Версия PHP: 8.2.23
+
+SET SQL_MODE = "NO_AUTO_VALUE_ON_ZERO";
+START TRANSACTION;
+SET time_zone = "+00:00";
 
 
-# SET SQL_MODE = "NO_AUTO_VALUE_ON_ZERO";
-# START TRANSACTION;
-# SET time_zone = "+00:00";
-CREATE DATABASE IF NOT EXISTS lab3;
-USE lab3;
-SET NAMES utf8mb4;
+/*!40101 SET @OLD_CHARACTER_SET_CLIENT=@@CHARACTER_SET_CLIENT */;
+/*!40101 SET @OLD_CHARACTER_SET_RESULTS=@@CHARACTER_SET_RESULTS */;
+/*!40101 SET @OLD_COLLATION_CONNECTION=@@COLLATION_CONNECTION */;
+/*!40101 SET NAMES utf8mb4 */;
+
+--
+-- База данных: `lab3`
+--
+
+-- --------------------------------------------------------
+
+--
+-- Структура таблицы `application`
+--
 
 CREATE TABLE `application` (
   `id` int NOT NULL,
@@ -44,6 +64,9 @@ CREATE TABLE `application` (
   `Stop_date` date NOT NULL
 ) ENGINE=MyISAM DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
+--
+-- Дамп данных таблицы `application`
+--
 
 INSERT INTO `application` (`id`, `Number`, `Reg_date`, `Status`, `Provide_date`, `Departure_type`, `Goods`, `Origin_state`, `Enter_station`, `Region_depart`, `Road_depart`, `Station_depart`, `Consigner`, `State_destination`, `Exit_station`, `Region_destination`, `Road_destination`, `Station_destination`, `Consignee`, `Wagon_type`, `Property`, `Wagon_owner`, `Payer`, `Road_owner`, `Transport_manager`, `Tons_declared`, `Tons_accepted`, `Wagon_declared`, `Wagon_accepted`, `Filing_date`, `Agreement_date`, `Approval_date`, `Start_date`, `Stop_date`) VALUES
 (1, 39847462, '2028-10-20', 'Согласована', '2001-11-20', 'Групповая', 1, 1, 2508, 4, 10, 1761, 408, 1, 2508, 48, 5, 189, 305, 4, 'Собственный', 'ООО АТЛАНТ', 'АО КТК', 'ООО ТЭК МЕРЕТЬ', '', 5500, 5500, 79, 79, '2028-10-20', '2028-10-20', '2028-10-20', '2006-10-20', '2019-11-20'),
@@ -9441,6 +9464,19 @@ INSERT INTO `gruz` (`id`, `Name`, `ETSNG`, `GNG`) VALUES
 -- --------------------------------------------------------
 
 --
+-- Структура таблицы `news`
+--
+
+CREATE TABLE `news` (
+  `id` int NOT NULL,
+  `title` varchar(255) NOT NULL,
+  `text` varchar(255) NOT NULL,
+  `user_id` varchar(255) NOT NULL
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+
+-- --------------------------------------------------------
+
+--
 -- Структура таблицы `region`
 --
 
@@ -12218,6 +12254,29 @@ INSERT INTO `station` (`id`, `Name`, `ESR`, `Road`) VALUES
 -- --------------------------------------------------------
 
 --
+-- Структура таблицы `user`
+--
+
+CREATE TABLE `user` (
+  `id` int NOT NULL,
+  `login` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NOT NULL,
+  `password` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NOT NULL,
+  `mail` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NOT NULL
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+
+--
+-- Дамп данных таблицы `user`
+--
+
+INSERT INTO `user` (`id`, `login`, `password`, `mail`) VALUES
+(30, 'q', 'q', 'saintecroix@yandex.ru'),
+(31, 'w', 'q', 'markovka@oiate.ru'),
+(32, 'example', 'q', 'example@example.com'),
+(33, 'qwe', 'qwe', 'w@w.com');
+
+-- --------------------------------------------------------
+
+--
 -- Структура таблицы `wagon`
 --
 
@@ -12261,6 +12320,15 @@ ALTER TABLE `gruz`
   ADD PRIMARY KEY (`id`);
 
 --
+-- Индексы таблицы `news`
+--
+ALTER TABLE `news`
+  ADD PRIMARY KEY (`id`),
+  ADD UNIQUE KEY `title` (`title`),
+  ADD UNIQUE KEY `new_text` (`text`),
+  ADD KEY `user_id` (`user_id`);
+
+--
 -- Индексы таблицы `region`
 --
 ALTER TABLE `region`
@@ -12283,6 +12351,14 @@ ALTER TABLE `state`
 --
 ALTER TABLE `station`
   ADD PRIMARY KEY (`id`);
+
+--
+-- Индексы таблицы `user`
+--
+ALTER TABLE `user`
+  ADD PRIMARY KEY (`id`),
+  ADD UNIQUE KEY `login` (`login`),
+  ADD UNIQUE KEY `mail` (`mail`);
 
 --
 -- Индексы таблицы `wagon`
@@ -12313,6 +12389,12 @@ ALTER TABLE `gruz`
   MODIFY `id` int NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=1169;
 
 --
+-- AUTO_INCREMENT для таблицы `news`
+--
+ALTER TABLE `news`
+  MODIFY `id` int NOT NULL AUTO_INCREMENT;
+
+--
 -- AUTO_INCREMENT для таблицы `region`
 --
 ALTER TABLE `region`
@@ -12337,45 +12419,18 @@ ALTER TABLE `station`
   MODIFY `id` int NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=2510;
 
 --
+-- AUTO_INCREMENT для таблицы `user`
+--
+ALTER TABLE `user`
+  MODIFY `id` int NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=34;
+
+--
 -- AUTO_INCREMENT для таблицы `wagon`
 --
 ALTER TABLE `wagon`
   MODIFY `id` int NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=7;
-
-CREATE TABLE `user` (
-                        `id` int NOT NULL,
-                        `login` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NOT NULL,
-                        `password` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NOT NULL,
-                        `mail` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NOT NULL
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
-
---
--- Индексы сохранённых таблиц
---
-
---
--- Индексы таблицы `user`
---
-ALTER TABLE `user`
-    ADD PRIMARY KEY (`id`),
-    ADD UNIQUE KEY `login` (`login`),
-    ADD UNIQUE KEY `mail` (`mail`);
-
---
--- AUTO_INCREMENT для сохранённых таблиц
---
-
---
--- AUTO_INCREMENT для таблицы `user`
---
-ALTER TABLE `user`
-    MODIFY `id` int NOT NULL AUTO_INCREMENT;
 COMMIT;
 
-# COMMIT;
-
-# /*!40101 SET CHARACTER_SET_CLIENT=@OLD_CHARACTER_SET_CLIENT */;
-# /*!40101 SET CHARACTER_SET_RESULTS=@OLD_CHARACTER_SET_RESULTS */;
-# /*!40101 SET COLLATION_CONNECTION=@OLD_COLLATION_CONNECTION */;
-
-SOURCE /var/lib/mysql/lab3.sql;
+/*!40101 SET CHARACTER_SET_CLIENT=@OLD_CHARACTER_SET_CLIENT */;
+/*!40101 SET CHARACTER_SET_RESULTS=@OLD_CHARACTER_SET_RESULTS */;
+/*!40101 SET COLLATION_CONNECTION=@OLD_COLLATION_CONNECTION */;

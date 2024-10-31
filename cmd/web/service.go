@@ -365,3 +365,105 @@ func (app *application) rssParse(w http.ResponseWriter) *RssNews {
 	}
 	return &rss
 }
+
+// Добавление новости в бд.
+func (app *application) addNew(w http.ResponseWriter, r *http.Request) {
+	if r.Method != "POST" {
+		http.Error(w, "method not allowed", http.StatusMethodNotAllowed)
+		app.serverError(w, fmt.Errorf("method not allowed"))
+		return
+	}
+
+	type jsonData struct {
+		Title string `json:"title"`
+		Text  string `json:"text"`
+		User  string `json:"user_id"`
+	}
+
+	var data jsonData
+	decoder := json.NewDecoder(r.Body)
+	err := decoder.Decode(&data)
+	if err != nil {
+		http.Error(w, "Ошибка при декодировании запроса", http.StatusInternalServerError)
+		app.serverError(w, err)
+		return
+	}
+
+	type successAnsw struct {
+		Success bool `json:"success"`
+	}
+
+	var success successAnsw
+
+	_, err = app.db.Query(fmt.Sprintf("INSERT INTO `news` "+
+		"(`title`, `text`, `user_id`) VALUES('%s', '%s', '%s')", data.Title, data.Text, data.User))
+	if err != nil {
+		app.serverError(w, err)
+		return
+	} else {
+		success = successAnsw{Success: true}
+	}
+
+	answ, err := json.Marshal(success)
+	if err != nil {
+		http.Error(w, "Ошибка при кодировании ответа JSON", http.StatusInternalServerError)
+		app.serverError(w, err)
+		return
+	}
+	w.Header().Set("Content-Type", "application/json")
+	w.Write(answ)
+}
+
+// Получение новостей с БД с преображением в XML данные для объединения с новостями с "РИА Новости"
+func (app *application) getLocalNews() ([]Item, error) {
+	getData, err := app.db.Query("SELECT * FROM `news`")
+	if err != nil {
+		return nil, err
+	}
+	type localNews struct {
+		id    int
+		title string
+		text  string
+		user  string
+		date  string
+	}
+	news := make([]Item, 0)
+	for getData.Next() {
+		var newItem Item
+		var localNew localNews
+		err = getData.Scan(&localNew.id, &localNew.title, &localNew.text, &localNew.user, &localNew.date)
+		if err != nil {
+			return nil, err
+		}
+		newItem.Title = localNew.title
+		newItem.Text = localNew.text
+		newItem.User = localNew.user
+		setTime, err := ConvertTomeFromDB(localNew.date)
+		if err != nil {
+			return nil, err
+		}
+		newItem.PubDate = *setTime
+		news = append(news, newItem)
+	}
+	return news, nil
+}
+
+func ConvertTomeFromDB(dateString string) (*string, error) {
+	// Парсим строку в тип time.Time с указанием временной зоны UTC
+	layout := "2006-01-02 15:04:05"
+	parsedTime, err := time.ParseInLocation(layout, dateString, time.UTC)
+	if err != nil {
+		return nil, err
+	}
+
+	// Получаем московское время (UTC+3)
+	moscowTime := parsedTime.In(time.FixedZone("MSK", 3*3600)) // UTC+3
+
+	// Форматируем дату в нужный формат
+	formattedTime := moscowTime.Format("Mon, 02 Jan 2006 15:04:05 -0700")
+	return &formattedTime, nil
+}
+
+func localToXML(items []Item) {
+
+}

@@ -334,7 +334,6 @@ authForm?.addEventListener("submit", async (event) =>{
 		auth_username: auth_login.value,
 		auth_password: auth_pass.value,
 	};
-	console.log(authData);
 
 	fetch("/authorization", {
 		method: "POST",
@@ -379,6 +378,7 @@ authForm?.addEventListener("submit", async (event) =>{
 // Попытка авторизации (JWT)
 // Получить JWT из браузера.
 const jwt = localStorage.getItem("jwt");
+let user_name = ``;
 if (jwt) {
 	// Отправить запрос на защищенный маршрут с включенным JWT в заголовке авторизации.
 	fetch("/protected", {
@@ -390,7 +390,8 @@ if (jwt) {
 		.then(data => {
 			document.getElementById("button-container").classList.add('hidden')
 			document.getElementById("profile").classList.remove('hidden')
-			document.getElementById("user-name-text").innerHTML = ` ${data.user}`
+			document.getElementById("user-name-text").innerHTML = `${data.user}`
+			user_name = `${data.user}`
 			document.getElementById("user-mail-text").innerHTML = `${data.mail}`
 		})
 		.catch(err => console.error(err));
@@ -430,10 +431,51 @@ document.addEventListener("DOMContentLoaded", function () {
 	}
 });
 
-const addNew = document.getElementById("addNewBtn");
+//Передача данных формы добавление новостей на сервер
+const addNewBtn = document.getElementById("addNewBtn");
+const addNewForm = document.getElementById("addNew-modal");
+const addNewTitle = document.getElementById("addNewTitle");
+const addNewText = document.getElementById("addNewText");
+
 if (jwt) {
-	addNew.classList.remove('hidden')
+	addNewBtn.classList.remove('hidden')
+}else {
+	addNewBtn.classList.add('hidden')
 }
-addNew.addEventListener("click", () => {
-	document.getElementById("addNew-modal").classList.remove("hidden")
+addNewBtn.addEventListener("click", () => {
+	addNewForm.classList.remove("hidden")
+});
+
+addNewForm?.addEventListener("submit", async (event) => {
+	event.preventDefault()
+
+	const addNewData = {
+		title: addNewTitle.value,
+		text: addNewText.value,
+		user_id: user_name,
+	};
+
+	fetch("/addNew", {
+		method: "POST",
+		headers: {
+			"Content-Type": "application/json",
+		},
+		body: JSON.stringify(addNewData)
+	})
+		.catch(error => {
+			console.error("Ошибка при выполнении запроса на сервер: ", error)
+		})
+		.then(addNewResponse => {
+			if (!addNewResponse.ok) {
+				alert("Something went wrong! Please try again.");
+			} else {
+				setTimeout(() => {
+					window.location.reload()
+				}, 1000);
+				alert("Success!");
+			}
+		})
+		.catch(error => {
+			console.error("Ошибка при получении данных с сервера: ", error)
+		});
 });
