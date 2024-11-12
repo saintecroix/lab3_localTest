@@ -432,7 +432,7 @@ func (app *application) getLocalNews() ([]Item, error) {
 		newItem.Title = localNew.title
 		newItem.Text = localNew.text
 		newItem.User = localNew.user
-		setTime, err := ConvertTomeFromDB(localNew.date)
+		setTime, err := ConvertTimeFromDB(localNew.date)
 		if err != nil {
 			return nil, err
 		}
@@ -442,7 +442,7 @@ func (app *application) getLocalNews() ([]Item, error) {
 	return news, nil
 }
 
-func ConvertTomeFromDB(dateString string) (*string, error) {
+func ConvertTimeFromDB(dateString string) (*string, error) {
 	// Парсим строку в тип time.Time с указанием временной зоны UTC
 	layout := "2006-01-02 15:04:05"
 	parsedTime, err := time.ParseInLocation(layout, dateString, time.UTC)
@@ -459,5 +459,6 @@ func ConvertTomeFromDB(dateString string) (*string, error) {
 }
 
 func localToXML(items []Item) {
-
 }
+
+//Создать функцию конвертации времени риа в Time, функцию сортировки новостей по Time

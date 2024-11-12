@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- Хост: db
--- Время создания: Окт 23 2024 г., 11:39
+-- Время создания: Ноя 12 2024 г., 14:27
 -- Версия сервера: 9.0.1
 -- Версия PHP: 8.2.23
 
@@ -9471,8 +9471,18 @@ CREATE TABLE `news` (
   `id` int NOT NULL,
   `title` varchar(255) NOT NULL,
   `text` varchar(255) NOT NULL,
-  `user_id` varchar(255) NOT NULL
+  `user_id` varchar(255) NOT NULL,
+  `created_at` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+
+--
+-- Дамп данных таблицы `news`
+--
+
+INSERT INTO `news` (`id`, `title`, `text`, `user_id`, `created_at`) VALUES
+(4, 'Тест', 'Тестовый тест', 'qwe', '2024-10-24 14:03:29'),
+(5, 'Тест1', 'qwe', 'qwe', '2024-10-24 14:03:29'),
+(6, 'qwe', 'qweasd', 'qwe', '2024-10-30 20:00:27');
 
 -- --------------------------------------------------------
 
@@ -12392,7 +12402,7 @@ ALTER TABLE `gruz`
 -- AUTO_INCREMENT для таблицы `news`
 --
 ALTER TABLE `news`
-  MODIFY `id` int NOT NULL AUTO_INCREMENT;
+  MODIFY `id` int NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=7;
 
 --
 -- AUTO_INCREMENT для таблицы `region`

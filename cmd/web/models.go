@@ -120,17 +120,17 @@ type Channel struct {
 }
 
 type Item struct {
-	Id       int    `xml:"id"`
-	User     string `xml:"user"`
-	Text     string `xml:",chardata"`
-	Title    string `xml:"title"`
+	Id       int    `xml:"id" db:"id"`
+	User     string `xml:"user" db:"user_id"`
+	Text     string `xml:",chardata" db:"text"`
+	Title    string `xml:"title" db:"title"`
 	Link     string `xml:"link"`
 	Guid     string `xml:"guid"`
 	Priority struct {
 		Text string `xml:",chardata"`
 		Rian string `xml:"rian,attr"`
 	} `xml:"priority"`
-	PubDate string `xml:"pubDate"`
+	PubDate string `xml:"pubDate" db:"created_at"`
 	Type    struct {
 		Text string `xml:",chardata"`
 		Rian string `xml:"rian,attr"`
