@@ -1,5 +1,3 @@
-version: "3.9"
-
 volumes:
   mysql:
   phpmyadmin:
@@ -16,6 +14,7 @@ services:
     restart: always
     environment:
      - MYSQL_ALLOW_EMPTY_PASSWORD=yes
+     - MYSQL_DATABASE=lab3
     volumes:
       -  mysql:/var/lib/mysql
       - ./lab3.sql:/docker-entrypoint-initdb.d/lab3.sql
