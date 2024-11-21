@@ -40,7 +40,7 @@ func (app *application) routes() *mux.Router {
 	m.HandleFunc("/addNew", app.addNew).Methods(http.MethodPost)
 
 	fileServer := http.FileServer(http.Dir("./ui/static/"))
-	m.Handle("/static/", http.StripPrefix("/static", fileServer))
+	m.PathPrefix("/static/").Handler(http.StripPrefix("/static/", fileServer))
 
 	return m
 }
