@@ -8,6 +8,7 @@ import (
 	"github.com/golang-jwt/jwt/v4"
 	"io"
 	"net/http"
+	"sort"
 	"strings"
 	"time"
 )
@@ -208,30 +209,6 @@ func (app *application) dbSearch(resoultColomns, table, criterion string) ([]str
 	return result, nil
 }
 
-func (app *application) test(w http.ResponseWriter, r *http.Request) {
-	type sendData struct {
-		Result string `json:"result"`
-	}
-	result := &sendData{}
-	mail := "z"
-	res, err := app.dbSearch("mail", "user", fmt.Sprintf("where login = '%s'", mail))
-	if err != nil {
-		app.serverError(w, err)
-		return
-	}
-	if len(res) != 0 {
-		result.Result = res[0]
-	}
-
-	json, err := json.Marshal(result)
-	if err != nil {
-		http.Error(w, "Ошибка при кодировании данных в JSON", http.StatusInternalServerError)
-		return
-	}
-	w.Header().Set("Content-Type", "application/json")
-	w.Write(json)
-}
-
 // Создание JWT ключа с данными пользователя(логин, почта, время создания и время истечения срока). Необходимо для
 // авторизации пользователя на сайте.
 func (app *application) createJWT(userID string) (string, error) {
@@ -363,6 +340,9 @@ func (app *application) rssParse(w http.ResponseWriter) *RssNews {
 		app.serverError(w, err)
 		return nil
 	}
+	for i, r := range rss.Channel.Item {
+		r.Id = (i + 1) * -1
+	}
 	return &rss
 }
 
@@ -409,40 +389,25 @@ func (app *application) addNew(w http.ResponseWriter, r *http.Request) {
 }
 
 // Получение новостей с БД с преображением в XML данные для объединения с новостями с "РИА Новости"
-func (app *application) getLocalNews() ([]Item, error) {
+func (app *application) getLocalNews() ([]LocalNews, error) {
 	getData, err := app.db.Query("SELECT * FROM `news`")
 	if err != nil {
 		return nil, err
 	}
-	type localNews struct {
-		id    int
-		title string
-		text  string
-		user  string
-		date  string
-	}
-	news := make([]Item, 0)
+	news := make([]LocalNews, 0)
 	for getData.Next() {
-		var newItem Item
-		var localNew localNews
-		err = getData.Scan(&localNew.id, &localNew.title, &localNew.text, &localNew.user, &localNew.date)
+		var localNew LocalNews
+		err = getData.Scan(&localNew.Id, &localNew.Title, &localNew.Text, &localNew.User, &localNew.Date)
 		if err != nil {
 			return nil, err
 		}
-		newItem.Title = localNew.title
-		newItem.Text = localNew.text
-		newItem.User = localNew.user
-		setTime, err := ConvertTimeFromDB(localNew.date)
-		if err != nil {
-			return nil, err
-		}
-		newItem.PubDate = *setTime
-		news = append(news, newItem)
+		news = append(news, localNew)
 	}
 	return news, nil
 }
 
-func ConvertTimeFromDB(dateString string) (*string, error) {
+// Теоретически рудимент
+func ConvertDBTimeToString(dateString string) (*string, error) {
 	// Парсим строку в тип time.Time с указанием временной зоны UTC
 	layout := "2006-01-02 15:04:05"
 	parsedTime, err := time.ParseInLocation(layout, dateString, time.UTC)
@@ -458,7 +423,125 @@ func ConvertTimeFromDB(dateString string) (*string, error) {
 	return &formattedTime, nil
 }
 
-func localToXML(items []Item) {
+// layout определяет формат, который соответствует входной строке
+func ConvertToTime(dateString string, layout string) (time.Time, error) {
+	// Парсим строку в тип time.Time
+	parsedTime, err := time.Parse(layout, dateString)
+	if err != nil {
+		return time.Time{}, err // Возвращаем пустое значение time.Time и ошибку
+	}
+
+	return parsedTime, nil // Возвращаем распарсенное время и nil для ошибки
 }
 
-//Создать функцию конвертации времени риа в Time, функцию сортировки новостей по Time
+// Проработать смешанную структуру либо функцию, которая будет сортировать новости по датам на фронте
+func (app *application) mixNews(local []LocalNews, ria []Item) ([]LocalNews, []Item, error) {
+	resultLocal := make([]LocalNews, 0)
+	resultRia := make([]Item, 0)
+	forSort := make([]ForSortNews, 0)
+	for _, r := range local {
+		var a ForSortNews
+		localTime, err := ConvertToTime(r.Date, "2006-01-02 15:04:05")
+		if err != nil {
+			err = fmt.Errorf("ошибка при конвертации времени из дб: %w", err)
+			return nil, nil, err
+		}
+		a.NewsId = r.Id
+		a.Date = localTime
+		forSort = append(forSort, a)
+	}
+	for _, r := range ria {
+		var a ForSortNews
+		riaTime, err := ConvertToTime(r.PubDate, "Mon, 02 Jan 2006 15:04:05 -0700")
+		if err != nil {
+			err = fmt.Errorf("ошибка при конвертации времени риа: %w", err)
+			return nil, nil, err
+		}
+
+		a.NewsId = r.Id
+		a.Date = riaTime
+		forSort = append(forSort, a)
+	}
+	for _, r := range local {
+		resultLocal = append(resultLocal, r)
+	}
+	for _, r := range ria {
+		resultRia = append(resultRia, r)
+	}
+	sort.Slice(forSort, func(i, j int) bool {
+		return forSort[i].Date.After(forSort[j].Date)
+	})
+	mp := make(map[int]int)
+	for i, r := range forSort {
+		mp[r.NewsId] = i
+	}
+	sort.Slice(resultLocal, func(i, j int) bool {
+		return mp[resultLocal[i].Id] < mp[resultLocal[j].Id]
+	})
+	sort.Slice(resultRia, func(i, j int) bool {
+		return mp[resultRia[i].Id] > mp[resultRia[j].Id]
+	})
+	return resultLocal, resultRia, nil
+}
+
+func (app *application) indexNews(w http.ResponseWriter, r *http.Request) {
+	local, err := app.getLocalNews()
+	if err != nil {
+		app.serverError(w, err)
+		return
+	}
+	ria := app.rssParse(w)
+	items := make([]Item, 0)
+	for _, r := range ria.Channel.Item {
+		items = append(items, r)
+	}
+	resultLocal, resultRia, err := app.mixNews(local, items)
+	if err != nil {
+		app.serverError(w, err)
+		return
+	}
+	type Response struct {
+		Local []LocalNews
+		Ria   []Item
+	}
+	res, err := json.Marshal(Response{Local: resultLocal, Ria: resultRia})
+	if err != nil {
+		http.Error(w, "Error encoding JSON", http.StatusInternalServerError)
+		app.serverError(w, err)
+		return
+	}
+
+	w.Header().Set("Content-Type", "application/json")
+	w.Write(res)
+}
+
+func (app *application) test(w http.ResponseWriter, r *http.Request) {
+	local, err := app.getLocalNews()
+	if err != nil {
+		app.serverError(w, err)
+		return
+	}
+	ria := app.rssParse(w)
+	items := make([]Item, 0)
+	for _, r := range ria.Channel.Item {
+		items = append(items, r)
+	}
+	resultLocal, resultRia, err := app.mixNews(local, items)
+	if err != nil {
+		app.serverError(w, err)
+		return
+	}
+	type Response struct {
+		Local []LocalNews
+		Ria   []Item
+	}
+	json, err := json.Marshal(Response{Local: resultLocal, Ria: resultRia})
+	if err != nil {
+		http.Error(w, "Error encoding JSON", http.StatusInternalServerError)
+		app.serverError(w, err)
+		return
+	}
+
+	w.Header().Set("Content-Type", "application/json")
+	w.Write(json)
+}

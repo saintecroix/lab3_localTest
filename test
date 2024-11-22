@@ -1,0 +1,146 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>News</title>
+</head>
+<body>
+    <h1>News</h1>
+    <button onclick="filterNews('all')">All News</button>
+    <button onclick="filterNews('local')">Local News</button>
+    <button onclick="filterNews('ria')">RIA News</button>
+
+    <div id="news-container"></div>
+
+    <script>
+        let allNews = [];
+
+        async function fetchNews() {
+            const response = await fetch('/news');
+            const data = await response.json();
+            allNews = data.local.map(news => ({ ...news, type: 'local' }))
+                .concat(data.ria.map(news => ({ ...news, type: 'ria', date: news.pubDate })));
+            displayNews(allNews);
+        }
+
+        function displayNews(news) {
+            const container = document.getElementById('news-container');
+            container.innerHTML = '';
+            news.sort((a, b) => new Date(b.date || a.date) - new Date(a.date || b.date));
+            news.forEach(item => {
+                const newsItem = document.createElement('div');
+                newsItem.innerHTML = `<strong>${item.title}</strong> <br> ${item.text} <br> <small>${item.date || item.PubDate}</small><hr>`;
+                container.appendChild(newsItem);
+            });
+        }
+
+        function filterNews(type) {
+            if (type === 'all') {
+                displayNews(allNews);
+            } else {
+                const filteredNews = allNews.filter(news => news.type === type);
+                displayNews(filteredNews);
+            }
+        }
+
+        // Загружаем новости при загрузке страницы
+        window.onload = fetchNews;
+    </script>
+</body>
+</html>
+
+------------------------------------------------------------------------------------------------------------------------
+
+document.addEventListener("DOMContentLoaded", function () {
+    const newsFilter = document.querySelector('.news-filter');
+
+    if (newsFilter) {
+        const links = newsFilter.querySelectorAll('a.clickable');
+
+        if (links.length > 0) {
+            links.forEach(link => {
+                link.addEventListener('click', function () {
+                    // Удаляем класс 'active' у всех ссылок
+                    links.forEach(l => l.classList.remove('active'));
+                    // Добавляем класс 'active' только к текущему элементу
+                    this.classList.add('active');
+
+                    // Получаем тип новостей из data-атрибута
+                    const newsType = this.getAttribute('data-type');
+                    // Вызываем функцию filterNews с нужным типом
+                    filterNews(newsType);
+                });
+            });
+        }
+    }
+});
+
+function filterNews(type) {
+    // Пример данных, которые могут прийти с сервера
+    const allNews = [
+        {
+            Id: 1,
+            Title: "Общая новость 1",
+            Link: "https://example.com/general1",
+            PubDate: "2023-10-01",
+            Enclosure: { Type: "image/jpeg", URL: "https://example.com/image1.jpg" },
+            Type: { Text: "general" },
+            Category: "Общие"
+        },
+        {
+            Id: 2,
+            Title: "РИА новость 1",
+            Link: "https://ria.ru/news1",
+            PubDate: "2023-10-02",
+            Enclosure: { Type: "image/jpeg", URL: "https://example.com/image2.jpg" },
+            Type: { Text: "ria" },
+            Category: "РИА"
+        },
+        {
+            Id: 3,
+            Title: "Локальная новость 1",
+            Link: "https://example.com/local1",
+            PubDate: "2023-10-03",
+            Enclosure: { Type: "video/x-flv", URL: "https://example.com/video1.flv" },
+            Type: { Text: "local" },
+            Category: "Локальные"
+        },
+        // Добавьте другие новости по необходимости
+    ];
+
+    // Очищаем текущие новости
+    const newsContainer = document.querySelector('div'); // Замените на конкретный селектор вашего контейнера новостей
+    newsContainer.innerHTML = '';
+
+    // Фильтруем новости по типу
+    const filteredNews = allNews.filter(news => {
+        if (type === 'all') return true;
+        return news.Type.Text === type; // Используем поле Type.Text для фильтрации
+    });
+
+    // Отрисовываем отфильтрованные новости
+    filteredNews.forEach(news => {
+        const newsElement = document.createElement('div');
+        newsElement.className = 'news';
+
+        newsElement.innerHTML = `
+            <a href="${news.Link}" style="font-size: 18px">${news.Title}</a>
+            <div style="flex: 1; display: flex; flex-direction: column; justify-content: space-between;">
+                ${news.Enclosure ?
+                    (news.Enclosure.Type === "image/jpeg" ?
+                        `<img style="display: block; margin-left: auto; margin-right: auto;" src="${news.Enclosure.URL}" alt="Изображение не найдено"/>` :
+                        `<video autoplay loop width="650px" style="display: block; margin-left: auto; margin-right: auto;">
+                            <source src="${news.Enclosure.URL}" type="${news.Enclosure.Type}" />
+                        </video>`) : ''}
+                <p></p>
+                <div style="display: flex;">
+                    <a style="text-align: left;" class="no-hover">${news.PubDate}</a>
+                    <a style="margin-left: auto;" href="https://ria.ru">РИА Новости</a>
+                </div>
+            </div>
+        `;
+
+        newsContainer.appendChild(newsElement);
+    });
+}

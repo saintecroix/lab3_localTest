@@ -30,7 +30,7 @@ duosSelect?.addEventListener('change', (event) => {
 			headers: {
 				'Content-Type': 'application/json'
 			},
-			body: JSON.stringify({ checkFirstEl: event.target.value })
+			body: JSON.stringify({checkFirstEl: event.target.value})
 		})
 			.then(response => {
 				if (response.ok) {
@@ -327,7 +327,7 @@ auth_pass.addEventListener("change", () => {
 	auth_pass.setCustomValidity("")
 });
 
-authForm?.addEventListener("submit", async (event) =>{
+authForm?.addEventListener("submit", async (event) => {
 	event.preventDefault()
 
 	const authData = {
@@ -346,7 +346,7 @@ authForm?.addEventListener("submit", async (event) =>{
 			console.error("Ошибка при выполнении запроса на сервер: ", error)
 		})
 		.then(authResponse => {
-			if (!authResponse.ok){
+			if (!authResponse.ok) {
 				alert("Something went wrong! Please try again.")
 			} else {
 				token = authResponse.headers.get("Authorization");
@@ -363,10 +363,10 @@ authForm?.addEventListener("submit", async (event) =>{
 					}, 1000);
 					// Сохранить JWT в браузере.
 					localStorage.setItem("jwt", token);
-				}else {
+				} else {
 					auth_pass.setCustomValidity("Неверный пароль")
 				}
-			}else {
+			} else {
 				auth_login.setCustomValidity("Пользователя с таким именем не существует")
 			}
 		})
@@ -379,6 +379,7 @@ authForm?.addEventListener("submit", async (event) =>{
 // Получить JWT из браузера.
 const jwt = localStorage.getItem("jwt");
 let user_name = ``;
+
 if (jwt) {
 	// Отправить запрос на защищенный маршрут с включенным JWT в заголовке авторизации.
 	fetch("/protected", {
@@ -387,15 +388,21 @@ if (jwt) {
 			'Authorization': `${jwt}`
 		}
 	})
-		.then(res => res.json())
-		.then(data => {
-			document.getElementById("button-container").classList.add('hidden')
-			document.getElementById("profile").classList.remove('hidden')
-			document.getElementById("user-name-text").innerHTML = `${data.user}`
-			user_name = `${data.user}`
-			document.getElementById("user-mail-text").innerHTML = `${data.mail}`
+		.then(res => {
+			// Проверяем, успешен ли ответ
+			if (!res.ok) {
+				throw new Error(`HTTP error! status: ${res.status}`); // Бросаем ошибку с кодом статуса
+			}
+			return res.json(); // Преобразуем ответ в JSON
 		})
-		.catch(err => console.error(err));
+		.then(data => {
+			document.getElementById("button-container").classList.add('hidden');
+			document.getElementById("profile").classList.remove('hidden');
+			document.getElementById("user-name-text").innerHTML = `${data.user}`;
+			user_name = `${data.user}`;
+			document.getElementById("user-mail-text").innerHTML = `${data.mail}`;
+		})
+		.catch(err => console.error('Ошибка при получении данных:', err));
 }
 
 const profile = document.getElementById("profile")
@@ -411,14 +418,11 @@ document.getElementById("logout").addEventListener("click", () => {
 
 //Код для фильтра на новстной странице
 document.addEventListener("DOMContentLoaded", function () {
-	// Проверяем, есть ли элемент с классом 'news-filter' на странице
 	const newsFilter = document.querySelector('.news-filter');
 
 	if (newsFilter) {
-		// Находим все элементы <a> внутри .news-filter
 		const links = newsFilter.querySelectorAll('a.clickable');
 
-		// Проверяем, есть ли элементы <a> с классом 'clickable'
 		if (links.length > 0) {
 			links.forEach(link => {
 				link.addEventListener('click', function () {
@@ -426,6 +430,11 @@ document.addEventListener("DOMContentLoaded", function () {
 					links.forEach(l => l.classList.remove('active'));
 					// Добавляем класс 'active' только к текущему элементу
 					this.classList.add('active');
+
+					// Получаем тип новостей из data-атрибута
+					const newsType = this.getAttribute('data-type');
+					// Вызываем функцию filterNews с нужным типом
+					filterNews(newsType);
 				});
 			});
 		}
@@ -440,7 +449,7 @@ const addNewText = document.getElementById("addNewText");
 
 if (jwt) {
 	addNewBtn.classList.remove('hidden')
-}else {
+} else {
 	addNewBtn.classList.add('hidden')
 }
 addNewBtn.addEventListener("click", () => {
@@ -479,4 +488,114 @@ addNewForm?.addEventListener("submit", async (event) => {
 		.catch(error => {
 			console.error("Ошибка при получении данных с сервера: ", error)
 		});
+});
+
+//Функция фильтрации новостей и вывода по кнопкам
+async function fetchNews() {
+	try {
+		const response = await fetch('/indexNews', {
+			method: 'GET'
+		});
+
+		if (!response.ok) {
+			throw new Error('Network response was not ok: ' + response.statusText);
+		}
+
+		const data = await response.json();
+		console.log('Данные от API:', data); // Логируем ответ
+
+		// Проверяем, что данные содержат массивы
+		if (!Array.isArray(data.Local) || !Array.isArray(data.Ria)) {
+			throw new Error('Полученные данные не содержат массивов новостей');
+		}
+
+		// Обрабатываем данные
+		allNews = data.Local.map(news => ({
+			id: news.id,
+			title: news.title,
+			text: news.text,
+			user: news.user,
+			date: news.date,
+			type: 'local'
+		})).concat(data.Ria.map(news => ({
+			id: news.id,
+			title: news.title,
+			guid: news.guid,
+			user: news.user,
+			date: news.pubDate,
+			type: 'ria',
+			enclosure: news.enclosure || null
+		})));
+		return allNews; // Возвращаем все новости
+	} catch (error) {
+		console.error('Ошибка при загрузке новостей:', error);
+		throw error; // Перебрасываем ошибку для обработки
+	}
+}
+
+// Функция для отображения новостей
+function displayNews(news) {
+	const container = document.getElementById('news-container');
+	container.innerHTML = ''; // Очищаем контейнер перед отображением новостей
+
+	// Сортируем новости по дате
+	news.sort((a, b) => new Date(b.date) - new Date(a.date));
+
+	// Создаем элементы для каждой новости и добавляем их в контейнер
+	news.forEach(item => {
+		const newsItem = document.createElement('div');
+		newsItem.className = 'news-item'; // Добавляем класс для стилизации, если нужно
+
+		if (item.type === 'ria') {
+			newsItem.innerHTML = `
+			<a href="${item.guid}" style="font-size: 18px">${item.title}</a>
+			<div style="flex: 1; display: flex; flex-direction: column; justify-content: space-between;">
+				${item.enclosure ?
+				(item.enclosure.type === "image/jpeg" ?
+					`<p></p>
+						<img style="display: block; margin-left: auto; margin-right: auto;" src="${item.enclosure.url}"
+						alt="Изображение не найдено"/>` :
+					`<p></p>
+						<video autoPlay loop width="650px" style="display: block; margin-left: auto; margin-right: auto;">
+						<source src="${item.enclosure.url}" type="${item.enclosure.type}"/>
+						</video>`) : ''}
+				<p></p>
+				<div style="display: flex;">
+					<a style="text-align: left;" class="no-hover">${item.date}</a>
+					<a style="margin-left: auto;" href="https://ria.ru">РИА новости</a>
+				</div>
+			</div>
+`;}else {
+			newsItem.innerHTML = `
+			<a style="font-size: 18px">${item.title}</a>
+			<div style="flex: 1; display: flex; flex-direction: column; justify-content: space-between;">
+				<p></p>
+				<div style="display: flex;">
+					<a style="text-align: left;" class="no-hover">${item.date}</a>
+					<a style="margin-left: auto;" class="no-hover">Новости сайта</a>
+				</div>
+			</div>
+        `;}
+
+		container.appendChild(newsItem);
+	});
+}
+
+// Функция для фильтрации новостей по типу
+function filterNews(type) {
+	if (type === 'all') {
+		displayNews(allNews); // Если тип 'all', показываем все новости
+	} else {
+		const filteredNews = allNews.filter(news => news.type === type);
+		displayNews(filteredNews); // Показываем только отфильтрованные новости
+	}
+}
+
+document.addEventListener('DOMContentLoaded', async () => {
+	try {
+		const news = await fetchNews();
+		displayNews(news);
+	} catch (error) {
+		console.error('Ошибка при загрузке новостей:', error);
+	}
 });

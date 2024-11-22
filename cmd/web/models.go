@@ -1,6 +1,9 @@
 package main
 
-import "encoding/xml"
+import (
+	"encoding/xml"
+	"time"
+)
 
 type Average struct {
 	Month_reg_date      int
@@ -120,26 +123,39 @@ type Channel struct {
 }
 
 type Item struct {
-	Id       int    `xml:"id" db:"id"`
-	User     string `xml:"user" db:"user_id"`
-	Text     string `xml:",chardata" db:"text"`
-	Title    string `xml:"title" db:"title"`
-	Link     string `xml:"link"`
-	Guid     string `xml:"guid"`
+	Id       int    `xml:"id" json:"id"`
+	User     string `xml:"user" json:"user"`
+	Text     string `xml:",chardata" json:"text"`
+	Title    string `xml:"title" json:"title"`
+	Link     string `xml:"link" json:"link"`
+	Guid     string `xml:"guid" json:"guid"`
 	Priority struct {
-		Text string `xml:",chardata"`
-		Rian string `xml:"rian,attr"`
-	} `xml:"priority"`
-	PubDate string `xml:"pubDate" db:"created_at"`
+		Text string `xml:",chardata" json:"text"`
+		Rian string `xml:"rian,attr" json:"rian"`
+	} `xml:"priority" json:"priority"`
+	PubDate string `xml:"pubDate" db:"created_at" json:"pubDate"`
 	Type    struct {
-		Text string `xml:",chardata"`
-		Rian string `xml:"rian,attr"`
-	} `xml:"type"`
-	Category  string `xml:"category"`
+		Text string `xml:",chardata" json:"text"`
+		Rian string `xml:"rian,attr" json:"rian"`
+	} `xml:"type" json:"type"`
+	Category  string `xml:"category" json:"category"`
 	Enclosure struct {
-		Text       string `xml:",chardata"`
-		URL        string `xml:"url,attr"`
-		Type       string `xml:"type,attr"`
-		SourceName string `xml:"source_name,attr"`
-	} `xml:"enclosure"`
+		Text       string `xml:",chardata" json:"text"`
+		URL        string `xml:"url,attr" json:"url"`
+		Type       string `xml:"type,attr" json:"type"`
+		SourceName string `xml:"source_name,attr" json:"source_name"`
+	} `xml:"enclosure" json:"enclosure"`
+}
+
+type LocalNews struct {
+	Id    int    `json:"id"`
+	Title string `json:"title"`
+	Text  string `json:"text"`
+	User  string `json:"user"`
+	Date  string `json:"date"`
+}
+
+type ForSortNews struct {
+	NewsId int
+	Date   time.Time
 }

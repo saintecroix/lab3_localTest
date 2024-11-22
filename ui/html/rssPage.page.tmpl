@@ -6,11 +6,11 @@
 <h2 style="text-align: center;">Новостная лента</h2>
 <div class="outer-container">
     <div class="news-filter">
-        <a class="clickable active">Общие</a>
+        <a class="clickable active" data-type="all">Общие</a>
         <div class="separator"></div>
-        <a class="clickable">Внешние</a>
+        <a class="clickable" data-type="ria">Внешние</a>
         <div class="separator"></div>
-        <a class="clickable">Локальные</a>
+        <a class="clickable" data-type="local">Локальные</a>
     </div>
     <div style="margin-top: 15px;">
         <a id="addNewBtn" class="styled-link clickable hidden" style="">Написать новость</a>
@@ -38,31 +38,5 @@
         </form>
     </div>
 </div>
-<div>
-    {{range .Channel.Item}}
-    <div class="news">
-        <a href="{{ .Link }}" style="font-size: 18px">{{.Title}}</a>
-        <div style="flex: 1; display: flex; flex-direction: column; justify-content: space-between;">
-        {{if .Enclosure}}
-            {{if eq .Enclosure.Type "image/jpeg"}}
-                <p></p>
-                <img style="display: block; margin-left: auto; margin-right: auto;" src="{{.Enclosure.URL}}" alt="Изображение не найдено"/>
-            {{else if eq .Enclosure.Type "video/x-flv"}}
-                <p></p>
-                <video autoplay loop width="650px" style="display: block; margin-left: auto; margin-right: auto;">
-                    <source src="{{.Enclosure.URL}}" type="{{.Enclosure.Type}}" />
-                </video>
-            {{end}}
-        {{end}}
-        <p></p>
-        <div style="display: flex;">
-            <a style="text-align: left;" class="no-hover">{{.PubDate}}</a>
-            <a style="margin-left: auto;" href="https://ria.ru">РИА новости</a>
-        </div>
-        </div>
-    </div>
-    <p></p>
-    {{end}}
-
-</div>
+<div id="news-container"></div>
 {{end}}
