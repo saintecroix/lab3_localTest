@@ -544,7 +544,7 @@ function displayNews(news) {
 	// Создаем элементы для каждой новости и добавляем их в контейнер
 	news.forEach(item => {
 		const newsItem = document.createElement('div');
-		newsItem.className = 'news-item'; // Добавляем класс для стилизации, если нужно
+		newsItem.className = 'news'; // Добавляем класс для стилизации, если нужно
 
 		if (item.type === 'ria') {
 			newsItem.innerHTML = `
@@ -555,10 +555,7 @@ function displayNews(news) {
 					`<p></p>
 						<img style="display: block; margin-left: auto; margin-right: auto;" src="${item.enclosure.url}"
 						alt="Изображение не найдено"/>` :
-					`<p></p>
-						<video autoPlay loop width="650px" style="display: block; margin-left: auto; margin-right: auto;">
-						<source src="${item.enclosure.url}" type="${item.enclosure.type}"/>
-						</video>`) : ''}
+					`<p></p>`) : ''}
 				<p></p>
 				<div style="display: flex;">
 					<a style="text-align: left;" class="no-hover">${item.date}</a>
