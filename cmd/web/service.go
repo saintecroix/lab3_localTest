@@ -406,23 +406,6 @@ func (app *application) getLocalNews() ([]LocalNews, error) {
 	return news, nil
 }
 
-// Теоретически рудимент
-func ConvertDBTimeToString(dateString string) (*string, error) {
-	// Парсим строку в тип time.Time с указанием временной зоны UTC
-	layout := "2006-01-02 15:04:05"
-	parsedTime, err := time.ParseInLocation(layout, dateString, time.UTC)
-	if err != nil {
-		return nil, err
-	}
-
-	// Получаем московское время (UTC+3)
-	moscowTime := parsedTime.In(time.FixedZone("MSK", 3*3600)) // UTC+3
-
-	// Форматируем дату в нужный формат
-	formattedTime := moscowTime.Format("Mon, 02 Jan 2006 15:04:05 -0700")
-	return &formattedTime, nil
-}
-
 // layout определяет формат, который соответствует входной строке
 func ConvertToTime(dateString string, layout string) (time.Time, error) {
 	// Парсим строку в тип time.Time
