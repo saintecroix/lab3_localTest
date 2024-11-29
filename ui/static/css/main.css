@@ -820,3 +820,15 @@ section#button-container{
 .gallery-item:hover {
     transform: scale(1.05); /* увеличиваем изображение при наведении */
 }
+
+.case-item {
+    overflow: hidden;
+    border-radius: 8px; /* закругленные углы */
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1); /* тень */
+}
+
+.custom-image {
+    width: 1024px;  /* Устанавливаем ширину */
+    height: 321px;  /* Устанавливаем высоту */
+    object-fit: cover; /* Это свойство помогает сохранить пропорции изображения */
+}
