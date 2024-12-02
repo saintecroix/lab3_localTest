@@ -747,6 +747,9 @@ section#button-container{
     width: 650px;
     min-height: 100px;
     margin: auto auto 20px;
+    overflow: hidden;
+    border-radius: 8px; /* закругленные углы */
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1); /* тень */
 }
 
 .outer-container {
@@ -831,4 +834,25 @@ section#button-container{
     width: 1024px;  /* Устанавливаем ширину */
     height: 321px;  /* Устанавливаем высоту */
     object-fit: cover; /* Это свойство помогает сохранить пропорции изображения */
+}
+
+.platform-item {
+    display: flex;
+    overflow: hidden;
+    border-radius: 8px; /* закругленные углы */
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1); /* тень */
+    align-items: center; /* Align items vertically */
+    flex-direction: row;
+}
+
+.platform-image {
+    width: 240px;  /* Устанавливаем ширину */
+    height: 180px;  /* Устанавливаем высоту */
+    object-fit: cover; /* Это свойство помогает сохранить пропорции изображения */
+}
+
+.platform-text { /* New class for text content */
+    display: flex;
+    flex-direction: column; /* Arrange text in a column */
+    margin-left: 20px; /* Add spacing between image and text */
 }

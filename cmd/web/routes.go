@@ -41,6 +41,9 @@ func (app *application) routes() *mux.Router {
 	m.HandleFunc("/indexNews", app.indexNews).Methods(http.MethodGet)
 	m.HandleFunc("/gallery", app.galleryPage).Methods(http.MethodGet)
 	m.HandleFunc("/equipment", app.equipmentPage).Methods(http.MethodGet)
+	m.HandleFunc("/platform1", app.platform1Page).Methods(http.MethodGet)
+	m.HandleFunc("/platform2", app.closePlatformPage).Methods(http.MethodGet)
+	m.HandleFunc("/platform3", app.semiPlatformPage).Methods(http.MethodGet)
 
 	fileServer := http.FileServer(http.Dir("./ui/static/"))
 	m.PathPrefix("/static/").Handler(http.StripPrefix("/static/", fileServer))

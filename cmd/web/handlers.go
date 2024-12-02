@@ -1080,3 +1080,60 @@ func (app *application) equipmentPage(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 }
+
+func (app *application) platform1Page(w http.ResponseWriter, r *http.Request) {
+	files := []string{
+		"./ui/html/platform1.page.tmpl",
+		"./ui/html/base.layout.tmpl",
+		"./ui/html/footer.partial.tmpl",
+	}
+	ts, err := template.ParseFiles(files...)
+	if err != nil {
+		app.serverError(w, err)
+		return
+	}
+
+	err = ts.Execute(w, nil)
+	if err != nil {
+		app.serverError(w, err)
+		return
+	}
+}
+
+func (app *application) closePlatformPage(w http.ResponseWriter, r *http.Request) {
+	files := []string{
+		"./ui/html/platform2.page.tmpl",
+		"./ui/html/base.layout.tmpl",
+		"./ui/html/footer.partial.tmpl",
+	}
+	ts, err := template.ParseFiles(files...)
+	if err != nil {
+		app.serverError(w, err)
+		return
+	}
+
+	err = ts.Execute(w, nil)
+	if err != nil {
+		app.serverError(w, err)
+		return
+	}
+}
+
+func (app *application) semiPlatformPage(w http.ResponseWriter, r *http.Request) {
+	files := []string{
+		"./ui/html/platform3.page.tmpl",
+		"./ui/html/base.layout.tmpl",
+		"./ui/html/footer.partial.tmpl",
+	}
+	ts, err := template.ParseFiles(files...)
+	if err != nil {
+		app.serverError(w, err)
+		return
+	}
+
+	err = ts.Execute(w, nil)
+	if err != nil {
+		app.serverError(w, err)
+		return
+	}
+}
