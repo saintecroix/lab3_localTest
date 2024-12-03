@@ -1,0 +1,72 @@
+{{template "base" .}}
+
+{{define "title"}}Виджеты{{end}}
+
+{{define "main"}}
+<h2>Виджеты</h2>
+<div class="case-item">
+    <p>Радио Sputnik</p>
+    <audio controls="controls" autostart="0" autostart="false" preload="none">
+        <source src="https://icecast-rian.cdnvideo.ru/voicerus" type="audio/ogg" />
+        <source src="https://icecast-rian.cdnvideo.ru/voicerus" type="audio/mpeg" />
+    </audio>
+</div>
+<div class="case-item">
+    <p>Наш адрес</p>
+    <div style="position:relative;overflow:hidden;"><a href="https://yandex.ru/maps/org/obninskiy_institut_atomnoy_energetiki_niyau_mifi/206833913929/?utm_medium=mapframe&utm_source=maps" style="color:#eee;font-size:12px;position:absolute;top:0px;">Обнинский институт атомной энергетики НИЯУ МИФИ</a><a href="https://yandex.ru/maps/967/obninsk/category/university/184106140/?utm_medium=mapframe&utm_source=maps" style="color:#eee;font-size:12px;position:absolute;top:14px;">ВУЗ в Обнинске</a><iframe src="https://yandex.ru/map-widget/v1/?ll=36.606454%2C55.137006&mode=poi&poi%5Bpoint%5D=36.606741%2C55.137308&poi%5Buri%5D=ymapsbm1%3A%2F%2Forg%3Foid%3D206833913929&z=16.9" width="560" height="400" frameborder="1" allowfullscreen="true" style="position:relative;"></iframe></div>
+</div>
+<div class="case-item">
+    <p>Калькулятор</p>
+    <table id="calcu">
+        <tr>
+            <td colspan="3"><input type="text" id="result" readonly></td>
+            <td><input type="button" value="c" onclick="clr()"></td>
+        </tr>
+        <tr>
+            <td><input type="button" value="1" onclick="dis('1')"></td>
+            <td><input type="button" value="2" onclick="dis('2')"></td>
+            <td><input type="button" value="3" onclick="dis('3')"></td>
+            <td><input type="button" value="/" onclick="dis('/')"></td>
+        </tr>
+        <tr>
+            <td><input type="button" value="4" onclick="dis('4')"></td>
+            <td><input type="button" value="5" onclick="dis('5')"></td>
+            <td><input type="button" value="6" onclick="dis('6')"></td>
+            <td><input type="button" value="*" onclick="dis('*')"></td>
+        </tr>
+        <tr>
+            <td><input type="button" value="7" onclick="dis('7')"></td>
+            <td><input type="button" value="8" onclick="dis('8')"></td>
+            <td><input type="button" value="9" onclick="dis('9')"></td>
+            <td><input type="button" value="-" onclick="dis('-')"></td>
+        </tr>
+        <tr>
+            <td><input type="button" value="0" onclick="dis('0')"></td>
+            <td><input type="button" value="." onclick="dis('.')"></td>
+            <td><input type="button" value="=" onclick="solve()"></td>
+            <td><input type="button" value="+" onclick="dis('+')"></td>
+        </tr>
+    </table>
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/mathjs/11.8.0/math.js"></script>
+    <script>
+        function dis(val) {
+            document.getElementById("result").value += val;
+        }
+
+        function solve() {
+            let x = document.getElementById("result").value;
+            try {
+                let y = math.evaluate(x);
+                document.getElementById("result").value = y;
+            } catch (error) {
+                document.getElementById("result").value = "Ошибка";
+            }
+        }
+
+        function clr() {
+            document.getElementById("result").value = "";
+        }
+    </script>
+</div>
+{{end}}

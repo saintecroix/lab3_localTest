@@ -750,6 +750,7 @@ section#button-container{
     overflow: hidden;
     border-radius: 8px; /* закругленные углы */
     box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1); /* тень */
+    padding: 10px;
 }
 
 .outer-container {
@@ -828,6 +829,7 @@ section#button-container{
     overflow: hidden;
     border-radius: 8px; /* закругленные углы */
     box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1); /* тень */
+    padding: 10px;
 }
 
 .custom-image {
@@ -855,4 +857,16 @@ section#button-container{
     display: flex;
     flex-direction: column; /* Arrange text in a column */
     margin-left: 20px; /* Add spacing between image and text */
+}
+
+.radio-widget {
+    position: relative; /* Важно! Делает контейнер родительским для абсолютного позиционирования */
+    /* Другие стили вашего виджета */
+}
+
+.radio-widget svg.volume-indicator {
+    position: absolute; /* Позиционирование относительно родителя */
+    bottom: 0; /* Или top, left, right - в зависимости от расположения ползунка */
+    right: 0; /* Или left - в зависимости от расположения ползунка */
+    margin: 5px; /* Отступы от краев */
 }
