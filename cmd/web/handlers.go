@@ -1156,3 +1156,36 @@ func (app *application) widgets(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 }
+
+func (app *application) handleVisits(w http.ResponseWriter, r *http.Request) {
+	cookie, err := app.handleVisit(r)
+	if err != nil {
+		app.serverError(w, err)
+		return
+	}
+	http.SetCookie(w, cookie)
+	raw, err := app.db.Query("SELECT COUNT(*) FROM user_visits")
+	if err != nil {
+		app.serverError(w, err)
+		return
+	}
+	defer raw.Close()
+	var count int
+	if raw.Next() {
+		err = raw.Scan(&count)
+		if err != nil {
+			app.serverError(w, err)
+			return
+		}
+	}
+
+	type Result struct {
+		Visits int `json:"visits"`
+	}
+	w.Header().Set("Content-Type", "application/json")
+	err = json.NewEncoder(w).Encode(Result{Visits: count})
+	if err != nil {
+		app.serverError(w, err)
+		return
+	}
+}

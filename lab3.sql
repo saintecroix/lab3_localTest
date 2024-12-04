@@ -3,9 +3,9 @@
 -- https://www.phpmyadmin.net/
 --
 -- Хост: db
--- Время создания: Ноя 12 2024 г., 14:27
--- Версия сервера: 9.0.1
--- Версия PHP: 8.2.23
+-- Время создания: Дек 04 2024 г., 00:18
+-- Версия сервера: 9.1.0
+-- Версия PHP: 8.2.25
 
 SET SQL_MODE = "NO_AUTO_VALUE_ON_ZERO";
 START TRANSACTION;
@@ -12287,6 +12287,17 @@ INSERT INTO `user` (`id`, `login`, `password`, `mail`) VALUES
 -- --------------------------------------------------------
 
 --
+-- Структура таблицы `user_visits`
+--
+
+CREATE TABLE `user_visits` (
+  `user_id` text CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NOT NULL,
+  `visit_count` int NOT NULL
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+
+-- --------------------------------------------------------
+
+--
 -- Структура таблицы `wagon`
 --
 
@@ -12369,6 +12380,12 @@ ALTER TABLE `user`
   ADD PRIMARY KEY (`id`),
   ADD UNIQUE KEY `login` (`login`),
   ADD UNIQUE KEY `mail` (`mail`);
+
+--
+-- Индексы таблицы `user_visits`
+--
+ALTER TABLE `user_visits`
+  ADD PRIMARY KEY (`user_id`(255));
 
 --
 -- Индексы таблицы `wagon`

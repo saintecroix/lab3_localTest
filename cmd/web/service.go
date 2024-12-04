@@ -4,8 +4,11 @@ import (
 	"database/sql"
 	"encoding/json"
 	"encoding/xml"
+	"errors"
 	"fmt"
 	"github.com/golang-jwt/jwt/v4"
+	_ "github.com/golang-jwt/jwt/v4"
+	"github.com/google/uuid"
 	"io"
 	"net/http"
 	"sort"
@@ -527,4 +530,24 @@ func (app *application) test(w http.ResponseWriter, r *http.Request) {
 
 	w.Header().Set("Content-Type", "application/json")
 	w.Write(json)
+}
+
+func (app *application) handleVisit(r *http.Request) (*http.Cookie, error) {
+	cookie, err := r.Cookie("user_id")
+	if errors.Is(err, http.ErrNoCookie) {
+		userID := uuid.New().String()
+		_, err = app.db.Exec("INSERT INTO user_visits (user_id) VALUES (?)", userID)
+		if err != nil {
+			return nil, fmt.Errorf("ошибка при добавлении нового cookie в БД: %w", err)
+		}
+		cookie = &http.Cookie{
+			Name:     "user_id",
+			Value:    userID,
+			HttpOnly: true,
+			Path:     "/",
+		}
+	} else if err != nil {
+		return nil, fmt.Errorf("ошибка при чтении cookie: %w", err)
+	}
+	return cookie, nil
 }

@@ -1,3 +1,23 @@
 {{define "footer"}}
-<footer class="footer">Марков К.А. ИВТ-Б20 <strong>ИАТЭ НИЯУ МИФИ</strong>. 2023г.</footer>
+<footer class="footer">
+    Марков К.А. ИВТ-Б20 <strong>ИАТЭ НИЯУ МИФИ</strong>. 2023г.
+    <div id="visits-widget">
+        Посещений: <span id="visits-count">0</span>
+    </div>
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            updateVisits();
+        });
+
+        async function updateVisits() {
+            try {
+                const response = await fetch('/visits');
+                const data = await response.json();
+                document.getElementById('visits-count').textContent = data.visits;
+            } catch (error) {
+                console.error('Error fetching visits:', error);
+            }
+        }
+    </script>
+</footer>
 {{end}}
