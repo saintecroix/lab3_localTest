@@ -4,6 +4,7 @@ import (
 	"encoding/json"
 	"encoding/xml"
 	"fmt"
+	"github.com/gorilla/mux"
 	"html/template"
 	"net/http"
 	"os"
@@ -1184,6 +1185,40 @@ func (app *application) handleVisits(w http.ResponseWriter, r *http.Request) {
 	}
 	w.Header().Set("Content-Type", "application/json")
 	err = json.NewEncoder(w).Encode(Result{Visits: count})
+	if err != nil {
+		app.serverError(w, err)
+		return
+	}
+}
+
+func (app *application) newPage(w http.ResponseWriter, r *http.Request) {
+	files := []string{
+		"./ui/html/local_new.page.tmpl",
+		"./ui/html/base.layout.tmpl",
+		"./ui/html/footer.partial.tmpl",
+	}
+	ts, err := template.ParseFiles(files...)
+	if err != nil {
+		app.serverError(w, err)
+		return
+	}
+	vars := mux.Vars(r)
+	newsID, err := strconv.Atoi(vars["id"])
+	if err != nil {
+		app.serverError(w, err)
+		return
+	}
+	localNew, err := app.gotNew(newsID)
+	if err != nil {
+		app.serverError(w, err)
+		return
+	}
+
+	type Result struct {
+		New *LocalNews
+	}
+
+	err = ts.Execute(w, Result{New: localNew})
 	if err != nil {
 		app.serverError(w, err)
 		return

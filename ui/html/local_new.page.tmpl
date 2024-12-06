@@ -1,0 +1,12 @@
+{{template "base" .}}
+
+{{define "title"}}{{ .New.Title }}{{end}}
+
+{{define "main"}}
+<h2>{{ .New.Title }}</h2>
+<p>{{ .New.Text }}</p>
+<div style="display: flex; justify-content: space-between;">
+    <p>Автор: {{ .New.User }}</p>
+    <p>{{ .New.Date }}</p>
+</div>
+{{end}}

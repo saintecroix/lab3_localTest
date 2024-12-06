@@ -18,13 +18,20 @@ header {
     top: 0;
     width: 100%;
     max-width: 2000px;
-    background: linear-gradient(0deg, rgba(146,165,235,1) 0%, rgba(45,91,253,1) 100%);
+    background: linear-gradient(0deg, rgba(146, 165, 235, 1) 0%, rgba(45, 91, 253, 1) 100%);
     border-bottom: 1px solid #E4E5E7;
     padding: 14px calc((100% - 800px) / 2) 17px;
     text-align: center;
     z-index: 1000;
     box-sizing: border-box;
     height: 100px;
+}
+
+#profile {
+    position: absolute;
+    right: 20px;
+    top: 50%;
+    transform: translateY(-50%);
 }
 
 footer {

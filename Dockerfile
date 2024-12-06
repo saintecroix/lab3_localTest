@@ -9,6 +9,7 @@ RUN go build ./cmd/web
 FROM ubuntu:22.04
 COPY --from=app /app/. /app/.
 COPY --from=app /etc/ssl/certs/ca-certificates.crt /etc/ssl/certs/
+RUN apt update && apt install -y tzdata
 WORKDIR /app
 EXPOSE 4000
 CMD ["/app/web"]

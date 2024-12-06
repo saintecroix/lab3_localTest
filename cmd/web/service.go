@@ -7,7 +7,6 @@ import (
 	"errors"
 	"fmt"
 	"github.com/golang-jwt/jwt/v4"
-	_ "github.com/golang-jwt/jwt/v4"
 	"github.com/google/uuid"
 	"io"
 	"net/http"
@@ -397,14 +396,31 @@ func (app *application) getLocalNews() ([]LocalNews, error) {
 	if err != nil {
 		return nil, err
 	}
+	defer getData.Close()
 	news := make([]LocalNews, 0)
+	loc, err := time.LoadLocation("Europe/Moscow")
+	if err != nil {
+		return nil, fmt.Errorf("failed to load location: %w", err)
+	}
 	for getData.Next() {
 		var localNew LocalNews
-		err = getData.Scan(&localNew.Id, &localNew.Title, &localNew.Text, &localNew.User, &localNew.Date)
+		var createdAtString string
+		err := getData.Scan(&localNew.Id, &localNew.Title, &localNew.Text, &localNew.User, &createdAtString)
 		if err != nil {
-			return nil, err
+			return nil, fmt.Errorf("error scanning row: %w", err)
 		}
+
+		t, err := time.Parse("2006-01-02 15:04:05", createdAtString)
+		if err != nil {
+			return nil, fmt.Errorf("error parsing datetime: %w", err)
+		}
+
+		localNew.Date = t.In(loc).Format("2006-01-02 15:04:05")
+
 		news = append(news, localNew)
+	}
+	if err := getData.Err(); err != nil {
+		return nil, fmt.Errorf("error iterating through rows: %w", err)
 	}
 	return news, nil
 }
@@ -501,6 +517,52 @@ func (app *application) indexNews(w http.ResponseWriter, r *http.Request) {
 	w.Write(res)
 }
 
+func (app *application) handleVisit(r *http.Request) (*http.Cookie, error) {
+	cookie, err := r.Cookie("user_id")
+	if errors.Is(err, http.ErrNoCookie) {
+		userID := uuid.New().String()
+		_, err = app.db.Exec("INSERT INTO user_visits (user_id) VALUES (?)", userID)
+		if err != nil {
+			return nil, fmt.Errorf("ошибка при добавлении нового cookie в БД: %w", err)
+		}
+		cookie = &http.Cookie{
+			Name:     "user_id",
+			Value:    userID,
+			HttpOnly: true,
+			Path:     "/",
+		}
+	} else if err != nil {
+		return nil, fmt.Errorf("ошибка при чтении cookie: %w", err)
+	}
+	return cookie, nil
+}
+
+func (app *application) gotNew(newsID int) (*LocalNews, error) {
+	raw, err := app.db.Query("SELECT * FROM news WHERE id=?", newsID)
+	if err != nil {
+		return nil, fmt.Errorf("error bad db request: %w", err)
+	}
+	var gotNew LocalNews
+	loc, err := time.LoadLocation("Europe/Moscow")
+	if err != nil {
+		return nil, fmt.Errorf("failed to load location: %w", err)
+	}
+	var createdAtString string
+	for raw.Next() {
+		err = raw.Scan(&gotNew.Id, &gotNew.Title, &gotNew.Text, &gotNew.User, &createdAtString)
+		if err != nil {
+			return nil, fmt.Errorf("error bad response from db: %w", err)
+		}
+		t, err := time.Parse("2006-01-02 15:04:05", createdAtString)
+		if err != nil {
+			return nil, fmt.Errorf("error parsing datetime: %w", err)
+		}
+
+		gotNew.Date = t.In(loc).Format("2006-01-02 15:04:05")
+	}
+	return &gotNew, nil
+}
+
 func (app *application) test(w http.ResponseWriter, r *http.Request) {
 	local, err := app.getLocalNews()
 	if err != nil {
@@ -530,24 +592,4 @@ func (app *application) test(w http.ResponseWriter, r *http.Request) {
 
 	w.Header().Set("Content-Type", "application/json")
 	w.Write(json)
-}
-
-func (app *application) handleVisit(r *http.Request) (*http.Cookie, error) {
-	cookie, err := r.Cookie("user_id")
-	if errors.Is(err, http.ErrNoCookie) {
-		userID := uuid.New().String()
-		_, err = app.db.Exec("INSERT INTO user_visits (user_id) VALUES (?)", userID)
-		if err != nil {
-			return nil, fmt.Errorf("ошибка при добавлении нового cookie в БД: %w", err)
-		}
-		cookie = &http.Cookie{
-			Name:     "user_id",
-			Value:    userID,
-			HttpOnly: true,
-			Path:     "/",
-		}
-	} else if err != nil {
-		return nil, fmt.Errorf("ошибка при чтении cookie: %w", err)
-	}
-	return cookie, nil
 }

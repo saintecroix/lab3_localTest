@@ -564,7 +564,7 @@ function displayNews(news) {
 			</div>
 `;}else {
 			newsItem.innerHTML = `
-			<a style="font-size: 18px">${item.title}</a>
+			<a href="/local/${item.id}" style="font-size: 18px">${item.title}</a>
 			<div style="flex: 1; display: flex; flex-direction: column; justify-content: space-between;">
 				<p></p>
 				<div style="display: flex;">
