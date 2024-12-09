@@ -22,7 +22,7 @@ func main() {
 	infoLog := log.New(os.Stdout, "INFO\t", log.Ldate|log.Ltime)
 	errorLog := log.New(os.Stderr, "ERROR\t", log.Ldate|log.Ltime|log.Lshortfile)
 
-	db, errsql := sql.Open("mysql", "root:@(db:3306)/lab3")
+	db, errsql := sql.Open("mysql", "root:@(db:8080)/lab3")
 	if errsql != nil {
 		log.Fatal(errsql)
 	}
