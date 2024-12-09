@@ -1,16 +1,21 @@
 services:
-  db:
-    image: mysql:8
+  mysql:
+    image: mysql
+    container_name: mysql
     restart: always
     environment:
-      - MYSQL_ROOT_PASSWORD=your_strong_password  # Замените на сильный пароль!
+      - MYSQL_ALLOW_EMPTY_PASSWORD=yes
       - MYSQL_DATABASE=lab3
     volumes:
-      - db_data:/var/lib/mysql
+      - mysql:/var/lib/mysql
+      - ./lab3.sql:/docker-entrypoint-initdb.d/lab3.sql
     ports:
-      - "3306:3306"
+      - "13306:3306"
     networks:
-      - app
+      app:
+        aliases:
+          - db
+          - mysql
 
   app:
     build:
