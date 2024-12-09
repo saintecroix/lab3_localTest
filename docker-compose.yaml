@@ -1,52 +1,57 @@
-volumes:
-  mysql:
-  phpmyadmin:
-
-networks:
-  app:
-    driver: bridge
-    attachable: true
-
 services:
-  mysql:
-    image: mysql
-    container_name: mysql
+  db:
+    image: mysql:8
     restart: always
     environment:
-     - MYSQL_ALLOW_EMPTY_PASSWORD=yes
-     - MYSQL_DATABASE=lab3
+      - MYSQL_ROOT_PASSWORD=your_strong_password  # Замените на сильный пароль!
+      - MYSQL_DATABASE=lab3
     volumes:
-      -  mysql:/var/lib/mysql
-      - ./lab3.sql:/docker-entrypoint-initdb.d/lab3.sql
+      - db_data:/var/lib/mysql
     ports:
-      - "13306:3306"
+      - "3306:3306"
     networks:
-      app:
-        aliases:
-          - db
-          - mysql
+      - app
 
   app:
     build:
+      context: .
       dockerfile: Dockerfile
-    container_name: app
     restart: always
     ports:
       - "4000:4000"
     networks:
-      app:
+      - app
+    depends_on:
+      - db
+
+  nginx:
+    image: nginx:latest
+    restart: always
+    ports:
+      - "80:80"
+    volumes:
+      - ./nginx.conf:/etc/nginx/conf.d/default.conf
+      - ./public:/usr/share/nginx/html #только если вы используете статику
+    networks:
+      - app
+    depends_on:
+      - app
+
 
   phpmyadmin:
     image: phpmyadmin
-    container_name: phpmyadmin
     restart: always
     environment:
       - PMA_ARBITRARY=1
     ports:
-      - "3306:80"
-    volumes:
-      - mysql:/var/lib/mysql
+      - "8080:80"
     depends_on:
-      - mysql
+      - db
     networks:
-      app:
+      - app
+
+networks:
+  app:
+
+volumes:
+  db_data:

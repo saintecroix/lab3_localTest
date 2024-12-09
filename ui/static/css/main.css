@@ -814,6 +814,7 @@ section#button-container{
 }
 
 .gallery-item {
+    position: relative;
     overflow: hidden; /* скрыть переполнение */
     border-radius: 8px; /* закругленные углы */
     box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1); /* тень */
@@ -830,6 +831,31 @@ section#button-container{
 
 .gallery-item:hover {
     transform: scale(1.05); /* увеличиваем изображение при наведении */
+}
+
+.gallery-item-overlay {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(0, 0, 0, 0.5); /* затемнение */
+    opacity: 0;
+    transition: opacity 0.3s; /* анимация */
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    border-radius: 8px;
+}
+
+.gallery-item-title {
+    color: white;
+    font-weight: bold;
+    text-shadow: 1px 1px 2px rgba(0,0,0,0.5); /* тень текста */
+}
+
+.gallery-item:hover .gallery-item-overlay {
+    opacity: 1; /* показать затемнение при наведении */
 }
 
 .case-item {
