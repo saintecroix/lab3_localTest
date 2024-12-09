@@ -5,7 +5,7 @@
 {{define "main"}}
 <label>Поиск по двум атрибутам: </label>
 <form id="my-form">
-    <label>Первый атрибут: </label>
+    <label>Тип вагонов: </label>
     <select id="Duos" name="Duos">
         <option value="">Выберите тип вагонов</option>
         {{ range .Wagon }}
@@ -14,7 +14,7 @@
     </select>
     <p></p>
     <p>
-        <label>Второй атрибут: </label>
+        <label>Тип груза: </label>
         <select id="Gruz-list" name="gruz-list">
             <option value="">Выберите тип груза</option>
         </select>
