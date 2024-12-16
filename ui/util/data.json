@@ -1,0 +1,14 @@
+[
+  {
+    "title": "Home",
+    "url": "index.html",
+    "content": "Welcome to our homepage! Here you'll find resources and updates.",
+    "snippet": "Welcome to our homepage!"
+  },
+  {
+    "title": "About Us",
+    "url": "about.html",
+    "content": "Learn more about our mission, vision, and team.",
+    "snippet": "Learn more about our mission."
+  }
+]
