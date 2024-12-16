@@ -2,8 +2,8 @@
 -- version 5.2.1
 -- https://www.phpmyadmin.net/
 --
--- Хост: db
--- Время создания: Дек 04 2024 г., 00:18
+-- Хост: mysql
+-- Время создания: Дек 16 2024 г., 13:24
 -- Версия сервера: 9.1.0
 -- Версия PHP: 8.2.25
 
@@ -9470,7 +9470,7 @@ INSERT INTO `gruz` (`id`, `Name`, `ETSNG`, `GNG`) VALUES
 CREATE TABLE `news` (
   `id` int NOT NULL,
   `title` varchar(255) NOT NULL,
-  `text` varchar(255) NOT NULL,
+  `text` text CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci NOT NULL,
   `user_id` varchar(255) NOT NULL,
   `created_at` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
@@ -9480,9 +9480,9 @@ CREATE TABLE `news` (
 --
 
 INSERT INTO `news` (`id`, `title`, `text`, `user_id`, `created_at`) VALUES
-(4, 'Тест', 'Тестовый тест', 'qwe', '2024-10-24 14:03:29'),
-(5, 'Тест1', 'qwe', 'qwe', '2024-10-24 14:03:29'),
-(6, 'qwe', 'qweasd', 'qwe', '2024-10-30 20:00:27');
+(8, 'Теперь на сайте есть счетчик посещений!', 'Счетчик пользователей работает на основе хранения уникального идентификатора (UUID) для каждого пользователя в базе данных. При каждом посещении сайта проверяется наличие идентификатора пользователя в cookie. Если идентификатор отсутствует, генерируется новый UUID, сохраняется в базе данных и устанавливается в cookie. Количество уникальных пользователей определяется путем подсчета записей в базе данных.', 'admin', '2024-12-06 09:51:14'),
+(9, 'На сайте появились виджеты!', 'На сайт добавлены три новых виджета, улучшающие пользовательский опыт и предоставляющие дополнительную информацию:\n\n1. Виджет карты: Интерактивная карта с отображением местоположения вашей организации. Это позволяет посетителям сайта легко найти вас и планировать маршрут.\n\n2. Калькулятор: Стандартный математический калькулятор, позволяющий пользователям выполнять простые вычисления прямо на сайте, без необходимости переходить на другие ресурсы.\n\n3. Виджет радио Sputnik: Встроенный плеер онлайн-радиостанции Sputnik, добавляющий мультимедийный контент на сайт и повышающий вовлеченность пользователей.\n\nЭти виджеты были успешно интегрированы на сайт и готовы к использованию.', 'admin', '2024-12-06 11:38:15'),
+(10, 'Новость', 'Надо работать', 'vjaz', '2024-12-02 16:06:42');
 
 -- --------------------------------------------------------
 
@@ -12282,7 +12282,9 @@ INSERT INTO `user` (`id`, `login`, `password`, `mail`) VALUES
 (30, 'q', 'q', 'saintecroix@yandex.ru'),
 (31, 'w', 'q', 'markovka@oiate.ru'),
 (32, 'example', 'q', 'example@example.com'),
-(33, 'qwe', 'qwe', 'w@w.com');
+(33, 'qwe', 'qwe', 'w@w.com'),
+(34, 'admin', 'root', 'admin@test.com'),
+(35, 'vjaz', 'tlv', 'vvv@iate.ru');
 
 -- --------------------------------------------------------
 
@@ -12291,9 +12293,19 @@ INSERT INTO `user` (`id`, `login`, `password`, `mail`) VALUES
 --
 
 CREATE TABLE `user_visits` (
-  `user_id` text CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NOT NULL,
-  `visit_count` int NOT NULL
+  `user_id` text CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NOT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+
+--
+-- Дамп данных таблицы `user_visits`
+--
+
+INSERT INTO `user_visits` (`user_id`) VALUES
+('2572bfd1-d4b4-4bf9-a3db-f92889882fe8'),
+('6d5aec95-631e-4179-b29e-35cca87245bb'),
+('a41ee8e6-02bc-4373-8529-caeba0598e8a'),
+('c32379d3-d034-4f50-9cfc-16d97eb2862c'),
+('e097a907-fc90-4d83-8098-0b879ed670fd');
 
 -- --------------------------------------------------------
 
@@ -12346,7 +12358,6 @@ ALTER TABLE `gruz`
 ALTER TABLE `news`
   ADD PRIMARY KEY (`id`),
   ADD UNIQUE KEY `title` (`title`),
-  ADD UNIQUE KEY `new_text` (`text`),
   ADD KEY `user_id` (`user_id`);
 
 --
@@ -12419,7 +12430,7 @@ ALTER TABLE `gruz`
 -- AUTO_INCREMENT для таблицы `news`
 --
 ALTER TABLE `news`
-  MODIFY `id` int NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=7;
+  MODIFY `id` int NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=11;
 
 --
 -- AUTO_INCREMENT для таблицы `region`
@@ -12449,7 +12460,7 @@ ALTER TABLE `station`
 -- AUTO_INCREMENT для таблицы `user`
 --
 ALTER TABLE `user`
-  MODIFY `id` int NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=34;
+  MODIFY `id` int NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=36;
 
 --
 -- AUTO_INCREMENT для таблицы `wagon`

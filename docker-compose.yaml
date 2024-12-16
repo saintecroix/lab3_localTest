@@ -45,11 +45,11 @@ services:
       - "80:80"
     volumes:
       - ./nginx.conf:/etc/nginx/conf.d/default.conf
+      - ./ui/static:/app/static
     networks:
       app:
     depends_on:
       - app
-
 
   phpmyadmin:
     image: phpmyadmin
@@ -57,8 +57,10 @@ services:
     restart: always
     environment:
       - PMA_ARBITRARY=1
+      - PMA_HOST=mysql
+      - PMA_USER=root
     ports:
-      - "8080:80"
+      - "6672:80"
     volumes:
       - mysql:/var/lib/mysql
     depends_on:
