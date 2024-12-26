@@ -4,6 +4,8 @@ if (select) {
 	select.addEventListener("change", myFunction);
 }
 
+console.log(1)
+
 
 function myFunction() {
 	let select = document.getElementById("Goods");
@@ -155,6 +157,131 @@ document.querySelectorAll('.menu__switcher > .menu__link').forEach(link => {
 		parent.classList.toggle('active');
 	});
 });
+
+/*----------------------------------------------------------------------------------------*/
+const data = [
+	{
+		"title": "Главная",
+		"url": "/",
+		"content": "Главная",
+		"snippet": "Главная"
+	},
+	{
+		"title": "Виджеты",
+		"url": "/widgets",
+		"content": "Виджеты",
+		"snippet": "Виджеты"
+	},
+	{
+		"title": "Подвижной состав",
+		"url": "/equipment",
+		"content": "Подвижной состав",
+		"snippet": "Подвижной состав"
+	},
+	{
+		"title": "Галерея",
+		"url": "/gallery",
+		"content": "Галерея",
+		"snippet": "Галерея"
+	},
+	{
+		"title": "Новостная лента",
+		"url": "/rss",
+		"content": "Новостная лента",
+		"snippet": "Новостная лента"
+	},
+	{
+		"title": "Страница с XML данными",
+		"url": "/xml",
+		"content": "Страница с XML данными",
+		"snippet": "Страница с XML данными"
+	},
+	{
+		"title": "О базе данных",
+		"url": "/about_db",
+		"content": "база данных",
+		"snippet": "Данная база данных была создана для быстрого получения и изменения данных о железнодорожных перевозках для поиска новых клиентов и анализа рынка логистических услуг в сфере ж\\д грузоперевозок. Работу выполнил студент группы ИВТ-Б20 - Марков К.А."
+	},
+	{
+		"title": "Ввод данных в бд",
+		"url": "/input",
+		"content": "Ввод данных в бд",
+		"snippet": "Ввод данных в бд"
+	},
+	{
+		"title": "Поиск по двум атрибутам:",
+		"url": "/duoSearch",
+		"content": "Поиск по двум атрибутам:",
+		"snippet": "Поиск по двум атрибутам:"
+	},
+	{
+		"title": "Поиск по одному атрибуту: ",
+		"url": "/soloSearch",
+		"content": "Поиск по одному атрибуту: ",
+		"snippet": "Поиск по одному атрибуту: "
+	},
+	{
+		"title": "Статистика",
+		"url": "/stats",
+		"content": "Средний уровень грузоперевозок по месяцам:",
+		"snippet": "Средний уровень грузоперевозок по месяцам:"
+	},
+	{
+		"title": "Статистика",
+		"url": "/stats",
+		"content": "Популярные направления для транспортировок: ",
+		"snippet": "Популярные направления для транспортировок: "
+	},
+	{
+		"title": "Статистика",
+		"url": "/stats",
+		"content": "Направления, по которым возят ключевые грузоотправители: ",
+		"snippet": "Направления, по которым возят ключевые грузоотправители: "
+	}
+	,
+	{
+		"title": "Статистика",
+		"url": "/stats",
+		"content": "Статистика",
+		"snippet": "Статистика"
+	}
+];
+
+const searchInput2 = document.getElementById('search-input2');
+const resultsContainer = document.getElementById('results');
+
+function searchSite() {
+	const query = searchInput2.value.toLowerCase();
+	resultsContainer.innerHTML = '';
+
+
+	let results
+
+
+	if (query !== '') {
+		results = data.filter(page =>
+			page.snippet.toLowerCase().includes(query) || page.content.toLowerCase().includes(query)
+		);
+	}
+
+
+	results.forEach(result => {
+		const resultDiv = document.createElement('div');
+		resultDiv.innerHTML = `<h3><a href="${result.url}">${result.title}</a></h3><p>${result.content}</p>`;
+		resultsContainer.appendChild(resultDiv);
+	});
+}
+
+searchInput2.addEventListener('focus', () => {
+	resultsContainer.style.display = 'flex';
+});
+
+searchInput2.addEventListener('blur', () => {
+	setTimeout(() => {
+		resultsContainer.style.display = 'none';
+	}, 200);
+});
+searchInput2.addEventListener('input', searchSite);
 
 /*----------------------------------------------------------------------------------------*/
 

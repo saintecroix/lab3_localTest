@@ -914,3 +914,24 @@ section#button-container{
     padding: 10px;
     background-color: white;
 }
+
+
+#results {
+    position: absolute;
+    padding: 10px;
+    display: none;
+    z-index: 30;
+    width: 100%;
+    background: rgb(236, 239, 241);
+    flex-direction: column;
+    border-bottom: 1px solid black;
+    gap: 6px;
+    align-items: center;
+}
+
+#search-input2 {
+    width: fit-content;
+    padding: 5px;
+    margin-left: 40px;
+    margin-bottom: 10px;
+}
