@@ -2,238 +2,250 @@
 
 {{define "title"}}Ввод данных в бд{{end}}
 
+
+
+
 {{define "main"}}
-<h2>Ввод данных в бд</h2>
-<form action="/save_application" method="post">
-    <p>
-        <label for="Number" >Номер заявки: </label>
-        <input type="number" id="Number" name="Number" required />
-        Например: 123412
-    </p>
-    <p>
-        <label for="Reg_date">Дата регистрации: </label>
-        <input type="date" id="Reg_date" name="Reg_date" required />
-        Например: 28.10.2022
-    </p>
-    <p>
-        <label for="Status">Статус заявки: </label>
-        <select id="Status" name="Status">
-          <option disabled selected>--Please choose status--</option>
-          <option value="Согласована">Согласована</option>
-          <option value="Закрыта по учет карт">Закрыта по учет карт</option>
-          <option value="Согласована с изм">Согласована с изм</option>
-          <option value="Отклонена">Отклонена</option>
-          <option value="На согласовании">На согласовании</option>
-        </select>
-    </p>
-    <p>
-        <label for="Provide_date">Дата подачи вагона: </label>
-        <input type="date" id="Provide_date" name="Provide_date" required  />
-        Например: 28.10.2022
-    </p>
-    <p>
-        <label for="Departure_type">Вид отправления: </label>
-        <input type="text" id="Departure_type" name="Departure_type"/>
-    </p>
-    <p>
-        <label for="Goods">Наименование груза: </label>
-        <select id="Goods" name="Goods">
-          <option disabled selected>Please choose good</option>
-          {{ range .Gruz }}
-          <option value="{{ .Id }}">{{ .Name }} ГНГ({{ .GNG }})</option>
-          {{ end }}
-        </select> <a href="/add_gruz" class="butt">Добавить груз</a>
-    </p>
-    <p>
-        <label for="Origin_state">Государство отправления: </label>
-        <select id="Origin_state" name="Origin_state">
-          <option disabled selected>Please choose state</option>
-            {{ range .State }}
-            <option value="{{ .Id }}">{{ .Name }}</option>
-            {{ end }}
-        </select> <a href="/add_state" class="butt">Добавить страну</a>
-    </p>
-    <p>
-        <label for="Enter_station">Станция входа на Россию: </label>
-        <select id="Enter_station" name="Enter_station">
-          <option disabled selected>Please choose station</option>
-            {{ range .Station }}
-            <option value="{{ .Id }}">{{ .Name }}</option>
-            {{ end }}
-        </select> <a href="/add_station" class="butt">Добавить станцию</a>
-    </p>
-    <p>
-        <label for="Region_depart">Область отправления: </label>
-        <select id="Region_depart" name="Region_depart">
-          <option disabled selected>Please choose region</option>
-            {{ range .Region }}
-            <option value="{{ .Id }}">{{ .Name }}</option>
-            {{ end }}
-        </select> <a href="/add_region" class="butt">Добавить область</a>
-    </p>
-    <p>
-        <label for="Road_depart">Дорога отправления: </label>
-        <select id="Road_depart" name="Road_depart">
-          <option disabled selected>Please choose road</option>
-            {{ range .Road }}
-            <option value="{{ .Id }}">{{ .Name }}</option>
-            {{ end }}
-        </select> <a href="/add_road" class="butt">Добавить дорогу</a>
-    </p>
-    <p>
-        <label for="Station_depart">Станция отправления: </label>
-        <select id="Station_depart" name="Station_depart">
-          <option disabled selected>Please choose station</option>
-            {{ range .Station }}
-            <option value="{{ .Id }}">{{ .Name }}</option>
-            {{ end }}
-        </select> <a href="/add_station" class="butt">Добавить станцию</a>
-    </p>
-    <p>
-        <label for="Consigner">Грузоотправитель: </label>
-        <select id="Consigner" name="Consigner">
-          <option disabled selected>Please choose Consigner</option>
-            {{ range .Consignee }}
-            {{ if .Was_sender}}<option value="{{ .Id }}">{{ .Name }}</option>{{ end }}
-            {{ end }}
-        </select> <a href="/add_consignee" class="butt">Добавить грузоотправителя/грузополучателя</a>
-    </p>
-    <p>
-        <label for="State_destination">Государство назначения: </label>
-        <select id="State_destination" name="State_destination">
-          <option disabled selected>Please choose state</option>
-            {{ range .State }}
-            <option value="{{ .Id }}">{{ .Name }}</option>
-            {{ end }}
-        </select> <a href="/add_state" class="butt">Добавить страну</a>
-    </p>
-    <p>
-        <label for="Exit_station">Станция выхода из России: </label>
-        <select id="Exit_station" name="Exit_station">
-          <option disabled selected>Please choose station</option>
-            {{ range .Station }}
-            <option value="{{ .Id }}">{{ .Name }}</option>
-            {{ end }}
-        </select> <a href="/add_station" class="butt">Добавить станцию</a>
-    </p>
-    <p>
-        <label for="Region_destination">Область назначения: </label>
-        <select id="Region_destination" name="Region_destination">
-          <option disabled selected>Please choose region</option>
-            {{ range .Region }}
-            <option value="{{ .Id }}">{{ .Name }}</option>
-            {{ end }}
-        </select> <a href="/add_region" class="butt">Добавить область</a>
-    </p>
-    <p>
-        <label for="Road_destination">Дорога назначения: </label>
-        <select id="Road_destination" name="Road_destination">
-          <option disabled selected>Please choose road</option>
-            {{ range .Road }}
-            <option value="{{ .Id }}">{{ .Name }}</option>
-            {{ end }}
-        </select> <a href="/add_road" class="butt">Добавить дорогу</a>
-    </p>
-    <p>
-        <label for="Station_destination">Станция назначения: </label>
-        <select id="Station_destination" name="Station_destination">
-          <option disabled selected>Please choose station</option>
-            {{ range .Station }}
-            <option value="{{ .Id }}">{{ .Name }}</option>
-            {{ end }}
-        </select> <a href="/add_station" class="butt">Добавить станцию</a>
-    </p>
-    <p>
-        <label for="Consignee">Грузополучатель: </label>
-        <select id="Consignee" name="Consignee">
-          <option disabled selected>Please choose Consignee</option>
-            {{ range .Consignee }}
-            <option value="{{ .Id }}">{{ .Name }}</option>
-            {{ end }}
-        </select> <a href="/add_consignee" class="butt">Добавить грузоотправителя/грузополучателя</a>
-    </p>
-    <p>
-        <label for="Wagon_type">Тип вагона: </label>
-        <select id="Wagon_type" name="Wagon_type">
-          <option disabled selected>Please choose wagon type</option>
-            {{ range .Wagon }}
-            <option value="{{ .Id }}">{{ .Name }}</option>
-            {{ end }}
-        </select> <a href="/add_wagon" class="butt">Добавить тип вагона</a>
-    </p>
-    <p>
-        <label for="Property">Призн собств вагона: </label>
-        <select id="Property" name="Property">
-          <option disabled selected>Please choose property</option>
-          <option value="Арендованный">Арендованный</option>
-          <option value="Не определено">Не определено</option>
-        </select>
-    </p>
-    <p>
-        <label for="Wagon_owner">Собственник вагона: </label>
-        <input type="text" id="Wagon_owner" name="Wagon_owner"/>
-        Например: ООО АТЛАНТ
-    </p>
-    <p>
-        <label for="Payer">Плательщик: </label>
-        <input type="text" id="Payer" name="Payer"/>
-        Например: АО КТК
-    </p>
-    <p>
-        <label for="Road_owner">Владелец пути необщего пользования: </label>
-        <input type="text" id="Road_owner" name="Road_owner"/>
-        Например: ООО ТЭК МЕРЕТЬ
-    </p>
-    <p>
-        <label for="Transport_manager">Организация перевозки в порту: </label>
-        <input type="text" id="Transport_manager" name="Transport_manager"/>
-        Например: ООО ТЭК МЕРЕТЬ
-    </p>
-    <p>
-        <label for="Tons_declared">Тонн заявлено: </label>
-        <input type="number" id="Tons_declared" name="Tons_declared" required />
-        Например: 5500
-    </p>
-    <p>
-        <label for="Tons_accepted">Тонн принято: </label>
-        <input type="number" id="Tons_accepted" name="Tons_accepted" required />
-        Например: 5000
-    </p>
-    <p>
-        <label for="Wagon_declared">Вагонов(контейнеров) заявлено: </label>
-        <input type="number" id="Wagon_declared" name="Wagon_declared" required />
-        Например: 79
-    </p>
-    <p>
-        <label for="Wagon_accepted">Вагонов(контейнеров) принято: </label>
-        <input type="number" id="Wagon_accepted" name="Wagon_accepted" required />
-        Например: 70
-    </p>
-    <p>
-        <label for="Filing_date">Дата подачи заявления: </label>
-        <input type="date" id="Filing_date" name="Filing_date" required />
-        Например: 28.10.2022
-    </p>
-    <p>
-        <label for="Agreement_date">Дата начала согласования: </label>
-        <input type="date" id="Agreement_date" name="Agreement_date" required />
-        Например: 28.10.2022
-    </p>
-    <p>
-        <label for="Approval_date">Дата утверждения: </label>
-        <input type="date" id="Approval_date" name="Approval_date" required />
-        Например: 28.10.2022
-    </p>
-    <p>
-        <label for="Start_date">Дата начала действия: </label>
-        <input type="date" id="Start_date" name="Start_date" required />
-        Например: 28.10.2022
-    </p>
-    <p>
-        <label for="Stop_date">Дата окончания действия: </label>
-        <input type="date" id="Stop_date" name="Stop_date" required />
-        Например: 28.10.2022
-    </p>
-    <input type="submit" value="Добавить заявку" class="glo" />
-</form>
+    <div class="notification__wrap">
+        <div class="notification success">
+            <p>Заявка принято</p>
+        </div>
+        <div class="notification failure">
+            <p>Ошибка, попробуйте позже</p>
+        </div>
+    </div>
+    <h2>Ввод данных в бд</h2>
+    <form action="/save_application" method="post">
+        <p>
+            <label for="Number" >Номер заявки: </label>
+            <input type="number" id="Number" class="autonum" name="Number" required />
+            Например: 123412
+        </p>
+        <p>
+            <label for="Reg_date">Дата регистрации: </label>
+            <input type="date" id="Reg_date" name="Reg_date" required />
+            Например: 28.10.2022
+        </p>
+        <p>
+            <label for="Status">Статус заявки: </label>
+            <select id="Status" name="Status">
+              <option disabled selected>--Please choose status--</option>
+              <option value="Согласована">Согласована</option>
+              <option value="Закрыта по учет карт">Закрыта по учет карт</option>
+              <option value="Согласована с изм">Согласована с изм</option>
+              <option value="Отклонена">Отклонена</option>
+              <option value="На согласовании">На согласовании</option>
+            </select>
+        </p>
+        <p>
+            <label for="Provide_date">Дата подачи вагона: </label>
+            <input type="date" id="Provide_date" name="Provide_date" required  />
+            Например: 28.10.2022
+        </p>
+        <p>
+            <label for="Departure_type">Вид отправления: </label>
+            <input type="text" id="Departure_type" name="Departure_type"/>
+        </p>
+        <p>
+            <label for="Goods">Наименование груза: </label>
+            <select id="Goods" name="Goods">
+              <option disabled selected>Please choose good</option>
+              {{ range .Gruz }}
+              <option value="{{ .Id }}">{{ .Name }} ГНГ({{ .GNG }})</option>
+              {{ end }}
+            </select> <a href="/add_gruz" class="butt">Добавить груз</a>
+        </p>
+        <p>
+            <label for="Origin_state">Государство отправления: </label>
+            <select id="Origin_state" name="Origin_state">
+              <option disabled selected>Please choose state</option>
+                {{ range .State }}
+                <option value="{{ .Id }}">{{ .Name }}</option>
+                {{ end }}
+            </select> <a href="/add_state" class="butt">Добавить страну</a>
+        </p>
+        <p>
+            <label for="Enter_station">Станция входа на Россию: </label>
+            <select id="Enter_station" name="Enter_station">
+              <option disabled selected>Please choose station</option>
+                {{ range .Station }}
+                <option value="{{ .Id }}">{{ .Name }}</option>
+                {{ end }}
+            </select> <a href="/add_station" class="butt">Добавить станцию</a>
+        </p>
+        <p>
+            <label for="Region_depart">Область отправления: </label>
+            <select id="Region_depart" name="Region_depart">
+              <option disabled selected>Please choose region</option>
+                {{ range .Region }}
+                <option value="{{ .Id }}">{{ .Name }}</option>
+                {{ end }}
+            </select> <a href="/add_region" class="butt">Добавить область</a>
+        </p>
+        <p>
+            <label for="Road_depart">Дорога отправления: </label>
+            <select id="Road_depart" name="Road_depart">
+              <option disabled selected>Please choose road</option>
+                {{ range .Road }}
+                <option value="{{ .Id }}">{{ .Name }}</option>
+                {{ end }}
+            </select> <a href="/add_road" class="butt">Добавить дорогу</a>
+        </p>
+        <p>
+            <label for="Station_depart">Станция отправления: </label>
+            <select id="Station_depart" name="Station_depart">
+              <option disabled selected>Please choose station</option>
+                {{ range .Station }}
+                <option value="{{ .Id }}">{{ .Name }}</option>
+                {{ end }}
+            </select> <a href="/add_station" class="butt">Добавить станцию</a>
+        </p>
+        <p>
+            <label for="Consigner">Грузоотправитель: </label>
+            <select id="Consigner" name="Consigner">
+              <option disabled selected>Please choose Consigner</option>
+                {{ range .Consignee }}
+                {{ if .Was_sender}}<option value="{{ .Id }}">{{ .Name }}</option>{{ end }}
+                {{ end }}
+            </select>
+            <a href="/add_consignee" class="butt">Добавить грузоотправителя/грузополучателя</a>
+        </p>
+        <p>
+            <label for="State_destination">Государство назначения: </label>
+            <select id="State_destination" name="State_destination">
+              <option disabled selected>Please choose state</option>
+                {{ range .State }}
+                <option value="{{ .Id }}">{{ .Name }}</option>
+                {{ end }}
+            </select> <a href="/add_state" class="butt">Добавить страну</a>
+        </p>
+        <p>
+            <label for="Exit_station">Станция выхода из России: </label>
+            <select id="Exit_station" name="Exit_station">
+              <option disabled selected>Please choose station</option>
+                {{ range .Station }}
+                <option value="{{ .Id }}">{{ .Name }}</option>
+                {{ end }}
+            </select> <a href="/add_station" class="butt">Добавить станцию</a>
+        </p>
+        <p>
+            <label for="Region_destination">Область назначения: </label>
+            <select id="Region_destination" name="Region_destination">
+              <option disabled selected>Please choose region</option>
+                {{ range .Region }}
+                <option value="{{ .Id }}">{{ .Name }}</option>
+                {{ end }}
+            </select> <a href="/add_region" class="butt">Добавить область</a>
+        </p>
+        <p>
+            <label for="Road_destination">Дорога назначения: </label>
+            <select id="Road_destination" name="Road_destination">
+              <option disabled selected>Please choose road</option>
+                {{ range .Road }}
+                <option value="{{ .Id }}">{{ .Name }}</option>
+                {{ end }}
+            </select> <a href="/add_road" class="butt">Добавить дорогу</a>
+        </p>
+        <p>
+            <label for="Station_destination">Станция назначения: </label>
+            <select id="Station_destination" name="Station_destination">
+              <option disabled selected>Please choose station</option>
+                {{ range .Station }}
+                <option value="{{ .Id }}">{{ .Name }}</option>
+                {{ end }}
+            </select> <a href="/add_station" class="butt">Добавить станцию</a>
+        </p>
+        <p>
+            <label for="Consignee">Грузополучатель: </label>
+            <select id="Consignee" name="Consignee">
+              <option disabled selected>Please choose Consignee</option>
+                {{ range .Consignee }}
+                <option value="{{ .Id }}">{{ .Name }}</option>
+                {{ end }}
+            </select> <a href="/add_consignee" class="butt">Добавить грузоотправителя/грузополучателя</a>
+        </p>
+        <p>
+            <label for="Wagon_type">Тип вагона: </label>
+            <select id="Wagon_type" name="Wagon_type">
+              <option disabled selected>Please choose wagon type</option>
+                {{ range .Wagon }}
+                <option value="{{ .Id }}">{{ .Name }}</option>
+                {{ end }}
+            </select> <a href="/add_wagon" class="butt">Добавить тип вагона</a>
+        </p>
+        <p>
+            <label for="Property">Призн собств вагона: </label>
+            <select id="Property" name="Property">
+              <option disabled selected>Please choose property</option>
+              <option value="Арендованный">Арендованный</option>
+              <option value="Не определено">Не определено</option>
+            </select>
+        </p>
+        <p>
+            <label for="Wagon_owner">Собственник вагона: </label>
+            <input type="text" id="Wagon_owner" name="Wagon_owner"/>
+            Например: ООО АТЛАНТ
+        </p>
+        <p>
+            <label for="Payer">Плательщик: </label>
+            <input type="text" id="Payer" name="Payer"/>
+            Например: АО КТК
+        </p>
+        <p>
+            <label for="Road_owner">Владелец пути необщего пользования: </label>
+            <input type="text" id="Road_owner" name="Road_owner"/>
+            Например: ООО ТЭК МЕРЕТЬ
+        </p>
+        <p>
+            <label for="Transport_manager">Организация перевозки в порту: </label>
+            <input type="text" id="Transport_manager" name="Transport_manager"/>
+            Например: ООО ТЭК МЕРЕТЬ
+        </p>
+        <p>
+            <label for="Tons_declared">Тонн заявлено: </label>
+            <input type="number" id="Tons_declared" name="Tons_declared" required />
+            Например: 5500
+        </p>
+        <p>
+            <label for="Tons_accepted">Тонн принято: </label>
+            <input type="number" id="Tons_accepted" name="Tons_accepted" required />
+            Например: 5000
+        </p>
+        <p>
+            <label for="Wagon_declared">Вагонов(контейнеров) заявлено: </label>
+            <input type="number" id="Wagon_declared" name="Wagon_declared" required />
+            Например: 79
+        </p>
+        <p>
+            <label for="Wagon_accepted">Вагонов(контейнеров) принято: </label>
+            <input type="number" id="Wagon_accepted" name="Wagon_accepted" required />
+            Например: 70
+        </p>
+        <p>
+            <label for="Filing_date">Дата подачи заявления: </label>
+            <input type="date" id="Filing_date" name="Filing_date" required />
+            Например: 28.10.2022
+        </p>
+        <p>
+            <label for="Agreement_date">Дата начала согласования: </label>
+            <input type="date" id="Agreement_date" name="Agreement_date" required />
+            Например: 28.10.2022
+        </p>
+        <p>
+            <label for="Approval_date">Дата утверждения: </label>
+            <input type="date" id="Approval_date" name="Approval_date" required />
+            Например: 28.10.2022
+        </p>
+        <p>
+            <label for="Start_date">Дата начала действия: </label>
+            <input type="date" id="Start_date" name="Start_date" required />
+            Например: 28.10.2022
+        </p>
+        <p>
+            <label for="Stop_date">Дата окончания действия: </label>
+            <input type="date" id="Stop_date" name="Stop_date" required />
+            Например: 28.10.2022
+        </p>
+        <input type="submit" value="Добавить заявку" class="glo" />
+    </form>
 {{end}}

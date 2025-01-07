@@ -1,10 +1,16 @@
+// ----- Создания Номер заявки для усера
+const randomNumber = Math.floor(100000 + Math.random() * 900000);
+
+const autonum = document.querySelector('.autonum')
+autonum.value = randomNumber;
+
+
 let select = document.getElementById("Goods");
 
 if (select) {
 	select.addEventListener("change", myFunction);
 }
 
-console.log(1)
 
 
 function myFunction() {
@@ -723,3 +729,4 @@ document.addEventListener('DOMContentLoaded', async () => {
 		console.error('Ошибка при загрузке новостей:', error);
 	}
 });
+
