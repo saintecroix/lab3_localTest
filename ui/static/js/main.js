@@ -1,10 +1,3 @@
-// ----- Создания Номер заявки для усера
-const randomNumber = Math.floor(100000 + Math.random() * 900000);
-
-const autonum = document.querySelector('.autonum')
-autonum.value = randomNumber;
-
-
 let select = document.getElementById("Goods");
 
 if (select) {
@@ -257,11 +250,12 @@ const searchInput2 = document.getElementById('search-input2');
 const resultsContainer = document.getElementById('results');
 
 function searchSite() {
+  console.log(1212)
 	const query = searchInput2.value.toLowerCase();
 	resultsContainer.innerHTML = '';
 
 
-	let results
+	let results;
 
 
 	if (query !== '') {

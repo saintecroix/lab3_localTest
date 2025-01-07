@@ -248,4 +248,11 @@
         </p>
         <input type="submit" value="Добавить заявку" class="glo" />
     </form>
+
+    <script>
+        const randomNumber = Math.floor(100000 + Math.random() * 900000);
+
+        const autonum = document.querySelector('.autonum')
+        autonum.value = randomNumber;
+    </script>
 {{end}}
