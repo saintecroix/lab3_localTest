@@ -519,7 +519,7 @@ table th {
     text-align: center;
 }
 
-section#button-container{
+div#button-container{
     position: absolute;
     width: 100px;
     top: 13px;
@@ -947,13 +947,4 @@ section#button-container{
     font-size: 18px;
     margin: 0 auto;
   }
-}
-
-
-.notification.success {
-  background: linear-gradient(0deg, rgba(146, 165, 235, 1) 0%, rgba(45, 91, 253, 1) 100%);
-}
-
-.notification.failure {
-  background: linear-gradient(0deg, rgba(253, 45, 45, 1) 0%, rgba(235, 146, 146, 1) 100%);
 }
