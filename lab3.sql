@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- Хост: mysql
--- Время создания: Дек 16 2024 г., 13:24
+-- Время создания: Янв 30 2025 г., 11:55
 -- Версия сервера: 9.1.0
 -- Версия PHP: 8.2.25
 
@@ -9482,7 +9482,8 @@ CREATE TABLE `news` (
 INSERT INTO `news` (`id`, `title`, `text`, `user_id`, `created_at`) VALUES
 (8, 'Теперь на сайте есть счетчик посещений!', 'Счетчик пользователей работает на основе хранения уникального идентификатора (UUID) для каждого пользователя в базе данных. При каждом посещении сайта проверяется наличие идентификатора пользователя в cookie. Если идентификатор отсутствует, генерируется новый UUID, сохраняется в базе данных и устанавливается в cookie. Количество уникальных пользователей определяется путем подсчета записей в базе данных.', 'admin', '2024-12-06 09:51:14'),
 (9, 'На сайте появились виджеты!', 'На сайт добавлены три новых виджета, улучшающие пользовательский опыт и предоставляющие дополнительную информацию:\n\n1. Виджет карты: Интерактивная карта с отображением местоположения вашей организации. Это позволяет посетителям сайта легко найти вас и планировать маршрут.\n\n2. Калькулятор: Стандартный математический калькулятор, позволяющий пользователям выполнять простые вычисления прямо на сайте, без необходимости переходить на другие ресурсы.\n\n3. Виджет радио Sputnik: Встроенный плеер онлайн-радиостанции Sputnik, добавляющий мультимедийный контент на сайт и повышающий вовлеченность пользователей.\n\nЭти виджеты были успешно интегрированы на сайт и готовы к использованию.', 'admin', '2024-12-06 11:38:15'),
-(10, 'Новость', 'Надо работать', 'vjaz', '2024-12-02 16:06:42');
+(10, 'Новость', 'Надо работать', 'vjaz', '2024-12-02 16:06:42'),
+(11, '111', '1111', 'qwe', '2025-01-22 13:43:48');
 
 -- --------------------------------------------------------
 
@@ -12271,20 +12272,21 @@ CREATE TABLE `user` (
   `id` int NOT NULL,
   `login` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NOT NULL,
   `password` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NOT NULL,
-  `mail` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NOT NULL
+  `mail` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NOT NULL,
+  `news_sources` text CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
 --
 -- Дамп данных таблицы `user`
 --
 
-INSERT INTO `user` (`id`, `login`, `password`, `mail`) VALUES
-(30, 'q', 'q', 'saintecroix@yandex.ru'),
-(31, 'w', 'q', 'markovka@oiate.ru'),
-(32, 'example', 'q', 'example@example.com'),
-(33, 'qwe', 'qwe', 'w@w.com'),
-(34, 'admin', 'root', 'admin@test.com'),
-(35, 'vjaz', 'tlv', 'vvv@iate.ru');
+INSERT INTO `user` (`id`, `login`, `password`, `mail`, `news_sources`) VALUES
+(30, 'q', 'q', 'saintecroix@yandex.ru', NULL),
+(31, 'w', 'q', 'markovka@oiate.ru', NULL),
+(32, 'example', 'q', 'example@example.com', NULL),
+(33, 'qwe', 'qwe', 'w@w.com', NULL),
+(34, 'admin', 'root', 'admin@test.com', NULL),
+(35, 'vjaz', 'tlv', 'vvv@iate.ru', NULL);
 
 -- --------------------------------------------------------
 
@@ -12301,10 +12303,26 @@ CREATE TABLE `user_visits` (
 --
 
 INSERT INTO `user_visits` (`user_id`) VALUES
+('0c33b672-670f-4cf2-b89f-6f360a47b63e'),
+('1910dc06-d8a4-42c3-bfb9-45f7ceed7cf8'),
 ('2572bfd1-d4b4-4bf9-a3db-f92889882fe8'),
+('41034056-9df3-4f47-a9aa-5817e199f06f'),
+('45d00dd3-a897-45b9-a7fc-3e39b6728a6a'),
+('49fafc74-6f20-4f1d-9185-c68c1946addb'),
+('4e80f2a0-0abf-4ae7-b3ac-984a22d23a10'),
+('51608820-e786-4548-8839-64eb97dfec6d'),
+('5f963f49-506a-4d09-a5be-192abbdd0912'),
 ('6d5aec95-631e-4179-b29e-35cca87245bb'),
+('7e0d26fc-751a-44df-8007-924f3abfd3db'),
+('84c97157-c460-41f1-af31-a43adc67172c'),
+('8c6a9091-6781-4255-8a3f-2e5281d107a1'),
 ('a41ee8e6-02bc-4373-8529-caeba0598e8a'),
+('ada4d11f-c939-453a-b068-1274f40b2057'),
+('b1fd3da7-e80d-4a40-848d-d67069155050'),
+('c027a07c-cc75-4024-b462-44b6bce55013'),
+('c2d44869-0087-4051-af31-78339342cfb8'),
 ('c32379d3-d034-4f50-9cfc-16d97eb2862c'),
+('cec5fce5-68a3-4d78-8806-09d1999fe4ae'),
 ('e097a907-fc90-4d83-8098-0b879ed670fd');
 
 -- --------------------------------------------------------
@@ -12430,7 +12448,7 @@ ALTER TABLE `gruz`
 -- AUTO_INCREMENT для таблицы `news`
 --
 ALTER TABLE `news`
-  MODIFY `id` int NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=11;
+  MODIFY `id` int NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=12;
 
 --
 -- AUTO_INCREMENT для таблицы `region`
