@@ -9,6 +9,7 @@ import (
 	"net/http"
 	"os"
 	"strconv"
+	"strings"
 )
 
 func (app *application) home(w http.ResponseWriter, r *http.Request) {
@@ -74,55 +75,37 @@ func (app *application) input(w http.ResponseWriter, r *http.Request) {
 /*----------------------------------------------------------------------------------------*/
 
 func (app *application) save_application(w http.ResponseWriter, r *http.Request) {
-	number, _ := strconv.Atoi(r.FormValue("Number"))
-	reg_date := r.FormValue("Reg_date")
-	status := r.FormValue("Status")
-	provide_date := r.FormValue("Provide_date")
-	departure_type := r.FormValue("Departure_type")
-	property := r.FormValue("Property")
-	wagon_owner := r.FormValue("Wagon_owner")
-	payer := r.FormValue("Payer")
-	road_owner := r.FormValue("Road_owner")
-	transport_manager := r.FormValue("Transport_manager")
-	tons_declared, _ := strconv.Atoi(r.FormValue("Tons_declared"))
-	tons_accepted, _ := strconv.Atoi(r.FormValue("Tons_accepted"))
-	wagon_declared, _ := strconv.Atoi(r.FormValue("Wagon_declared"))
-	wagon_accepted, _ := strconv.Atoi(r.FormValue("Wagon_accepted"))
-	filing_date := r.FormValue("Filing_date")
-	agreement_date := r.FormValue("Agreement_date")
-	approval_date := r.FormValue("Approval_date")
-	start_date := r.FormValue("Start_date")
-	stop_date := r.FormValue("Stop_date")
+	decoder := json.NewDecoder(r.Body)
+	data := &Application{}
+	err := decoder.Decode(data)
+	if err != nil {
+		http.Error(w, "Ошибка при декодировании запроса", http.StatusBadRequest)
+		return
+	}
+	fmt.Println(data)
 
 	db := app.db
 
-	goods, _ := strconv.Atoi(r.FormValue("Goods"))
+	type Result struct {
+		Success bool  `json:"success"`
+		Error   error `json:"error,omitempty"`
+	}
+	var res Result
 
-	origin_state, _ := strconv.Atoi(r.FormValue("Origin_state"))
-
-	enter_station, _ := strconv.Atoi(r.FormValue("Enter_station"))
-
-	region_depart, _ := strconv.Atoi(r.FormValue("Region_depart"))
-
-	road_depart, _ := strconv.Atoi(r.FormValue("Road_depart"))
-
-	station_depart, _ := strconv.Atoi(r.FormValue("Station_depart"))
-
-	consigner, _ := strconv.Atoi(r.FormValue("Consigner"))
-
-	state_destination, _ := strconv.Atoi(r.FormValue("State_destination"))
-
-	exit_station, _ := strconv.Atoi(r.FormValue("Exit_station"))
-
-	region_destination, _ := strconv.Atoi(r.FormValue("Region_destination"))
-
-	road_destination, _ := strconv.Atoi(r.FormValue("Road_destination"))
-
-	station_destination, _ := strconv.Atoi(r.FormValue("Station_destination"))
-
-	consignees, _ := strconv.Atoi(r.FormValue("Consignee"))
-
-	wagon_type, _ := strconv.Atoi(r.FormValue("Wagon_type"))
+	good, err := strconv.Atoi(data.Goods)
+	origin_state, err := strconv.Atoi(data.Origin_state)
+	enter_station, err := strconv.Atoi(data.Enter_station)
+	region_depart, err := strconv.Atoi(data.Region_depart)
+	road_depart, err := strconv.Atoi(data.Road_depart)
+	station_depart, err := strconv.Atoi(data.Station_depart)
+	consigner, err := strconv.Atoi(data.Consigner)
+	state_destination, err := strconv.Atoi(data.State_destination)
+	exit_station, err := strconv.Atoi(data.Exit_station)
+	region_destination, err := strconv.Atoi(data.Region_destination)
+	road_destination, err := strconv.Atoi(data.Road_destination)
+	station_destination, err := strconv.Atoi(data.Station_destination)
+	consignee, err := strconv.Atoi(data.Consignee)
+	wagon_type, err := strconv.Atoi(data.Wagon_type)
 
 	insert, err := db.Query(fmt.Sprintf("INSERT INTO `application` "+
 		"(`Number`, `Reg_date`, `Status`, `Provide_date`, `Departure_type`, `Goods`, `Origin_state`, "+
@@ -132,18 +115,25 @@ func (app *application) save_application(w http.ResponseWriter, r *http.Request)
 		"`Tons_accepted`, `Wagon_declared`, `Wagon_accepted`, `Filing_date`, `Agreement_date`, `Approval_date`, "+
 		"`Start_date`, `Stop_date`) VALUES('%d', '%s', '%s', '%s', '%s', '%d', '%d', '%d', '%d', '%d', '%d', "+
 		"'%d', '%d', '%d', '%d', '%d', '%d', '%d', '%d', '%s', '%s', '%s', '%s', '%s', '%d', '%d', '%d', '%d', "+
-		"'%s', '%s', '%s', '%s', '%s')", number, reg_date, status, provide_date, departure_type, goods, origin_state,
-		enter_station, region_depart, road_depart, station_depart, consigner, state_destination, exit_station,
-		region_destination, road_destination, station_destination, consignees, wagon_type, property, wagon_owner,
-		payer, road_owner, transport_manager, tons_declared, tons_accepted, wagon_declared, wagon_accepted, filing_date,
-		agreement_date, approval_date, start_date, stop_date))
+		"'%s', '%s', '%s', '%s', '%s')", data.Number, data.Reg_date, data.Status, data.Provide_date,
+		data.Departure_type, good, origin_state, enter_station, region_depart, road_depart,
+		station_depart, consigner, state_destination, exit_station, region_destination,
+		road_destination, station_destination, consignee, wagon_type, data.Property,
+		data.Wagon_owner, data.Payer, data.Road_owner, data.Transport_manager, data.Tons_declared, data.Tons_accepted,
+		data.Wagon_declared, data.Wagon_accepted, data.Filing_date, data.Agreement_date, data.Approval_date,
+		data.Start_date, data.Stop_date))
 	if err != nil {
-		app.serverError(w, err)
-		return
+		res = Result{Success: false, Error: fmt.Errorf("Ошибка при записи данных в бд: %v", err)}
 	}
 	defer insert.Close()
 
-	http.Redirect(w, r, "/", http.StatusSeeOther)
+	res.Success = true
+	jsonApps, err := json.Marshal(res)
+	if err != nil {
+		res = Result{Success: false, Error: fmt.Errorf("Ошибка при кодировании данных в JSON: %v", err)}
+	}
+	w.Header().Set("Content-Type", "application/json")
+	w.Write(jsonApps)
 }
 
 /*----------------------------------------------------------------------------------------*/
@@ -691,8 +681,7 @@ func (app *application) getSecondPerSearch(w http.ResponseWriter, r *http.Reques
 
 	db := app.db
 
-	getRaw, err := db.Query(fmt.Sprintf("SELECT * FROM `gruz` WHERE id in (SELECT Goods FROM `application` "+
-		"WHERE Wagon_type = %s);", data.CheckData))
+	getRaw, err := db.Query(fmt.Sprintf("SELECT * FROM `gruz` WHERE id in (SELECT Goods FROM `application` WHERE Wagon_type = %s);", data.CheckData))
 	if err != nil {
 		app.serverError(w, err)
 		return
@@ -1032,12 +1021,7 @@ func (app *application) rssPage(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	rssData := app.rssParse(w)
-	if rssData == nil {
-		return
-	}
-
-	err = ts.Execute(w, rssData)
+	err = ts.Execute(w, nil)
 	if err != nil {
 		app.serverError(w, err)
 		return
@@ -1223,4 +1207,109 @@ func (app *application) newPage(w http.ResponseWriter, r *http.Request) {
 		app.serverError(w, err)
 		return
 	}
+}
+
+func (app *application) addSource(w http.ResponseWriter, r *http.Request) {
+	type JsonData struct {
+		Login string `json:"login"`
+		Url   string `json:"url"`
+	}
+	type Response struct {
+		Success bool        `json:"success"`
+		Error   interface{} `json:"error,omitempty"`
+	}
+	decoder := json.NewDecoder(r.Body)
+	var data JsonData
+	var response Response
+	err := decoder.Decode(&data)
+	if err != nil {
+		response.Success = false
+		response.Error = err.Error()
+		app.jsonResponse(w, http.StatusBadRequest, response)
+		return
+	}
+	if !app.sourceValid(data.Url) {
+		response.Success = false
+		response.Error = "url is invalid"
+		app.jsonResponse(w, http.StatusBadRequest, response)
+		return
+	}
+
+	userExists, err := app.userExists(data.Login)
+	if err != nil {
+		response.Success = false
+		response.Error = fmt.Errorf("error checking user existance: %w", err).Error()
+		app.jsonResponse(w, http.StatusInternalServerError, response)
+		return
+	}
+
+	if !userExists {
+		response.Success = false
+		response.Error = "user not found"
+		app.jsonResponse(w, http.StatusBadRequest, response)
+		return
+	}
+
+	_, err = app.db.Exec( // Выполняем запрос через app.db.Exec()
+		"UPDATE `user` SET `news_sources` = CASE WHEN `news_sources` IS NULL THEN ? ELSE CONCAT(`news_sources`, ',', ?) END WHERE `login` = ?", data.Url, data.Url, data.Login)
+	if err != nil {
+		response.Success = false
+		response.Error = fmt.Errorf("error updating db: %w", err).Error()
+		app.jsonResponse(w, http.StatusInternalServerError, response)
+		return
+	}
+
+	response.Success = true
+	app.jsonResponse(w, http.StatusOK, response)
+	return
+}
+
+func (app *application) sourcesPage(w http.ResponseWriter, r *http.Request) {
+	files := []string{
+		"./ui/html/sources.page.tmpl",
+		"./ui/html/base.layout.tmpl",
+		"./ui/html/footer.partial.tmpl",
+	}
+	ts, err := template.ParseFiles(files...)
+	if err != nil {
+		app.serverError(w, err)
+		return
+	}
+
+	err = ts.Execute(w, nil)
+	if err != nil {
+		app.serverError(w, err)
+		return
+	}
+}
+
+func (app *application) sources(w http.ResponseWriter, r *http.Request) {
+	type Response struct {
+		User string `json:"user"`
+	}
+	type Request struct {
+		Sources []string    `json:"sources"`
+		Error   interface{} `json:"error,omitempty"`
+	}
+	var response Response
+	var request Request
+	err := jsonRequest(r, response)
+	if err != nil {
+		app.logError(err)
+		request.Error = err
+		app.jsonResponse(w, http.StatusBadRequest, request)
+		return
+	}
+
+	sources, err := app.getSources(response.User)
+	if err != nil {
+		app.logError(err)
+		request.Error = err
+		app.jsonResponse(w, http.StatusBadRequest, request)
+		return
+	}
+
+	request.Sources = strings.Split(sources, ",")
+	app.jsonResponse(w, http.StatusOK, request)
+	return
 }

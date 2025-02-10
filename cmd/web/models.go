@@ -1,7 +1,7 @@
 package main
 
 import (
-	"encoding/xml"
+	"github.com/mmcdole/gofeed"
 	"time"
 )
 
@@ -109,53 +109,21 @@ type Gruz struct {
 	GNG   string `json:"gng"`
 }
 
-type RssNews struct {
-	XMLName xml.Name `xml:"rss"`
-	Channel Channel  `xml:"channel"`
-}
-
-type Channel struct {
-	Title     string `xml:"title"`
-	Link      string `xml:"link"`
-	Language  string `xml:"language"`
-	Copyright string `xml:"copyright"`
-	Item      []Item `xml:"item"`
-}
-
-type Item struct {
-	Id       int    `xml:"id" json:"id"`
-	User     string `xml:"user" json:"user"`
-	Text     string `xml:",chardata" json:"text"`
-	Title    string `xml:"title" json:"title"`
-	Link     string `xml:"link" json:"link"`
-	Guid     string `xml:"guid" json:"guid"`
-	Priority struct {
-		Text string `xml:",chardata" json:"text"`
-		Rian string `xml:"rian,attr" json:"rian"`
-	} `xml:"priority" json:"priority"`
-	PubDate string `xml:"pubDate" db:"created_at" json:"pubDate"`
-	Type    struct {
-		Text string `xml:",chardata" json:"text"`
-		Rian string `xml:"rian,attr" json:"rian"`
-	} `xml:"type" json:"type"`
-	Category  string `xml:"category" json:"category"`
-	Enclosure struct {
-		Text       string `xml:",chardata" json:"text"`
-		URL        string `xml:"url,attr" json:"url"`
-		Type       string `xml:"type,attr" json:"type"`
-		SourceName string `xml:"source_name,attr" json:"source_name"`
-	} `xml:"enclosure" json:"enclosure"`
-}
-
 type LocalNews struct {
-	Id    int    `json:"id"`
-	Title string `json:"title"`
-	Text  string `json:"text"`
-	User  string `json:"user"`
-	Date  string `json:"date"`
+	Id      int       `json:"id"`
+	Title   string    `json:"title"`
+	Text    string    `json:"text"`
+	User    string    `json:"user"`
+	Date    time.Time `json:"date"`
+	ResDate string    `json:"resDate"`
 }
 
-type ForSortNews struct {
-	NewsId int
-	Date   time.Time
+type ResultNews struct {
+	IsLocal bool         `json:"isLocal"`
+	Local   *LocalNews   `json:"local"`
+	Global  *gofeed.Item `json:"global"`
+}
+
+type GlobalNews struct {
+	Feed *gofeed.Feed
 }

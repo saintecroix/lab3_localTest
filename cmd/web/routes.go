@@ -38,7 +38,7 @@ func (app *application) routes() *mux.Router {
 	m.HandleFunc("/protected", app.protected).Methods(http.MethodPost)
 	m.HandleFunc("/rss", app.rssPage).Methods(http.MethodGet)
 	m.HandleFunc("/addNew", app.addNew).Methods(http.MethodPost)
-	m.HandleFunc("/indexNews", app.indexNews).Methods(http.MethodGet)
+	m.HandleFunc("/indexNews", app.indexNews).Methods(http.MethodPost)
 	m.HandleFunc("/gallery", app.galleryPage).Methods(http.MethodGet)
 	m.HandleFunc("/equipment", app.equipmentPage).Methods(http.MethodGet)
 	m.HandleFunc("/platform1", app.platform1Page).Methods(http.MethodGet)
@@ -47,6 +47,8 @@ func (app *application) routes() *mux.Router {
 	m.HandleFunc("/widgets", app.widgets).Methods(http.MethodGet)
 	m.HandleFunc("/visits", app.handleVisits).Methods(http.MethodGet)
 	m.HandleFunc("/local/{id}", app.newPage).Methods(http.MethodGet)
+	m.HandleFunc("/addSource", app.addSource).Methods(http.MethodPost)
+	m.HandleFunc("/sources", app.sourcesPage).Methods(http.MethodGet)
 
 	fileServer := http.FileServer(http.Dir("./ui/static/"))
 	m.PathPrefix("/static/").Handler(http.StripPrefix("/static/", fileServer))

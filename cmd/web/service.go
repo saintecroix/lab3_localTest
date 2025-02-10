@@ -3,12 +3,11 @@ package main
 import (
 	"database/sql"
 	"encoding/json"
-	"encoding/xml"
 	"errors"
 	"fmt"
 	"github.com/golang-jwt/jwt/v4"
 	"github.com/google/uuid"
-	"io"
+	"github.com/mmcdole/gofeed"
 	"net/http"
 	"sort"
 	"strings"
@@ -211,6 +210,23 @@ func (app *application) dbSearch(resoultColomns, table, criterion string) ([]str
 	return result, nil
 }
 
+func jsonRequest(r *http.Request, target interface{}) error {
+	decoder := json.NewDecoder(r.Body)
+	return decoder.Decode(target)
+}
+
+func (app *application) jsonResponse(w http.ResponseWriter, status int, data interface{}) {
+	jsonResponse, err := json.Marshal(data)
+	if err != nil {
+		app.serverError(w, err)
+		return
+	}
+
+	w.Header().Set("Content-Type", "application/json")
+	w.WriteHeader(status)
+	w.Write(jsonResponse)
+}
+
 // Создание JWT ключа с данными пользователя(логин, почта, время создания и время истечения срока). Необходимо для
 // авторизации пользователя на сайте.
 func (app *application) createJWT(userID string) (string, error) {
@@ -307,47 +323,6 @@ func (app *application) protected(w http.ResponseWriter, r *http.Request) {
 	w.Write(json)
 }
 
-// Обработка новостной ленты РИА Новости.
-func (app *application) rssParse(w http.ResponseWriter) *RssNews {
-	url1 := "https://ria.ru/export/rss2/archive/index.xml"
-
-	client := &http.Client{}
-	req, err := http.NewRequest("GET", url1, nil)
-	if err != nil {
-		http.Error(w, "Error creating request", http.StatusInternalServerError)
-		app.serverError(w, err)
-		return nil
-	}
-
-	req.Header.Set("X-Forwarded-For", "128.204.79.211")
-	resp, err := client.Do(req)
-	if err != nil {
-		http.Error(w, "Ошибка при выполнении запроса к РИА новости", http.StatusInternalServerError)
-		app.serverError(w, err)
-		return nil
-	}
-	defer resp.Body.Close()
-
-	body, err := io.ReadAll(resp.Body)
-	if err != nil {
-		http.Error(w, "Ошибка при чтении тела ответа", http.StatusInternalServerError)
-		app.serverError(w, err)
-		return nil
-	}
-
-	var rss RssNews
-	err = xml.Unmarshal(body, &rss)
-	if err != nil {
-		http.Error(w, "Ошибка при декодировании xml", http.StatusInternalServerError)
-		app.serverError(w, err)
-		return nil
-	}
-	for i, r := range rss.Channel.Item {
-		r.Id = (i + 1) * -1
-	}
-	return &rss
-}
-
 // Добавление новости в бд.
 func (app *application) addNew(w http.ResponseWriter, r *http.Request) {
 	type jsonData struct {
@@ -390,131 +365,31 @@ func (app *application) addNew(w http.ResponseWriter, r *http.Request) {
 	w.Write(answ)
 }
 
-// Получение новостей с БД с преображением в XML данные для объединения с новостями с "РИА Новости"
-func (app *application) getLocalNews() ([]LocalNews, error) {
-	getData, err := app.db.Query("SELECT * FROM `news`")
+// Получение локальной новости из БД для отображения ее на отдельной странице.
+func (app *application) gotNew(newsID int) (*LocalNews, error) {
+	raw, err := app.db.Query("SELECT * FROM news WHERE id=?", newsID)
 	if err != nil {
-		return nil, err
+		return nil, fmt.Errorf("error bad db request: %w", err)
 	}
-	defer getData.Close()
-	news := make([]LocalNews, 0)
+	var gotNew LocalNews
 	loc, err := time.LoadLocation("Europe/Moscow")
 	if err != nil {
 		return nil, fmt.Errorf("failed to load location: %w", err)
 	}
-	for getData.Next() {
-		var localNew LocalNews
-		var createdAtString string
-		err := getData.Scan(&localNew.Id, &localNew.Title, &localNew.Text, &localNew.User, &createdAtString)
+	var createdAtString string
+	for raw.Next() {
+		err = raw.Scan(&gotNew.Id, &gotNew.Title, &gotNew.Text, &gotNew.User, &createdAtString)
 		if err != nil {
-			return nil, fmt.Errorf("error scanning row: %w", err)
+			return nil, fmt.Errorf("error bad response from db: %w", err)
 		}
-
 		t, err := time.Parse("2006-01-02 15:04:05", createdAtString)
 		if err != nil {
 			return nil, fmt.Errorf("error parsing datetime: %w", err)
 		}
 
-		localNew.Date = t.In(loc).Format("2006-01-02 15:04:05")
-
-		news = append(news, localNew)
+		gotNew.Date = t.In(loc)
 	}
-	if err := getData.Err(); err != nil {
-		return nil, fmt.Errorf("error iterating through rows: %w", err)
-	}
-	return news, nil
-}
-
-// layout определяет формат, который соответствует входной строке
-func ConvertToTime(dateString string, layout string) (time.Time, error) {
-	// Парсим строку в тип time.Time
-	parsedTime, err := time.Parse(layout, dateString)
-	if err != nil {
-		return time.Time{}, err // Возвращаем пустое значение time.Time и ошибку
-	}
-
-	return parsedTime, nil // Возвращаем распарсенное время и nil для ошибки
-}
-
-// Проработать смешанную структуру либо функцию, которая будет сортировать новости по датам на фронте
-func (app *application) mixNews(local []LocalNews, ria []Item) ([]LocalNews, []Item, error) {
-	resultLocal := make([]LocalNews, 0)
-	resultRia := make([]Item, 0)
-	forSort := make([]ForSortNews, 0)
-	for _, r := range local {
-		var a ForSortNews
-		localTime, err := ConvertToTime(r.Date, "2006-01-02 15:04:05")
-		if err != nil {
-			err = fmt.Errorf("ошибка при конвертации времени из дб: %w", err)
-			return nil, nil, err
-		}
-		a.NewsId = r.Id
-		a.Date = localTime
-		forSort = append(forSort, a)
-	}
-	for _, r := range ria {
-		var a ForSortNews
-		riaTime, err := ConvertToTime(r.PubDate, "Mon, 02 Jan 2006 15:04:05 -0700")
-		if err != nil {
-			err = fmt.Errorf("ошибка при конвертации времени риа: %w", err)
-			return nil, nil, err
-		}
-
-		a.NewsId = r.Id
-		a.Date = riaTime
-		forSort = append(forSort, a)
-	}
-	for _, r := range local {
-		resultLocal = append(resultLocal, r)
-	}
-	for _, r := range ria {
-		resultRia = append(resultRia, r)
-	}
-	sort.Slice(forSort, func(i, j int) bool {
-		return forSort[i].Date.After(forSort[j].Date)
-	})
-	mp := make(map[int]int)
-	for i, r := range forSort {
-		mp[r.NewsId] = i
-	}
-	sort.Slice(resultLocal, func(i, j int) bool {
-		return mp[resultLocal[i].Id] < mp[resultLocal[j].Id]
-	})
-	sort.Slice(resultRia, func(i, j int) bool {
-		return mp[resultRia[i].Id] > mp[resultRia[j].Id]
-	})
-	return resultLocal, resultRia, nil
-}
-
-func (app *application) indexNews(w http.ResponseWriter, r *http.Request) {
-	local, err := app.getLocalNews()
-	if err != nil {
-		app.serverError(w, err)
-		return
-	}
-	ria := app.rssParse(w)
-	items := make([]Item, 0)
-	for _, r := range ria.Channel.Item {
-		items = append(items, r)
-	}
-	resultLocal, resultRia, err := app.mixNews(local, items)
-	if err != nil {
-		app.serverError(w, err)
-		return
-	}
-	type Response struct {
-		Local []LocalNews
-		Ria   []Item
-	}
-	res, err := json.Marshal(Response{Local: resultLocal, Ria: resultRia})
-	if err != nil {
-		http.Error(w, "Error encoding JSON", http.StatusInternalServerError)
-		app.serverError(w, err)
-		return
-	}
-
-	w.Header().Set("Content-Type", "application/json")
-	w.Write(res)
+	return &gotNew, nil
 }
 
 func (app *application) handleVisit(r *http.Request) (*http.Cookie, error) {
@@ -537,59 +412,318 @@ func (app *application) handleVisit(r *http.Request) (*http.Cookie, error) {
 	return cookie, nil
 }
 
-func (app *application) gotNew(newsID int) (*LocalNews, error) {
-	raw, err := app.db.Query("SELECT * FROM news WHERE id=?", newsID)
+// Получение новостей с БД для объединения с новостями с "РИА Новости"
+func (app *application) getLocalNews() ([]LocalNews, error) {
+	getData, err := app.db.Query("SELECT * FROM `news`")
 	if err != nil {
-		return nil, fmt.Errorf("error bad db request: %w", err)
+		return nil, err
 	}
-	var gotNew LocalNews
-	loc, err := time.LoadLocation("Europe/Moscow")
-	if err != nil {
-		return nil, fmt.Errorf("failed to load location: %w", err)
-	}
-	var createdAtString string
-	for raw.Next() {
-		err = raw.Scan(&gotNew.Id, &gotNew.Title, &gotNew.Text, &gotNew.User, &createdAtString)
+	defer getData.Close()
+	news := make([]LocalNews, 0)
+	for getData.Next() {
+		var localNew LocalNews
+		var createdAtString string
+		err := getData.Scan(&localNew.Id, &localNew.Title, &localNew.Text, &localNew.User, &createdAtString)
 		if err != nil {
-			return nil, fmt.Errorf("error bad response from db: %w", err)
+			return nil, fmt.Errorf("error scanning row: %w", err)
 		}
-		t, err := time.Parse("2006-01-02 15:04:05", createdAtString)
+
+		t, err := ConvertToTime("2006-01-02 15:04:05", createdAtString)
 		if err != nil {
 			return nil, fmt.Errorf("error parsing datetime: %w", err)
 		}
 
-		gotNew.Date = t.In(loc).Format("2006-01-02 15:04:05")
+		localNew.Date = t
+		localNew.ResDate, err = FromTimeToString(t)
+		if err != nil {
+			return nil, fmt.Errorf("error converting datetime: %w", err)
+		}
+
+		news = append(news, localNew)
 	}
-	return &gotNew, nil
+	if err := getData.Err(); err != nil {
+		return nil, fmt.Errorf("error iterating through rows: %w", err)
+	}
+	return news, nil
+}
+
+// layout определяет формат, который соответствует входной строке.
+// Возвращает время по Москве.
+func ConvertToTime(layout string, dateString string) (time.Time, error) {
+	loc, err := time.LoadLocation("Europe/Moscow")
+	if err != nil {
+		return time.Time{}, fmt.Errorf("failed to load location: %w", err)
+	}
+	parsedTime, err := time.Parse(layout, dateString)
+	if err != nil {
+		return time.Time{}, err
+	}
+	return parsedTime.In(loc), nil
+}
+
+func FromTimeToString(t time.Time) (string, error) {
+	layout := "2006-01-02 15:04:05"
+	loc, err := time.LoadLocation("Europe/Moscow")
+	if err != nil {
+		return "", fmt.Errorf("failed to load location: %w", err)
+	}
+	t = t.In(loc)
+	return t.Format(layout), nil
+}
+
+// Возвращает список подписок пользователя.
+func (app *application) getSources(user string) (string, error) {
+	getData, err := app.db.Query("SELECT `news_sources` FROM `user` WHERE login = ?", user)
+	if err != nil {
+		return "", fmt.Errorf("error bad db request: %w", err)
+	}
+	var sources string
+	for getData.Next() {
+		err = getData.Scan(&sources)
+		if err != nil {
+			return "", fmt.Errorf("error bad response from db: %w", err)
+		}
+	}
+	return sources, nil
+}
+
+func rssFeed(link string) (news *gofeed.Feed, err error) {
+	fp := gofeed.NewParser()
+	feed, err := fp.ParseURL(link)
+	if err != nil {
+		return nil, err
+	}
+	return feed, nil
+}
+
+func (app *application) userExists(login string) (bool, error) {
+	var count int
+	err := app.db.QueryRow("SELECT COUNT(*) FROM `user` WHERE `login` = ?", login).Scan(&count)
+	if err != nil {
+		return false, fmt.Errorf("error querying user: %w", err)
+	}
+	return count > 0, nil
+}
+
+func (app *application) sourceValid(link string) bool {
+	news, err := rssFeed(link)
+	if err != nil {
+		return false
+	}
+	var empty *gofeed.Feed
+	if news == empty {
+		return false
+	}
+	return true
+}
+
+func (app *application) sortNews(feed []ResultNews) []ResultNews {
+	sort.Slice(feed, func(i, j int) bool {
+		var date1 time.Time
+		var date2 time.Time
+
+		if feed[i].IsLocal {
+			date1 = feed[i].Local.Date
+		} else if feed[i].Global.PublishedParsed != nil {
+			date1 = *feed[i].Global.PublishedParsed
+		} else {
+			date1 = time.Time{}
+		}
+
+		if feed[j].IsLocal {
+			date2 = feed[j].Local.Date
+		} else if feed[j].Global.PublishedParsed != nil {
+			date2 = *feed[j].Global.PublishedParsed
+		} else {
+			date2 = time.Time{}
+		}
+		return date1.After(date2)
+	})
+	return feed
+}
+
+func (app *application) indexNews(w http.ResponseWriter, r *http.Request) {
+	type JsonData struct {
+		User string `json:"user,omitempty"`
+	}
+	type Response struct {
+		Feed  []ResultNews `json:"feed"`
+		Error interface{}  `json:"error,omitempty"`
+	}
+
+	var data JsonData
+	var response Response
+	loc, err := time.LoadLocation("Europe/Moscow")
+	if err != nil {
+		app.logError(err)
+		response.Error = fmt.Errorf("failed to load location: %w", err)
+		app.jsonResponse(w, http.StatusInternalServerError, response)
+		return
+	}
+
+	decoder := json.NewDecoder(r.Body)
+	err = decoder.Decode(&data)
+
+	// Ошибка декодирования не является критической, обрабатываем ее как отсутствие данных
+	if err != nil {
+		app.logError(err)
+		fmt.Println("Error decoding JSON:", err)
+	}
+
+	local, err := app.getLocalNews()
+	if err != nil {
+		app.logError(err)
+		response.Error = err
+		app.jsonResponse(w, http.StatusInternalServerError, response)
+		return
+	}
+
+	for _, l := range local {
+		l.ResDate, err = FromTimeToString(l.Date)
+		if err != nil {
+			app.logError(err)
+			response.Error = err
+			app.jsonResponse(w, http.StatusInternalServerError, response)
+			return
+		}
+		response.Feed = append(response.Feed, ResultNews{IsLocal: true, Local: &l})
+	}
+
+	ria, err := rssFeed("https://ria.ru/export/rss2/index.xml")
+	if err != nil {
+		app.logError(err)
+		response.Error = err
+		app.jsonResponse(w, http.StatusInternalServerError, response)
+		return
+	}
+	for _, v := range ria.Items {
+		if v.PublishedParsed != nil {
+			*v.PublishedParsed = v.PublishedParsed.In(loc)
+			v.Published, err = FromTimeToString(*v.PublishedParsed)
+			v.GUID = ria.Title
+			if err != nil {
+				app.logError(err)
+				response.Error = err
+				app.jsonResponse(w, http.StatusInternalServerError, response)
+				return
+			}
+		}
+		response.Feed = append(response.Feed, ResultNews{IsLocal: false, Global: v})
+	}
+	if data.User != "" {
+		getSources, err := app.getSources(data.User)
+		if err != nil {
+			app.logError(err)
+			response.Error = err
+			app.jsonResponse(w, http.StatusInternalServerError, response)
+			return
+		}
+		if getSources != "" {
+			sources := strings.Split(getSources, ",")
+			for _, v := range sources {
+				if !app.sourceValid(v) {
+					app.logError(err)
+					response.Error = fmt.Errorf("invalid source: %v", v)
+					app.jsonResponse(w, http.StatusBadRequest, response)
+					return
+				}
+				feed, err := rssFeed(v)
+				if err != nil {
+					app.logError(err)
+					response.Error = err
+					app.jsonResponse(w, http.StatusInternalServerError, response)
+					return
+				}
+				for _, f := range feed.Items {
+					if f.PublishedParsed != nil {
+						*f.PublishedParsed = f.PublishedParsed.In(loc)
+						f.Published, err = FromTimeToString(*f.PublishedParsed)
+						f.GUID = feed.Title
+						if err != nil {
+							app.logError(err)
+							response.Error = err
+							app.jsonResponse(w, http.StatusBadRequest, response)
+							return
+						}
+					}
+					response.Feed = append(response.Feed, ResultNews{IsLocal: false, Global: f})
+				}
+			}
+		}
+	}
+
+	response.Feed = app.sortNews(response.Feed)
+	app.jsonResponse(w, http.StatusOK, response)
+	return
 }
 
 func (app *application) test(w http.ResponseWriter, r *http.Request) {
-	local, err := app.getLocalNews()
-	if err != nil {
-		app.serverError(w, err)
-		return
-	}
-	ria := app.rssParse(w)
-	items := make([]Item, 0)
-	for _, r := range ria.Channel.Item {
-		items = append(items, r)
-	}
-	resultLocal, resultRia, err := app.mixNews(local, items)
-	if err != nil {
-		app.serverError(w, err)
-		return
+	type JsonData struct {
+		User string `json:"user,omitempty"`
 	}
 	type Response struct {
-		Local []LocalNews
-		Ria   []Item
+		Feed  []ResultNews `json:"feed"`
+		Error interface{}  `json:"error"`
 	}
-	json, err := json.Marshal(Response{Local: resultLocal, Ria: resultRia})
+	var data JsonData
+	var response Response
+	loc, err := time.LoadLocation("Europe/Moscow")
 	if err != nil {
-		http.Error(w, "Error encoding JSON", http.StatusInternalServerError)
-		app.serverError(w, err)
+		response.Error = err
+		app.jsonResponse(w, http.StatusBadRequest, response)
+		return
+	}
+	decoder := json.NewDecoder(r.Body)
+	err = decoder.Decode(&data)
+	if err != nil {
+		response.Error = err
+		app.jsonResponse(w, http.StatusBadRequest, response)
 		return
 	}
 
-	w.Header().Set("Content-Type", "application/json")
-	w.Write(json)
+	if data.User != "" {
+		getSources, err := app.getSources(data.User)
+		if err != nil {
+			app.logError(err)
+			response.Error = err
+			app.jsonResponse(w, http.StatusInternalServerError, response)
+			return
+		}
+		if getSources != "" {
+			sources := strings.Split(getSources, ",")
+			for _, v := range sources {
+				if !app.sourceValid(v) {
+					app.logError(err)
+					response.Error = fmt.Errorf("invalid source: %v", v)
+					app.jsonResponse(w, http.StatusBadRequest, response)
+					return
+				}
+				feed, err := rssFeed(v)
+				if err != nil {
+					app.logError(err)
+					response.Error = err
+					app.jsonResponse(w, http.StatusInternalServerError, response)
+					return
+				}
+				app.logError(fmt.Errorf("feed : \n %v", feed))
+				for _, f := range feed.Items {
+					if f.PublishedParsed != nil {
+						*f.PublishedParsed = f.PublishedParsed.In(loc)
+						f.Published, err = FromTimeToString(*f.PublishedParsed)
+						f.GUID = feed.Title
+						if err != nil {
+							app.logError(err)
+							response.Error = err
+							app.jsonResponse(w, http.StatusBadRequest, response)
+							return
+						}
+					}
+					response.Feed = append(response.Feed, ResultNews{IsLocal: false, Global: f})
+				}
+			}
+		}
+	}
+
+	app.jsonResponse(w, http.StatusOK, response)
+	return
 }

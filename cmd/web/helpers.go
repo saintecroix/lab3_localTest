@@ -9,8 +9,7 @@ import (
 // Помощник serverError записывает сообщение об ошибке в errorLog и
 // затем отправляет пользователю ответ 500 "Внутренняя ошибка сервера".
 func (app *application) serverError(w http.ResponseWriter, err error) {
-	trace := fmt.Sprintf("%s\n%s", err.Error(), debug.Stack())
-	app.errorLog.Output(2, trace)
+	app.logError(err)
 
 	http.Error(w, http.StatusText(http.StatusInternalServerError), http.StatusInternalServerError)
 }
@@ -26,4 +25,9 @@ func (app *application) clientError(w http.ResponseWriter, status int) {
 // удобная оболочка вокруг clientError, которая отправляет пользователю ответ "404 Страница не найдена".
 func (app *application) notFound(w http.ResponseWriter) {
 	app.clientError(w, http.StatusNotFound)
+}
+
+func (app *application) logError(err error) {
+	trace := fmt.Sprintf("%s\n%s", err.Error(), debug.Stack())
+	app.errorLog.Output(2, trace)
 }

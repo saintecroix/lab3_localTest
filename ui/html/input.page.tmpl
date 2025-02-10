@@ -2,23 +2,12 @@
 
 {{define "title"}}Ввод данных в бд{{end}}
 
-
-
-
 {{define "main"}}
-    <div class="notification__wrap">
-        <div class="notification success">
-            <p>Заявка принято</p>
-        </div>
-        <div class="notification failure">
-            <p>Ошибка, попробуйте позже</p>
-        </div>
-    </div>
     <h2>Ввод данных в бд</h2>
-    <form action="/save_application" method="post">
+    <form id="applicationForm">
         <p>
             <label for="Number" >Номер заявки: </label>
-            <input type="number" id="Number" class="autonum" name="Number" required />
+            <input type="number" id="Number" name="Number" required />
             Например: 123412
         </p>
         <p>
@@ -248,11 +237,4 @@
         </p>
         <input type="submit" value="Добавить заявку" class="glo" />
     </form>
-
-    <script>
-        const randomNumber = Math.floor(100000 + Math.random() * 900000);
-
-        const autonum = document.querySelector('.autonum')
-        autonum.value = randomNumber;
-    </script>
 {{end}}

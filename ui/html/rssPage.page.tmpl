@@ -15,6 +15,9 @@
     <div style="margin-top: 15px;">
         <a id="addNewBtn" class="styled-link clickable hidden" style="">Написать новость</a>
     </div>
+    <div style="margin-top: 23px;">
+        <a id="addSrcBtn" class="styled-link clickable hidden" style="">Подписаться на источник</a>
+    </div>
 </div>
 <div id="addNew-modal" class="modal11 hidden">
     <div class="modal-content11">
@@ -35,6 +38,32 @@
                 </div>
             </div>
             <input type="submit" value="Добавить новость">
+        </form>
+    </div>
+</div>
+<div id="addSrc-modal" class="modal11 hidden">
+    <div class="modal-content11">
+        <form id="addSrcForm">
+            <div class="form_wrap">
+                <h2>Подпишитесь на источник!</h2>
+            </div>
+            <div class="form_wrap">
+                <div class="form_item">
+                    <label for="addSrcTitle">Источник:</label>
+                    <input type="text" id="addSrcTitle" required style="width: 100%; height: auto;">
+                </div>
+            </div>
+            <div class="form_wrap">
+                <div class="form_item">
+                    <p style="opacity: 0.7;">
+                        Необходимо ввести
+                        <span style="font-weight: bold;">полную</span>
+                        RSS-ссылку на источник, например:<br>
+                        <a href="http://www.rian.ru/export/rss2/index.xml" style="color: inherit;">http://www.rian.ru/export/rss2/index.xml</a>
+                    </p>
+                </div>
+            </div>
+            <input type="submit" value="Подписаться">
         </form>
     </div>
 </div>
