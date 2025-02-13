@@ -1284,32 +1284,86 @@ func (app *application) sourcesPage(w http.ResponseWriter, r *http.Request) {
 }
 
 func (app *application) sources(w http.ResponseWriter, r *http.Request) {
-	type Response struct {
+	type Request struct {
 		User string `json:"user"`
 	}
-	type Request struct {
+	type Response struct {
 		Sources []string    `json:"sources"`
 		Error   interface{} `json:"error,omitempty"`
 	}
 	var response Response
 	var request Request
-	err := jsonRequest(r, response)
+	err := jsonRequest(r, &request)
 	if err != nil {
 		app.logError(err)
-		request.Error = err
-		app.jsonResponse(w, http.StatusBadRequest, request)
+		response.Error = err
+		app.jsonResponse(w, http.StatusBadRequest, response)
 		return
 	}
 
-	sources, err := app.getSources(response.User)
+	userExists, err := app.userExists(request.User)
 	if err != nil {
-		app.logError(err)
-		request.Error = err
-		app.jsonResponse(w, http.StatusBadRequest, request)
+		response.Error = fmt.Errorf("error checking user existance: %w", err).Error()
+		app.jsonResponse(w, http.StatusInternalServerError, response)
 		return
 	}
 
-	request.Sources = strings.Split(sources, ",")
-	app.jsonResponse(w, http.StatusOK, request)
+	if !userExists {
+		response.Error = "user not found"
+		app.jsonResponse(w, http.StatusBadRequest, response)
+		return
+	}
+
+	sources, err := app.getSources(request.User)
+	if err != nil {
+		app.logError(err)
+		response.Error = err
+		app.jsonResponse(w, http.StatusBadRequest, response)
+		return
+	}
+
+	response.Sources = strings.Split(sources, ",")
+	app.jsonResponse(w, http.StatusOK, response)
+	return
+}
+
+func (app *application) deleteSource(w http.ResponseWriter, r *http.Request) {
+	type UserRequest struct {
+		Sources []string `json:"sources"`
+		User    string   `json:"user"`
+	}
+	type ServerResponse struct {
+		Error interface{} `json:"error,omitempty"`
+	}
+	var response ServerResponse
+	var request UserRequest
+	err := jsonRequest(r, &request)
+	if err != nil {
+		app.logError(err)
+		response.Error = err
+		app.jsonResponse(w, http.StatusBadRequest, response)
+		return
+	}
+	userExists, err := app.userExists(request.User)
+	if err != nil {
+		app.logError(err)
+		response.Error = fmt.Errorf("error checking user existance: %w", err).Error()
+		app.jsonResponse(w, http.StatusInternalServerError, response)
+		return
+	}
+	if !userExists {
+		response.Error = "user not found"
+		app.jsonResponse(w, http.StatusBadRequest, response)
+		return
+	}
+	err = app.deleteSources(request.User, request.Sources)
+	if err != nil {
+		app.logError(err)
+		response.Error = fmt.Errorf("error deleting sources: %w", err).Error()
+		app.jsonResponse(w, http.StatusInternalServerError, response)
+		return
+	}
+	response.Error = nil
+	app.jsonResponse(w, http.StatusOK, response)
 	return
 }

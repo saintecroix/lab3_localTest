@@ -49,6 +49,8 @@ func (app *application) routes() *mux.Router {
 	m.HandleFunc("/local/{id}", app.newPage).Methods(http.MethodGet)
 	m.HandleFunc("/addSource", app.addSource).Methods(http.MethodPost)
 	m.HandleFunc("/sources", app.sourcesPage).Methods(http.MethodGet)
+	m.HandleFunc("/getSources", app.sources).Methods(http.MethodPost)
+	m.HandleFunc("/deleteSource", app.deleteSource).Methods(http.MethodPost)
 
 	fileServer := http.FileServer(http.Dir("./ui/static/"))
 	m.PathPrefix("/static/").Handler(http.StripPrefix("/static/", fileServer))

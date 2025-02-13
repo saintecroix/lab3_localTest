@@ -374,70 +374,71 @@ confirmPasswordInput?.addEventListener("input", () => {
 	}
 });
 
-const reg_form = document.getElementById("reg-form");
-const reg_username = document.getElementById("username");
-const reg_password = document.getElementById("password");
-const reg_email = document.getElementById("email");
+if (window.location.pathname === '/reg') {
+    const reg_form = document.getElementById("reg-form");
+    const reg_username = document.getElementById("username");
+    const reg_password = document.getElementById("password");
+    const reg_email = document.getElementById("email");
 
-reg_username?.addEventListener("change", () => {
-	reg_username.setCustomValidity("")
-})
+    reg_username?.addEventListener("change", () => {
+        reg_username.setCustomValidity("")
+    })
 
-reg_email?.addEventListener("change", () => {
-	reg_email.setCustomValidity("")
-})
+    reg_email?.addEventListener("change", () => {
+        reg_email.setCustomValidity("")
+    })
 
-reg_form?.addEventListener("submit", async (event) => {
-	event.preventDefault();
+    reg_form?.addEventListener("submit", async (event) => {
+        event.preventDefault();
 
-	const formData = {
-		username: reg_username.value,
-		password: reg_password.value,
-		email: reg_email.value,
-	};
+        const formData = {
+            username: reg_username.value,
+            password: reg_password.value,
+            email: reg_email.value,
+        };
 
-	console.log("FormData:", formData);
-	fetch("/registration", {
-		method: "POST",
-		headers: {
-			"Content-Type": "application/json",
-		},
-		body: JSON.stringify(formData)
-	})
-		.catch(error => {
-			console.error("Ошибка при выполнении запроса на сервер: ", error)
-		})
-		.then(response => {
-			if (!response.ok) {
-				alert("Something went wrong! Please try again.");
-			} else {
-				return response.json()
-			}
-		})
-		.then(result => {
-			if (result.success === false) {
-				const existingUsername = result.existingUsername;
-				const existingEmail = result.existingEmail;
+        console.log("FormData:", formData);
+        fetch("/registration", {
+            method: "POST",
+            headers: {
+                "Content-Type": "application/json",
+            },
+            body: JSON.stringify(formData)
+        })
+            .catch(error => {
+                console.error("Ошибка при выполнении запроса на сервер: ", error)
+            })
+            .then(response => {
+                if (!response.ok) {
+                    alert("Something went wrong! Please try again.");
+                } else {
+                    return response.json()
+                }
+            })
+            .then(result => {
+                if (result.success === false) {
+                    const existingUsername = result.existingUsername;
+                    const existingEmail = result.existingEmail;
 
-				if (existingUsername && reg_username.value === existingUsername) {
-					reg_username.setCustomValidity("Пользователь с таким именем уже существует");
-				}
-				if (existingEmail && reg_email.value === existingEmail) {
-					reg_email.setCustomValidity("Пользователь с такой почтой уже существует");
-				}
-			} else {
-				setTimeout(() => {
-					window.location.href = "/";
-				}, 1000);
-				alert("success!");
-			}
-		})
-		.catch(error => {
-			// Ошибка при выполнении запроса
-			console.error("Ошибка при выполнении запроса на сервер: ", error);
-		});
-});
-
+                    if (existingUsername && reg_username.value === existingUsername) {
+                        reg_username.setCustomValidity("Пользователь с таким именем уже существует");
+                    }
+                    if (existingEmail && reg_email.value === existingEmail) {
+                        reg_email.setCustomValidity("Пользователь с такой почтой уже существует");
+                    }
+                } else {
+                    setTimeout(() => {
+                        window.location.href = "/";
+                    }, 1000);
+                    alert("success!");
+                }
+            })
+            .catch(error => {
+                // Ошибка при выполнении запроса
+                console.error("Ошибка при выполнении запроса на сервер: ", error);
+            });
+    });
+}
 /*----------------------------------------------------------------------------------------*/
 
 // Часть передачи запросов авторизации на сервер
@@ -551,216 +552,225 @@ document.getElementById("logout").addEventListener("click", () => {
 	window.location.reload()
 });
 
-//Код для фильтра на новстной странице
-document.addEventListener("DOMContentLoaded", function () {
-	const newsFilter = document.querySelector('.news-filter');
-
-	if (newsFilter) {
-		const links = newsFilter.querySelectorAll('a.clickable');
-
-		if (links.length > 0) {
-			links.forEach(link => {
-				link.addEventListener('click', function () {
-					// Удаляем класс 'active' у всех ссылок
-					links.forEach(l => l.classList.remove('active'));
-					// Добавляем класс 'active' только к текущему элементу
-					this.classList.add('active');
-
-					// Получаем тип новостей из data-атрибута
-					const newsType = this.getAttribute('data-type');
-					// Вызываем функцию filterNews с нужным типом
-					filterNews(newsType);
-				});
-			});
-		}
-	}
+document.addEventListener('DOMContentLoaded', async () => {
+    try {
+        await getUserInfo(); // Дожидаемся получения информации о пользователе
+    } catch (error) {
+        console.error('Ошибка при загрузке информации о пользователе:', error);
+    }
 });
+
+if (window.location.pathname === '/rss') {
+//Код для фильтра на новстной странице
+    document.addEventListener("DOMContentLoaded", function () {
+        const newsFilter = document.querySelector('.news-filter');
+
+        if (newsFilter) {
+            const links = newsFilter.querySelectorAll('a.clickable');
+
+            if (links.length > 0) {
+                links.forEach(link => {
+                    link.addEventListener('click', function () {
+                        // Удаляем класс 'active' у всех ссылок
+                        links.forEach(l => l.classList.remove('active'));
+                        // Добавляем класс 'active' только к текущему элементу
+                        this.classList.add('active');
+
+                        // Получаем тип новостей из data-атрибута
+                        const newsType = this.getAttribute('data-type');
+                        // Вызываем функцию filterNews с нужным типом
+                        filterNews(newsType);
+                    });
+                });
+            }
+        }
+    });
 
 //Передача данных формы добавление новостей на сервер
-const addNewBtn = document.getElementById("addNewBtn");
-const addNewForm = document.getElementById("addNew-modal");
-const addNewTitle = document.getElementById("addNewTitle");
-const addNewText = document.getElementById("addNewText");
-const addSrcBtn = document.getElementById("addSrcBtn");
-const addSrcForm = document.getElementById("addSrc-modal");
-const addSrcTitle = document.getElementById("addSrcTitle")
+    const addNewBtn = document.getElementById("addNewBtn");
+    const addNewForm = document.getElementById("addNew-modal");
+    const addNewTitle = document.getElementById("addNewTitle");
+    const addNewText = document.getElementById("addNewText");
+    const addSrcBtn = document.getElementById("addSrcBtn");
+    const addSrcForm = document.getElementById("addSrc-modal");
+    const addSrcTitle = document.getElementById("addSrcTitle")
 
-const updateUIBasedOnToken = () => {
-	if (user_name !== "") {
-		addNewBtn.classList.remove('hidden');
-		addSrcBtn.classList.remove('hidden');
-	} else {
-		addNewBtn.classList.add('hidden');
-		addSrcBtn.classList.add('hidden');
-	}
-};
-updateUIBasedOnToken();
+    const updateUIBasedOnToken = () => {
+        if (user_name !== "") {
+            addNewBtn.classList.remove('hidden');
+            addSrcBtn.classList.remove('hidden');
+        } else {
+            addNewBtn.classList.add('hidden');
+            addSrcBtn.classList.add('hidden');
+        }
+    };
+    updateUIBasedOnToken();
 
-console.log('Пользователь: ', user_name);
-addNewBtn.addEventListener("click", () => {
-	addNewForm.classList.remove("hidden")
-});
-addSrcBtn.addEventListener("click", () => {
-	addSrcForm.classList.remove("hidden")
-});
+    console.log('Пользователь: ', user_name);
+    addNewBtn.addEventListener("click", () => {
+        addNewForm.classList.remove("hidden")
+    });
+    addSrcBtn.addEventListener("click", () => {
+        addSrcForm.classList.remove("hidden")
+    });
 
-addNewForm?.addEventListener("submit", async (event) => {
-	event.preventDefault()
+    addNewForm?.addEventListener("submit", async (event) => {
+        event.preventDefault()
 
-	const addNewData = {
-		title: addNewTitle.value,
-		text: addNewText.value,
-		user_id: user_name,
-	};
+        const addNewData = {
+            title: addNewTitle.value,
+            text: addNewText.value,
+            user_id: user_name,
+        };
 
-	fetch("/addNew", {
-		method: "POST",
-		headers: {
-			"Content-Type": "application/json",
-		},
-		body: JSON.stringify(addNewData)
-	})
-		.catch(error => {
-			console.error("Ошибка при выполнении запроса на сервер: ", error)
-		})
-		.then(addNewResponse => {
-			if (!addNewResponse.ok) {
-				alert("Something went wrong! Please try again.");
-			} else {
-				setTimeout(() => {
-					window.location.reload()
-				}, 1000);
-				alert("Success!");
-			}
-		})
-		.catch(error => {
-			console.error("Ошибка при получении данных с сервера: ", error)
-		});
-});
-addSrcForm?.addEventListener("submit", async (event) => {
-	event.preventDefault()
+        fetch("/addNew", {
+            method: "POST",
+            headers: {
+                "Content-Type": "application/json",
+            },
+            body: JSON.stringify(addNewData)
+        })
+            .catch(error => {
+                console.error("Ошибка при выполнении запроса на сервер: ", error)
+            })
+            .then(addNewResponse => {
+                if (!addNewResponse.ok) {
+                    alert("Something went wrong! Please try again.");
+                } else {
+                    setTimeout(() => {
+                        window.location.reload()
+                    }, 1000);
+                    alert("Success!");
+                }
+            })
+            .catch(error => {
+                console.error("Ошибка при получении данных с сервера: ", error)
+            });
+    });
+    addSrcForm?.addEventListener("submit", async (event) => {
+        event.preventDefault()
 
-	const addNewData = {
-		login: user_name,
-		url: addSrcTitle.value,
-	};
+        const addNewData = {
+            login: user_name,
+            url: addSrcTitle.value,
+        };
 
-	fetch("/addSource", {
-		method: "POST",
-		headers: {
-			"Content-Type": "application/json",
-		},
-		body: JSON.stringify(addNewData)
-	})
-		.catch(error => {
-			console.error("Ошибка при выполнении запроса на сервер: ", error)
-		})
-		.then(addNewResponse => {
-			if (!addNewResponse.ok) {
-				alert("Something went wrong! Please try again.");
-			} else {
-				setTimeout(() => {
-					window.location.reload()
-				}, 1000);
-				alert("Success!");
-			}
-		})
-		.catch(error => {
-			console.error("Ошибка при получении данных с сервера: ", error)
-		});
-});
+        fetch("/addSource", {
+            method: "POST",
+            headers: {
+                "Content-Type": "application/json",
+            },
+            body: JSON.stringify(addNewData)
+        })
+            .catch(error => {
+                console.error("Ошибка при выполнении запроса на сервер: ", error)
+            })
+            .then(addNewResponse => {
+                if (!addNewResponse.ok) {
+                    alert("Something went wrong! Please try again.");
+                } else {
+                    setTimeout(() => {
+                        window.location.reload()
+                    }, 1000);
+                    alert("Success!");
+                }
+            })
+            .catch(error => {
+                console.error("Ошибка при получении данных с сервера: ", error)
+            });
+    });
 
-let allNews = [];
+    let allNews = [];
 
-async function fetchNews(user_name) {
-	try {
-		const response = await fetch('/indexNews', {
-			method: 'POST',
-			headers: {
-				'Content-Type': 'application/json'
-			},
-			body: JSON.stringify({user: user_name})
-		});
+    async function fetchNews(user_name) {
+        try {
+            const response = await fetch('/indexNews', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({user: user_name})
+            });
 
-		if (!response.ok) {
-			const errorData = await response.json(); // попытка получить данные об ошибке
-			const errorMessage = errorData.Error ? errorData.Error : response.statusText;
-			console.error('Ошибка при запросе:', response.status, errorMessage);
-			throw new Error('Network response was not ok: ' + errorMessage);
-		}
+            if (!response.ok) {
+                const errorData = await response.json(); // попытка получить данные об ошибке
+                const errorMessage = errorData.Error ? errorData.Error : response.statusText;
+                console.error('Ошибка при запросе:', response.status, errorMessage);
+                throw new Error('Network response was not ok: ' + errorMessage);
+            }
 
-		let data;
-		try {
-			data = await response.json(); // Помещаем в try/catch, чтобы поймать ошибки парсинга
-		} catch (error) {
-			console.error('Ошибка при парсинге JSON:', error);
-			throw new Error('Error parsing JSON: ' + error);
-		}
+            let data;
+            try {
+                data = await response.json(); // Помещаем в try/catch, чтобы поймать ошибки парсинга
+            } catch (error) {
+                console.error('Ошибка при парсинге JSON:', error);
+                throw new Error('Error parsing JSON: ' + error);
+            }
 
-		if (!data.feed) { // Проверяем на null
-			console.warn('Полученные данные не содержат массива новостей "feed". Возможно сервер вернул ошибку.');
-			return []; // Возвращаем пустой массив
-		}
+            if (!data.feed) { // Проверяем на null
+                console.warn('Полученные данные не содержат массива новостей "feed". Возможно сервер вернул ошибку.');
+                return []; // Возвращаем пустой массив
+            }
 
-		if (!Array.isArray(data.feed)) {
-			throw new Error('Полученные данные не содержат массива новостей "feed"');
-		}
+            if (!Array.isArray(data.feed)) {
+                throw new Error('Полученные данные не содержат массива новостей "feed"');
+            }
 
-		allNews = data.feed.map(item => {
-			if (item.isLocal) {
-				return {
-					id: item.local.id,
-					title: item.local.title,
-					text: item.local.text,
-					user: item.local.user,
-					date: item.local.resDate,
-					type: 'local'
-				};
-			} else {
-				return {
-					title: item.global.title,
-					link: item.global.link,
-					date: item.global.published,
-					type: 'global',
-					author: item.global.guid || null,
-					enclosure: item.global.enclosures || null
-				};
-			}
-		});
-		return allNews;
-	} catch (error) {
-		console.error('Ошибка при загрузке новостей:', error);
-		throw error;
-	}
-}
+            allNews = data.feed.map(item => {
+                if (item.isLocal) {
+                    return {
+                        id: item.local.id,
+                        title: item.local.title,
+                        text: item.local.text,
+                        user: item.local.user,
+                        date: item.local.resDate,
+                        type: 'local'
+                    };
+                } else {
+                    return {
+                        title: item.global.title,
+                        link: item.global.link,
+                        date: item.global.published,
+                        type: 'global',
+                        author: item.global.guid || null,
+                        enclosure: item.global.enclosures || null
+                    };
+                }
+            });
+            return allNews;
+        } catch (error) {
+            console.error('Ошибка при загрузке новостей:', error);
+            throw error;
+        }
+    }
 
-function displayNews(news) {
-	const container = document.getElementById('news-container');
-	container.innerHTML = '';
+    function displayNews(news) {
+        const container = document.getElementById('news-container');
+        container.innerHTML = '';
 
-	news.sort((a, b) => new Date(b.date) - new Date(a.date));
-	news.forEach(item => {
-		const newsItem = document.createElement('div');
-		newsItem.className = 'news';
+        news.sort((a, b) => new Date(b.date) - new Date(a.date));
+        news.forEach(item => {
+            const newsItem = document.createElement('div');
+            newsItem.className = 'news';
 
-		if (item.type === 'global') {
-			newsItem.innerHTML = `
+            if (item.type === 'global') {
+                newsItem.innerHTML = `
             <a href="${item.link}" style="font-size: 18px">${item.title}</a>
             <div style="flex: 1; display: flex; flex-direction: column; justify-content: space-between;">
                ${item.enclosure?.type ? // Используем опциональную цепочку
-				(item.enclosure.type.startsWith("image/") ?
-					`<p></p>
+                    (item.enclosure.type.startsWith("image/") ?
+                        `<p></p>
 						<img style="display: block; margin-left: auto; margin-right: auto; max-width: 100%; height: auto;" src="${item.enclosure.url}"
 						alt="Изображение не найдено"/>` :
-					``) : ''}
+                        ``) : ''}
 				<div style="display: flex;">
 					<a style="text-align: left;" class="no-hover">${item.date}</a>
 					${item.author ? `<a style="margin-left: auto;" class="no-hover">${item.author}</a>` : `<a style="margin-left: auto;" class="no-hover">Внешние новости</a>`}
 				</div>
 			</div>
         `;
-		} else {
-			newsItem.innerHTML = `
+            } else {
+                newsItem.innerHTML = `
             <a href="/local/${item.id}" style="font-size: 18px">${item.title}</a>
             <div style="flex: 1; display: flex; flex-direction: column; justify-content: space-between;">
 				<p></p>
@@ -770,102 +780,304 @@ function displayNews(news) {
 				</div>
 			</div>
         `;
-		}
+            }
 
-		container.appendChild(newsItem);
-	});
+            container.appendChild(newsItem);
+        });
+    }
+
+    function filterNews(type) {
+        if (type === 'all') {
+            displayNews(allNews);
+        } else {
+            const filteredNews = allNews.filter(news => news.type === type);
+            displayNews(filteredNews);
+        }
+    }
+
+    document.addEventListener('DOMContentLoaded', async () => {
+        try {
+            await getUserInfo(); // Дожидаемся получения информации о пользователе
+            const news = await fetchNews(user_name);
+            displayNews(news);
+            updateUIBasedOnToken();
+        } catch (error) {
+            console.error('Ошибка при загрузке новостей:', error);
+        }
+    });
 }
-
-function filterNews(type) {
-	if (type === 'all') {
-		displayNews(allNews);
-	} else {
-		const filteredNews = allNews.filter(news => news.type === type);
-		displayNews(filteredNews);
-	}
-}
-
-document.addEventListener('DOMContentLoaded', async () => {
-	try {
-		await getUserInfo(); // Дожидаемся получения информации о пользователе
-		const news = await fetchNews(user_name);
-		displayNews(news);
-		updateUIBasedOnToken();
-	} catch (error) {
-		console.error('Ошибка при загрузке новостей:', error);
-	}
-});
-
 const cons_input = document.getElementById('applicationForm');
 cons_input?.addEventListener("submit", async (event) => {
-	event.preventDefault();
-	fetch('/save_application', {
-		method: 'POST',
-		headers: {
-			'Content-Type': 'application/json'
-		},
-		body: JSON.stringify({
-			number_app: document.getElementById('Number').value,
-			reg_date_app: document.getElementById('Reg_date').value,
-			status_app: document.getElementById('Status').value,
-			provide_date_app: document.getElementById('Provide_date').value,
-			departure_type_app: document.getElementById('Departure_type').value,
-			goods_app: document.getElementById('Goods').value,
-			origin_state_app: document.getElementById('Origin_state').value,
-			enter_station_app: document.getElementById('Enter_station').value,
-			region_depart_app: document.getElementById('Region_depart').value,
-			road_depart_app: document.getElementById('Road_depart').value,
-			station_depart_app: document.getElementById('Station_depart').value,
-			consigner_app: document.getElementById('Consigner').value,
-			state_destination_app: document.getElementById('State_destination').value,
-			exit_station_app: document.getElementById('Exit_station').value,
-			region_destination_app: document.getElementById('Region_destination').value,
-			road_destination_app: document.getElementById('Road_destination').value,
-			station_destination_app: document.getElementById('Station_destination').value,
-			consignee_app: document.getElementById('Consignee').value,
-			wagon_type_app: document.getElementById('Wagon_type').value,
-			property_app: document.getElementById('Property').value,
-			wagon_owner_app: document.getElementById('Wagon_owner').value,
-			payer_app: document.getElementById('Payer').value,
-			road_owner_app: document.getElementById('Road_owner').value,
-			transport_manager_app: document.getElementById('Transport_manager').value,
-			tons_declared_app: document.getElementById('Tons_declared').value,
-			tons_accepted_app: document.getElementById('Tons_accepted').value,
-			wagon_declared_app: document.getElementById('Wagon_declared').value,
-			wagon_accepted_app: document.getElementById('Wagon_accepted').value,
-			filing_date_app: document.getElementById('Filing_date').value,
-			agreement_date_app: document.getElementById('Agreement_date').value,
-			approval_date_app: document.getElementById('Approval_date').value,
-			start_date_app: document.getElementById('Start_date').value,
-			stop_date_app: document.getElementById('Stop_date').value,
-		})
-	})
-		.catch(error => {
-			// Ошибка при выполнении запроса
-			alert("Ошибка при выполнении запроса на сервер: ", error);
-		})
-		.then(response => {
-			if (response.ok) {
-				// Успешный ответ, данные получены с сервера
-				return response.json();
-			} else {
-				// Ошибка при отправке запроса
-				alert("Ошибка при получении данных с сервера.");
-			}
-		})
-		.then(data => {
-			// Данные получены и доступны в переменной data
-			console.log("Полученные данные: ", data);
-			if (data.success === false){
-				setTimeout(() => {
-					window.location.href = "/";
-				}, 1000);
-				alert(`Данные не сохранены. ${data.error}`);
-			}else{
-				setTimeout(() => {
-					window.location.href = "/";
-				}, 1000);
-				alert(`Заявка принята!`);
-			}
-		})
+    event.preventDefault();
+    fetch('/save_application', {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({
+            number_app: document.getElementById('Number').value,
+            reg_date_app: document.getElementById('Reg_date').value,
+            status_app: document.getElementById('Status').value,
+            provide_date_app: document.getElementById('Provide_date').value,
+            departure_type_app: document.getElementById('Departure_type').value,
+            goods_app: document.getElementById('Goods').value,
+            origin_state_app: document.getElementById('Origin_state').value,
+            enter_station_app: document.getElementById('Enter_station').value,
+            region_depart_app: document.getElementById('Region_depart').value,
+            road_depart_app: document.getElementById('Road_depart').value,
+            station_depart_app: document.getElementById('Station_depart').value,
+            consigner_app: document.getElementById('Consigner').value,
+            state_destination_app: document.getElementById('State_destination').value,
+            exit_station_app: document.getElementById('Exit_station').value,
+            region_destination_app: document.getElementById('Region_destination').value,
+            road_destination_app: document.getElementById('Road_destination').value,
+            station_destination_app: document.getElementById('Station_destination').value,
+            consignee_app: document.getElementById('Consignee').value,
+            wagon_type_app: document.getElementById('Wagon_type').value,
+            property_app: document.getElementById('Property').value,
+            wagon_owner_app: document.getElementById('Wagon_owner').value,
+            payer_app: document.getElementById('Payer').value,
+            road_owner_app: document.getElementById('Road_owner').value,
+            transport_manager_app: document.getElementById('Transport_manager').value,
+            tons_declared_app: document.getElementById('Tons_declared').value,
+            tons_accepted_app: document.getElementById('Tons_accepted').value,
+            wagon_declared_app: document.getElementById('Wagon_declared').value,
+            wagon_accepted_app: document.getElementById('Wagon_accepted').value,
+            filing_date_app: document.getElementById('Filing_date').value,
+            agreement_date_app: document.getElementById('Agreement_date').value,
+            approval_date_app: document.getElementById('Approval_date').value,
+            start_date_app: document.getElementById('Start_date').value,
+            stop_date_app: document.getElementById('Stop_date').value,
+        })
+    })
+        .catch(error => {
+            // Ошибка при выполнении запроса
+            alert("Ошибка при выполнении запроса на сервер: ", error);
+        })
+        .then(response => {
+            if (response.ok) {
+                // Успешный ответ, данные получены с сервера
+                return response.json();
+            } else {
+                // Ошибка при отправке запроса
+                alert("Ошибка при получении данных с сервера.");
+            }
+        })
+        .then(data => {
+            // Данные получены и доступны в переменной data
+            console.log("Полученные данные: ", data);
+            if (data.success === false) {
+                setTimeout(() => {
+                    window.location.href = "/";
+                }, 1000);
+                alert(`Данные не сохранены. ${data.error}`);
+            } else {
+                setTimeout(() => {
+                    window.location.href = "/";
+                }, 1000);
+                alert(`Заявка принята!`);
+            }
+        })
 });
+
+if (window.location.pathname === '/sources') {
+	async function getSources(user_name, containerId) {
+		try {
+			const response = await fetch('/getSources', {
+				method: 'POST',
+				headers: {
+					'Content-Type': 'application/json'
+				},
+				body: JSON.stringify({user: user_name})
+			});
+
+			let data;
+			try {
+				data = await response.json();
+			} catch (error) {
+				console.error('Ошибка при парсинге JSON:', error);
+				throw new Error('Error parsing JSON: ' + error);
+			}
+
+			const container = document.getElementById(containerId);
+			if (!container) {
+				console.error(`Контейнер с ID "${containerId}" не найден.`);
+				return;
+			}
+			container.innerHTML = ''; // Очищаем контейнер перед отрисовкой
+
+			console.log("Подписки: ", data.sources)
+			if (!Array.isArray(data.sources)) {
+				if (!data.Error) {
+					const noSubscriptions = document.createElement('p');
+					noSubscriptions.textContent = "У Вас еще нет подписок!";
+					container.appendChild(noSubscriptions);
+				} else {
+					console.error("Ошибка на сервере:", data.Error);
+					const errorMessage = document.createElement('p');
+					errorMessage.textContent = "Произошла ошибка при загрузке подписок.";
+					container.appendChild(errorMessage);
+				}
+				return;
+			}
+
+			// Отрисовка таблицы
+			const table = document.createElement('table');
+			table.classList.add('subscriptions-table');
+
+			// Заголовок таблицы
+			const thead = document.createElement('thead');
+			const headerRow = document.createElement('tr');
+			const sourceHeader = document.createElement('th');
+			sourceHeader.textContent = 'Источник';
+			const selectHeader = document.createElement('th');
+			selectHeader.textContent = 'Выбрать';
+
+			headerRow.appendChild(sourceHeader);
+			headerRow.appendChild(selectHeader);
+			thead.appendChild(headerRow);
+			table.appendChild(thead);
+
+			// Тело таблицы
+			const tbody = document.createElement('tbody');
+			let allChecked = false; // Начальное состояние "выбрать все"
+
+			// Функция для создания строки таблицы для каждого источника
+			function createTableRow(source) {
+				const row = document.createElement('tr');
+
+				const sourceCell = document.createElement('td');
+				sourceCell.textContent = source;
+				row.appendChild(sourceCell);
+
+				const selectCell = document.createElement('td');
+				selectCell.classList.add('subscription-checkbox-cell');
+
+				const checkbox = document.createElement('input');
+				checkbox.type = 'checkbox';
+				checkbox.id = `subscription-${source}`;  // Уникальный ID для чекбокса
+				checkbox.checked = false; // По умолчанию не выбрано
+
+				const label = document.createElement('label'); // Для улучшения доступности
+				label.htmlFor = `subscription-${source}`; // Связываем label с чекбоксом
+				label.classList.add('subscription-checkbox-label');
+				label.innerHTML = '&#10008;'; // По умолчанию крестик
+
+				checkbox.addEventListener('change', () => {
+					label.innerHTML = checkbox.checked ? '&#10004;' : '&#10008;'; // Обновляем символ
+					updateSubmitButtonState(); // Обновляем состояние кнопки "Отписаться" при изменении чекбокса
+				});
+
+				selectCell.appendChild(checkbox);
+				selectCell.appendChild(label);
+				row.appendChild(selectCell);
+
+				return row;
+			}
+
+			// Создаем строки для каждого источника
+			data.sources.forEach(source => {
+				const row = createTableRow(source);
+				tbody.appendChild(row);
+			});
+
+			table.appendChild(tbody);
+			container.appendChild(table);
+
+			// "Выбрать все"
+			const selectAllDiv = document.createElement('div');
+			selectAllDiv.classList.add('select-all-container');
+
+			const selectAllCheckbox = document.createElement('input');
+			selectAllCheckbox.type = 'checkbox';
+			selectAllCheckbox.id = 'select-all';
+
+			const selectAllLabel = document.createElement('label');
+			selectAllLabel.htmlFor = 'select-all';
+			selectAllLabel.textContent = 'Выбрать все';
+
+			selectAllDiv.appendChild(selectAllCheckbox);
+			selectAllDiv.appendChild(selectAllLabel);
+			container.appendChild(selectAllDiv);
+
+			// Обработчик для "Выбрать все"
+			selectAllCheckbox.addEventListener('change', () => {
+				allChecked = selectAllCheckbox.checked;
+
+				// Обновляем все чекбоксы в таблице
+				const allCheckboxes = tbody.querySelectorAll('input[type="checkbox"]');
+				allCheckboxes.forEach(cb => {
+					cb.checked = allChecked;
+					const label = cb.nextElementSibling; // Получаем label после чекбокса
+					label.innerHTML = allChecked ? '&#10004;' : '&#10008;';
+				});
+				updateSubmitButtonState()
+			});
+
+			// Кнопка "Отписаться"
+			const unsubscribeButton = document.createElement('button');
+			unsubscribeButton.textContent = 'Отписаться';
+			unsubscribeButton.classList.add('clickable'); // Используем существующий стиль
+			unsubscribeButton.id = 'unsubscribe-button';
+			unsubscribeButton.disabled = true; // Изначально кнопка неактивна
+			container.appendChild(unsubscribeButton);
+
+			// Функция для обновления состояния кнопки "Отписаться"
+			function updateSubmitButtonState() {
+				const checkedCheckboxes = tbody.querySelectorAll('input[type="checkbox"]:checked');
+				unsubscribeButton.disabled = checkedCheckboxes.length === 0;
+			}
+
+			// Обработчик для кнопки "Отписаться"
+			unsubscribeButton.addEventListener('click', async () => {
+				const checkedCheckboxes = tbody.querySelectorAll('input[type="checkbox"]:checked');
+				if (checkedCheckboxes.length === 0) {
+					return; // Если ничего не выбрано, ничего не делаем
+				}
+
+				const sourcesToDelete = Array.from(checkedCheckboxes).map(checkbox => {
+					return checkbox.id.replace('subscription-', ''); // Получаем source из ID чекбокса
+				});
+
+				try {
+					const response = await fetch('/deleteSource', {
+						method: 'POST',
+						headers: {
+							'Content-Type': 'application/json'
+						},
+						body: JSON.stringify({sources: sourcesToDelete, user: user_name}) // Отправляем массив источников
+					});
+
+					if (!response.ok) {
+						throw new Error(`HTTP error! status: ${response.status}`);
+					}
+
+					// Обновляем список подписок (перезагружаем страницу или вызываем getSources заново)
+					await getSources(user_name, 'subscriptions-container'); // Перезагружаем список
+				} catch (error) {
+					console.error('Ошибка при отписке:', error);
+					alert('Произошла ошибка при отписке. Пожалуйста, попробуйте позже.');
+				}
+			});
+			updateSubmitButtonState();
+
+		} catch (error) {
+			console.error('Ошибка при загрузке подписок:', error);
+			const container = document.getElementById(containerId);
+			if (container) {
+				container.innerHTML = `<p>Ошибка при загрузке подписок: ${error.message}</p>`;
+			}
+		}
+	}
+
+	document.addEventListener('DOMContentLoaded', async () => {
+		let userName;
+		try {
+			userName = await getUserInfo(); // Дожидаемся завершения getUserInfo
+			console.log("Имя пользователя после await: ", userName);
+			await getSources(userName, 'subscriptions-container'); // Вызываем getSources только после получения userName
+		} catch (error) {
+			console.error('Ошибка при загрузке информации о пользователе или подписок:', error);
+		}
+	});
+}

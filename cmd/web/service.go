@@ -477,14 +477,98 @@ func (app *application) getSources(user string) (string, error) {
 	if err != nil {
 		return "", fmt.Errorf("error bad db request: %w", err)
 	}
+	defer getData.Close() // Важно закрывать rows после использования
+
 	var sources string
 	for getData.Next() {
-		err = getData.Scan(&sources)
+		var sourcesPtr *string          // Использовать указатель на string
+		err = getData.Scan(&sourcesPtr) // Сканировать в указатель
 		if err != nil {
 			return "", fmt.Errorf("error bad response from db: %w", err)
 		}
+
+		if sourcesPtr != nil { // Проверить на NULL
+			sources = *sourcesPtr // Разыменовать указатель, если не NULL
+		} else {
+			sources = "" // Если NULL, то sources = ""
+		}
 	}
+
+	err = getData.Err() // Проверить на ошибки после итерации
+	if err != nil {
+		return "", fmt.Errorf("error after iteration: %w", err)
+	}
+
 	return sources, nil
+}
+
+func (app *application) deleteSources(user string, sources []string) error {
+	userExist, err := app.userExists(user)
+	if err != nil {
+		return fmt.Errorf("error bad db request: %w", err)
+	}
+	if !userExist {
+		return fmt.Errorf("user %s does not exist", user)
+	}
+
+	oldSources, err := app.getSources(user)
+	if err != nil {
+		return fmt.Errorf("error bad db request: %w", err)
+	}
+
+	mp := make(map[string]bool)
+	for _, s := range sources {
+		mp[s] = true
+	}
+
+	old := strings.Split(oldSources, ",")
+	result := make([]string, 0)
+	for _, s := range old {
+		s = strings.TrimSpace(s)
+		if s != "" {
+			if _, ok := mp[s]; !ok {
+				result = append(result, s)
+			}
+		}
+	}
+
+	tx, err := app.db.Begin()
+	if err != nil {
+		return fmt.Errorf("error starting transaction: %w", err)
+	}
+
+	defer func() {
+		if err != nil {
+			rbErr := tx.Rollback()
+			if rbErr != nil {
+				fmt.Printf("Failed to rollback transaction: %v\n", rbErr)
+			}
+			return
+		}
+	}()
+
+	_, err = tx.Exec("UPDATE user SET news_sources = NULL WHERE login = ?", user)
+	if err != nil {
+		return fmt.Errorf("error setting news_sources to NULL: %w", err)
+	}
+
+	for _, source := range result {
+		source = strings.TrimSpace(source)
+		if source != "" {
+			_, err = tx.Exec(
+				"UPDATE `user` SET `news_sources` = CASE WHEN `news_sources` IS NULL THEN ? ELSE CONCAT(`news_sources`, ',', ?) END WHERE `login` = ?", source, source, user)
+			if err != nil {
+				return fmt.Errorf("error updating news_sources with source %s: %w", source, err)
+			}
+		}
+	}
+
+	err = tx.Commit()
+	if err != nil {
+		return fmt.Errorf("error committing transaction: %w", err)
+	}
+
+	return nil
 }
 
 func rssFeed(link string) (news *gofeed.Feed, err error) {
@@ -658,72 +742,5 @@ func (app *application) indexNews(w http.ResponseWriter, r *http.Request) {
 }
 
 func (app *application) test(w http.ResponseWriter, r *http.Request) {
-	type JsonData struct {
-		User string `json:"user,omitempty"`
-	}
-	type Response struct {
-		Feed  []ResultNews `json:"feed"`
-		Error interface{}  `json:"error"`
-	}
-	var data JsonData
-	var response Response
-	loc, err := time.LoadLocation("Europe/Moscow")
-	if err != nil {
-		response.Error = err
-		app.jsonResponse(w, http.StatusBadRequest, response)
-		return
-	}
-	decoder := json.NewDecoder(r.Body)
-	err = decoder.Decode(&data)
-	if err != nil {
-		response.Error = err
-		app.jsonResponse(w, http.StatusBadRequest, response)
-		return
-	}
 
-	if data.User != "" {
-		getSources, err := app.getSources(data.User)
-		if err != nil {
-			app.logError(err)
-			response.Error = err
-			app.jsonResponse(w, http.StatusInternalServerError, response)
-			return
-		}
-		if getSources != "" {
-			sources := strings.Split(getSources, ",")
-			for _, v := range sources {
-				if !app.sourceValid(v) {
-					app.logError(err)
-					response.Error = fmt.Errorf("invalid source: %v", v)
-					app.jsonResponse(w, http.StatusBadRequest, response)
-					return
-				}
-				feed, err := rssFeed(v)
-				if err != nil {
-					app.logError(err)
-					response.Error = err
-					app.jsonResponse(w, http.StatusInternalServerError, response)
-					return
-				}
-				app.logError(fmt.Errorf("feed : \n %v", feed))
-				for _, f := range feed.Items {
-					if f.PublishedParsed != nil {
-						*f.PublishedParsed = f.PublishedParsed.In(loc)
-						f.Published, err = FromTimeToString(*f.PublishedParsed)
-						f.GUID = feed.Title
-						if err != nil {
-							app.logError(err)
-							response.Error = err
-							app.jsonResponse(w, http.StatusBadRequest, response)
-							return
-						}
-					}
-					response.Feed = append(response.Feed, ResultNews{IsLocal: false, Global: f})
-				}
-			}
-		}
-	}
-
-	app.jsonResponse(w, http.StatusOK, response)
-	return
 }
